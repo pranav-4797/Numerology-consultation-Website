@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { Sparkles, MapPin, Phone, Mail, Clock } from 'lucide-react';
+import Image from 'next/image';
+import { MapPin, Phone, Mail, Clock } from 'lucide-react';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -53,8 +54,15 @@ export default function Footer() {
           {/* Brand Column */}
           <div className="space-y-5">
             <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center relative">
+                <Image
+                  src="/logo.jpg"
+                  alt="Divya Urja Logo"
+                  width={40}
+                  height={40}
+                  className="w-full h-full object-cover"
+                  unoptimized
+                />
               </div>
               <div>
                 <h3 className="font-playfair text-lg font-bold">Divya Urja</h3>
