@@ -18,7 +18,7 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
       <div className="min-h-screen bg-gray-50">
         <AdminSidebar />
         <AdminNavbar />
-        <main className="lg:ml-64 pt-16 p-4 sm:p-6 lg:p-8">
+        <main className="lg:ml-64 pt-20 pb-4 px-4 sm:pt-24 sm:pb-6 sm:px-6 lg:pt-24 lg:pb-8 lg:px-8">
           {children}
         </main>
       </div>
