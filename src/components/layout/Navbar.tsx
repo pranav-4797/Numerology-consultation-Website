@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Sparkles, Globe } from 'lucide-react';
+import { Menu, X, Globe } from 'lucide-react';
 import { getSectionVisibility } from '@/services/firestore';
 import type { SectionVisibility } from '@/services/firestore';
 import { useLanguage } from '@/context/LanguageContext';
@@ -75,8 +76,15 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/20 group-hover:shadow-primary/40 transition-shadow">
-              <Sparkles className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center shadow-lg shadow-primary/20 group-hover:shadow-primary/40 transition-shadow relative">
+              <Image
+                src="/logo.jpg"
+                alt="Divya Urja Logo"
+                width={40}
+                height={40}
+                className="w-full h-full object-cover"
+                unoptimized
+              />
             </div>
             <div>
               <h1 className="font-playfair text-lg font-bold text-text leading-tight">

@@ -2,11 +2,12 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import NextImage from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
-import { Menu, X, LogOut, ExternalLink, Sparkles,
+import { Menu, X, LogOut, ExternalLink,
   LayoutDashboard, Layers, FileText, Calendar, GraduationCap,
   MessageSquare, Image, Users, CalendarCheck, ClipboardList, Settings
 } from 'lucide-react';
@@ -67,8 +68,15 @@ export default function AdminNavbar() {
           <div className="absolute left-0 top-0 bottom-0 w-64 bg-white shadow-2xl">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
-                  <Sparkles className="w-4 h-4 text-white" />
+                <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center relative">
+                  <NextImage
+                    src="/logo.jpg"
+                    alt="Divya Urja Logo"
+                    width={32}
+                    height={32}
+                    className="w-full h-full object-cover"
+                    unoptimized
+                  />
                 </div>
                 <span className="font-playfair text-sm font-bold text-text">Admin</span>
               </div>

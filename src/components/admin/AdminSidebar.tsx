@@ -1,10 +1,11 @@
 'use client';
 
 import Link from 'next/link';
+import NextImage from 'next/image';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, Layers, FileText, Calendar, GraduationCap,
-  MessageSquare, Image, Users, Sparkles, CalendarCheck, ClipboardList, Settings,
+  MessageSquare, Image, Users, CalendarCheck, ClipboardList, Settings,
 } from 'lucide-react';
 
 const menuItems = [
@@ -28,8 +29,15 @@ export default function AdminSidebar() {
     <aside className="fixed left-0 top-0 bottom-0 w-64 bg-white border-r border-gray-100 z-40 hidden lg:block">
       {/* Logo */}
       <div className="flex items-center gap-2 px-6 py-6 border-b border-gray-100">
-        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
-          <Sparkles className="w-4 h-4 text-white" />
+        <div className="w-9 h-9 rounded-lg overflow-hidden flex items-center justify-center relative">
+          <NextImage
+            src="/logo.jpg"
+            alt="Divya Urja Logo"
+            width={36}
+            height={36}
+            className="w-full h-full object-cover"
+            unoptimized
+          />
         </div>
         <div>
           <h2 className="font-playfair text-sm font-bold text-text leading-tight">Divya Urja</h2>
