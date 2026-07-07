@@ -53,3 +53,55 @@ export function getZodiacSign(dateString: string): string {
   if ((month === 2 && day >= 19) || (month === 3 && day <= 20)) return 'Pisces';
   return '';
 }
+
+export const CHALDEAN_MAP: Record<string, number> = {
+  a: 1, i: 1, j: 1, q: 1, y: 1,
+  b: 2, r: 2, k: 2,
+  c: 3, g: 3, l: 3, s: 3,
+  d: 4, m: 4, t: 4,
+  e: 5, h: 5, n: 5, x: 5,
+  u: 6, v: 6, w: 6,
+  o: 7, z: 7,
+  f: 8, p: 8
+};
+
+export const PYTHAGOREAN_MAP: Record<string, number> = {
+  a: 1, j: 1, s: 1,
+  b: 2, k: 2, t: 2,
+  c: 3, l: 3, u: 3,
+  d: 4, m: 4, v: 4,
+  e: 5, n: 5, w: 5,
+  f: 6, o: 6, x: 6,
+  g: 7, p: 7, y: 7,
+  h: 8, q: 8, z: 8,
+  i: 9, r: 9
+};
+
+export interface LetterValue {
+  char: string;
+  val: number;
+}
+
+export function getChaldeanNameDetails(name: string): { sum: number; reduced: number; letters: LetterValue[] } {
+  const cleanName = name.toLowerCase().replace(/[^a-z]/g, '');
+  let sum = 0;
+  const letters = cleanName.split('').map((char) => {
+    const val = CHALDEAN_MAP[char] || 0;
+    sum += val;
+    return { char: char.toUpperCase(), val };
+  });
+  const reduced = reduceToSingleDigit(sum);
+  return { sum, reduced, letters };
+}
+
+export function getPythagoreanNameDetails(name: string): { sum: number; reduced: number; letters: LetterValue[] } {
+  const cleanName = name.toLowerCase().replace(/[^a-z]/g, '');
+  let sum = 0;
+  const letters = cleanName.split('').map((char) => {
+    const val = PYTHAGOREAN_MAP[char] || 0;
+    sum += val;
+    return { char: char.toUpperCase(), val };
+  });
+  const reduced = reduceToSingleDigit(sum);
+  return { sum, reduced, letters };
+}

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import {
-  Trash2, Phone, MessageCircle, Calendar, Clock, IndianRupee, Mail,
+  Trash2, Phone, MessageCircle, Calendar, Clock, IndianRupee, Mail, Sparkles,
 } from 'lucide-react';
 import { useFirestoreCollection } from '@/hooks/useFirestore';
 import { updateAppointment, deleteAppointment } from '@/services/firestore';
@@ -12,6 +12,7 @@ import DeleteConfirmModal from '@/components/admin/DeleteConfirmModal';
 import Loader from '@/components/ui/Loader';
 import EmptyState from '@/components/ui/EmptyState';
 import type { Appointment, AppointmentStatus } from '@/types';
+import { getChaldeanNameDetails, getPythagoreanNameDetails } from '@/utils/numerology';
 
 const STATUS_META: Record<AppointmentStatus, { label: string; badge: string }> = {
   pending: { label: 'Pending', badge: 'bg-amber-100 text-amber-700' },
@@ -27,6 +28,7 @@ export default function AdminAppointmentsPage() {
   const [filter, setFilter] = useState<AppointmentStatus | 'all'>('all');
   const [deleteModal, setDeleteModal] = useState<{ open: boolean; id: string }>({ open: false, id: '' });
   const [deleting, setDeleting] = useState(false);
+  const [spellingQuery, setSpellingQuery] = useState('');
 
   const filtered = filter === 'all' ? appointments : appointments.filter((a) => a.status === filter);
 
@@ -75,6 +77,64 @@ export default function AdminAppointmentsPage() {
         <p className="text-sm text-text/50">
           Consultation bookings from the website. Confirm the slot, then mark paid once payment is settled offline.
         </p>
+      </div>
+
+      {/* Spelling Correction Tool */}
+      <div className="bg-gradient-to-br from-primary/5 via-secondary/5 to-white rounded-2xl p-6 border border-primary/10 shadow-sm mb-8">
+        <h2 className="font-playfair text-lg font-bold text-text mb-1 flex items-center gap-1.5">
+          <span>🔮 Name Spelling &amp; Numerology Calculator</span>
+        </h2>
+        <p className="text-xs text-text/60 mb-4">
+          Type any name below to instantly see its Chaldean and Pythagorean letter breakdowns, total sum, and reduced destiny vibration. Perfect for spelling corrections!
+        </p>
+        <div className="flex flex-col md:flex-row gap-4 items-start">
+          <input
+            type="text"
+            placeholder="Type name here (e.g. PRANAV)"
+            value={spellingQuery}
+            onChange={(e) => setSpellingQuery(e.target.value)}
+            className="w-full md:w-80 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-semibold"
+          />
+          {spellingQuery && (
+            <div className="flex-1 w-full space-y-3 bg-white/50 backdrop-blur-sm p-4 rounded-xl border border-gray-100">
+              {/* Chaldean Breakdown */}
+              <div className="text-xs">
+                <div className="flex justify-between items-center mb-1">
+                  <span className="font-semibold text-primary">Chaldean System</span>
+                  <span className="text-[11px] font-bold text-text/70 bg-primary/10 px-2 py-0.5 rounded-full">
+                    Sum: {getChaldeanNameDetails(spellingQuery).sum} &rarr; Reduced: {getChaldeanNameDetails(spellingQuery).reduced}
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-1 font-mono">
+                  {getChaldeanNameDetails(spellingQuery).letters.map((l, idx) => (
+                    <span key={idx} className="bg-white border border-gray-200/60 px-2 py-1 rounded shadow-xs flex flex-col items-center">
+                      <span className="font-bold text-text text-sm">{l.char}</span>
+                      <span className="text-[9px] text-text/40 font-semibold">{l.val}</span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Pythagorean Breakdown */}
+              <div className="text-xs border-t border-gray-100/80 pt-3">
+                <div className="flex justify-between items-center mb-1">
+                  <span className="font-semibold text-secondary">Pythagorean System</span>
+                  <span className="text-[11px] font-bold text-text/70 bg-secondary/10 px-2 py-0.5 rounded-full">
+                    Sum: {getPythagoreanNameDetails(spellingQuery).sum} &rarr; Reduced: {getPythagoreanNameDetails(spellingQuery).reduced}
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-1 font-mono">
+                  {getPythagoreanNameDetails(spellingQuery).letters.map((l, idx) => (
+                    <span key={idx} className="bg-white border border-gray-200/60 px-2 py-1 rounded shadow-xs flex flex-col items-center">
+                      <span className="font-bold text-text text-sm">{l.char}</span>
+                      <span className="text-[9px] text-text/40 font-semibold">{l.val}</span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Status filter tabs */}
@@ -182,6 +242,24 @@ export default function AdminAppointmentsPage() {
                     &quot;{appointment.message}&quot;
                   </div>
                 )}
+
+                {/* Name Numerology */}
+                <div className="p-3 bg-secondary/5 rounded-xl border border-secondary/10 text-xs">
+                  <span className="block font-semibold text-text mb-1.5 flex items-center gap-1">
+                    <Sparkles className="w-3.5 h-3.5 text-secondary" />
+                    <span>Name Numerology: <strong className="text-secondary">{appointment.name}</strong></span>
+                  </span>
+                  <div className="grid grid-cols-2 gap-2 text-[10px] text-text/70 font-medium">
+                    <div className="bg-white/60 p-1.5 rounded border border-gray-100">
+                      <span className="block text-[8px] text-text/40 font-semibold uppercase">Chaldean</span>
+                      <span>Sum {getChaldeanNameDetails(appointment.name).sum} &rarr; <strong className="text-primary text-xs font-bold">{getChaldeanNameDetails(appointment.name).reduced}</strong></span>
+                    </div>
+                    <div className="bg-white/60 p-1.5 rounded border border-gray-100">
+                      <span className="block text-[8px] text-text/40 font-semibold uppercase">Pythagorean</span>
+                      <span>Sum {getPythagoreanNameDetails(appointment.name).sum} &rarr; <strong className="text-secondary text-xs font-bold">{getPythagoreanNameDetails(appointment.name).reduced}</strong></span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Paid toggle */}
