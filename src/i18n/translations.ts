@@ -60,11 +60,16 @@ const en: Dictionary = {
     'Fees are payable offline — our team will contact you on WhatsApp with payment details after registration.',
 
   // Booking
-  'book.title': 'Book an Appointment',
-  'book.subtitle': 'Choose a service, pick a convenient date and time, and we will confirm your consultation.',
+  'book.title': 'Book a Consultation',
+  'book.subtitle': 'Fill out the form with your details and date of birth to discover your numerology numbers and book a consultation.',
   'book.selectService': 'Choose a Service',
-  'book.selectDate': 'Select Date',
-  'book.selectTime': 'Select Time Slot',
+  'book.birthdate': 'Date of Birth',
+  'book.birthdatePlaceholder': 'Select your date of birth',
+  'book.personalityNumber': 'Personality Number',
+  'book.destinyNumber': 'Destiny Number',
+  'book.zodiacSign': 'Zodiac Sign',
+  'book.numerologyDetails': 'Your Numerology Profile',
+  'book.numerologyDetailsDesc': 'Discover your numbers based on your birthdate.',
   'book.yourDetails': 'Your Details',
   'book.notes': 'Anything you would like to share (optional)',
   'book.notesPlaceholder': 'Your questions or specific concerns...',
@@ -74,7 +79,7 @@ const en: Dictionary = {
     'Payment is settled at the consultation — our team will share the details after confirming your booking.',
   'book.confirm': 'Confirm Booking',
   'book.booking': 'Booking...',
-  'book.success': 'Appointment request received! We will confirm your slot shortly.',
+  'book.success': 'Request received! We will contact you on WhatsApp with details shortly.',
   'book.error': 'Something went wrong. Please try again.',
 };
 
@@ -124,11 +129,16 @@ const hi: Dictionary = {
   'register.paymentNote':
     'शुल्क ऑफलाइन देय है — रजिस्ट्रेशन के बाद हमारी टीम WhatsApp पर भुगतान विवरण साझा करेगी।',
 
-  'book.title': 'अपॉइंटमेंट बुक करें',
-  'book.subtitle': 'सेवा चुनें, सुविधाजनक तारीख और समय चुनें, और हम आपका परामर्श कन्फर्म करेंगे।',
+  'book.title': 'परामर्श बुक करें',
+  'book.subtitle': 'अंकशास्त्र संख्याओं को जानने और परामर्श बुक करने के लिए अपने विवरण और जन्म तिथि के साथ फॉर्म भरें।',
   'book.selectService': 'सेवा चुनें',
-  'book.selectDate': 'तारीख चुनें',
-  'book.selectTime': 'समय चुनें',
+  'book.birthdate': 'जन्म तिथि',
+  'book.birthdatePlaceholder': 'अपनी जन्म तिथि चुनें',
+  'book.personalityNumber': 'व्यक्तित्व संख्या (मूलांक)',
+  'book.destinyNumber': 'भाग्य संख्या (भाग्यांक)',
+  'book.zodiacSign': 'राशि चक्र',
+  'book.numerologyDetails': 'अंकशास्त्र प्रोफाइल',
+  'book.numerologyDetailsDesc': 'अपनी जन्म तिथि के आधार पर अपनी संख्याएं जानें।',
   'book.yourDetails': 'आपकी जानकारी',
   'book.notes': 'कुछ और बताना चाहें (वैकल्पिक)',
   'book.notesPlaceholder': 'आपके प्रश्न या विशेष चिंताएं...',
@@ -138,7 +148,7 @@ const hi: Dictionary = {
     'भुगतान परामर्श के समय होगा — बुकिंग कन्फर्म होने के बाद हमारी टीम विवरण साझा करेगी।',
   'book.confirm': 'बुकिंग कन्फर्म करें',
   'book.booking': 'बुक हो रहा है...',
-  'book.success': 'अपॉइंटमेंट अनुरोध मिल गया! हम जल्द ही आपका स्लॉट कन्फर्म करेंगे।',
+  'book.success': 'अनुरोध मिल गया! हम जल्द ही विवरण के साथ व्हाट्सएप पर आपसे संपर्क करेंगे।',
   'book.error': 'कुछ गलत हो गया। कृपया फिर से प्रयास करें।',
 };
 
@@ -188,11 +198,16 @@ const mr: Dictionary = {
   'register.paymentNote':
     'शुल्क ऑफलाइन देय आहे — नोंदणीनंतर आमची टीम WhatsApp वर पेमेंट तपशील पाठवेल.',
 
-  'book.title': 'अपॉइंटमेंट बुक करा',
-  'book.subtitle': 'सेवा निवडा, सोयीची तारीख आणि वेळ निवडा, आणि आम्ही तुमची सल्लामसलत निश्चित करू.',
+  'book.title': 'सल्लामसलत बुक करा',
+  'book.subtitle': 'अंकशास्त्र क्रमांक जाणून घेण्यासाठी आणि सल्लामसलत बुक करण्यासाठी तुमची माहिती आणि जन्म तारखेसह फॉर्म भरा.',
   'book.selectService': 'सेवा निवडा',
-  'book.selectDate': 'तारीख निवडा',
-  'book.selectTime': 'वेळ निवडा',
+  'book.birthdate': 'जन्म तारीख',
+  'book.birthdatePlaceholder': 'तुमची जन्म तारीख निवडा',
+  'book.personalityNumber': 'व्यक्तिमत्त्व क्रमांक (मूलांक)',
+  'book.destinyNumber': 'भाग्य क्रमांक (भाग्यांक)',
+  'book.zodiacSign': 'राशी',
+  'book.numerologyDetails': 'अंकशास्त्र प्रोफाइल',
+  'book.numerologyDetailsDesc': 'तुमच्या जन्म तारखेवर आधारित तुमचे अंकशास्त्र क्रमांक आणि राशी.',
   'book.yourDetails': 'तुमची माहिती',
   'book.notes': 'आणखी काही सांगायचे असल्यास (ऐच्छिक)',
   'book.notesPlaceholder': 'तुमचे प्रश्न किंवा विशेष चिंता...',
@@ -202,7 +217,7 @@ const mr: Dictionary = {
     'पेमेंट सल्लामसलतीच्या वेळी होईल — बुकिंग निश्चित झाल्यावर आमची टीम तपशील पाठवेल.',
   'book.confirm': 'बुकिंग निश्चित करा',
   'book.booking': 'बुक होत आहे...',
-  'book.success': 'अपॉइंटमेंट विनंती मिळाली! आम्ही लवकरच तुमचा स्लॉट निश्चित करू.',
+  'book.success': 'विनंती मिळाली! आम्ही लवकरच तपशीलांसह तुमच्याशी WhatsApp वर संपर्क साधू.',
   'book.error': 'काहीतरी चूक झाली. कृपया पुन्हा प्रयत्न करा.',
 };
 

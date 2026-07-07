@@ -6,34 +6,106 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import {
-  Calendar, Clock, CheckCircle, IndianRupee, Sparkles, Info, ArrowRight,
+  Calendar, CheckCircle, IndianRupee, Sparkles, Info, ArrowRight,
 } from 'lucide-react';
 import { appointmentSchema, type AppointmentFormData } from '@/schemas';
 import { getServices, createAppointment } from '@/services/firestore';
 import { useLanguage } from '@/context/LanguageContext';
 import Loader from '@/components/ui/Loader';
 import type { Service } from '@/types';
-
-const TIME_SLOTS = [
-  '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00',
-];
-
-function formatSlot(slot: string): string {
-  const hour = parseInt(slot.split(':')[0], 10);
-  const ampm = hour >= 12 ? 'PM' : 'AM';
-  const displayHour = hour % 12 || 12;
-  return `${displayHour}:00 ${ampm}`;
-}
+import { getPersonalityNumber, getDestinyNumber, getZodiacSign } from '@/utils/numerology';
 
 const inputClass =
   'w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-text placeholder:text-text/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all';
 
+const getTraits = (lang: string) => {
+  if (lang === 'hi') {
+    return {
+      personality: {
+        1: { title: 'नेता (Leader)', desc: 'स्वतंत्र, महत्वाकांक्षी और दृढ़ इच्छाशक्ति वाले।' },
+        2: { title: 'शांतिदूत (Peacemaker)', desc: 'सहयोगी, संवेदनशील और राजनयिक।' },
+        3: { title: 'रचनात्मक (Creative)', desc: 'अभिव्यंजक, आनंदमयी और सामाजिक।' },
+        4: { title: 'निर्माता (Builder)', desc: 'व्यावहारिक, अनुशासित और काम के प्रति समर्पित।' },
+        5: { title: 'खोजी (Explorer)', desc: 'साहसी, ऊर्जावान और स्वतंत्रता प्रिय।' },
+        6: { title: 'संरक्षक (Nurturer)', desc: 'जिम्मेदार, देखभाल करने वाले और कलात्मक।' },
+        7: { title: 'जिज्ञासु (Seeker)', desc: 'विश्लेषणात्मक, आध्यात्मिक और अंतर्मुखी।' },
+        8: { title: 'विजेता (Achiever)', desc: 'लक्ष्य-उन्मुख, शक्तिशाली और भौतिक रूप से सफल।' },
+        9: { title: 'परोपकारी (Humanitarian)', desc: 'सहानुभूतिशील, आदर्शवादी और उदार।' },
+      },
+      destiny: {
+        1: { title: 'नेतृत्व मार्ग', desc: 'आत्मनिर्भरता, नवाचार और नेतृत्व का मार्ग।' },
+        2: { title: 'सामंजस्य मार्ग', desc: 'सहयोग, कूटनीति और साझेदारी का मार्ग।' },
+        3: { title: 'अभिव्यक्ति मार्ग', desc: 'संचार, रचनात्मकता और आनंद फैलाने का मार्ग।' },
+        4: { title: 'स्थिरता मार्ग', desc: 'मजबूत नींव रखने, अनुशासन और सेवा का मार्ग।' },
+        5: { title: 'परिवर्तन मार्ग', desc: 'बहुमुखी प्रतिभा, रोमांच और जीवन के अनुभवों का मार्ग।' },
+        6: { title: 'सेवा मार्ग', desc: 'पारिवारिक जिम्मेदारी, प्रेम और उपचार का मार्ग।' },
+        7: { title: 'ज्ञान मार्ग', desc: 'बुद्धि, ध्यान और आध्यात्मिक खोज का मार्ग।' },
+        8: { title: 'सफलता मार्ग', desc: 'अधिकार, वित्तीय प्रबंधन और संगठन का मार्ग।' },
+        9: { title: 'मानवता मार्ग', desc: 'सार्वभौमिक प्रेम, करुणा और वैश्विक चेतना का मार्ग।' },
+      }
+    };
+  }
+  if (lang === 'mr') {
+    return {
+      personality: {
+        1: { title: 'नेता (Leader)', desc: 'स्वतंत्र, महत्त्वाकांक्षी आणि दृढनिश्चयी.' },
+        2: { title: 'शांततादूत (Peacemaker)', desc: 'सहकारी, संवेदनशील आणि मुत्सद्दी.' },
+        3: { title: 'सर्जनशील (Creative)', desc: 'अभिव्यक्त करणारा, आनंदी आणि सामाजिक.' },
+        4: { title: 'निर्माता (Builder)', desc: 'व्यावहारिक, शिस्तप्रिय आणि तपशीलवार काम करणारे.' },
+        5: { title: 'संशोधक (Explorer)', desc: 'धाडसी, गतिमान आणि स्वातंत्र्यप्रिय.' },
+        6: { title: 'पालक (Nurturer)', desc: 'जबाबदार, काळजीवाहू आणि कलात्मक.' },
+        7: { title: 'जिज्ञासू (Seeker)', desc: 'विश्लेषणात्मक, आध्यात्मिक आणि अंतर्मुखी.' },
+        8: { title: 'यशस्वी (Achiever)', desc: 'ध्येयवादी, शक्तिशाली आणि भौतिक यश मिळवणारे.' },
+        9: { title: 'परोपकारी (Humanitarian)', desc: 'दयाळू, आदर्शवादी आणि उदार.' },
+      },
+      destiny: {
+        1: { title: 'नेतृत्व मार्ग', desc: 'आत्मनिर्भरता, नाविन्य आणि नेतृत्व मिळवण्याचा मार्ग.' },
+        2: { title: 'सामंजस्य मार्ग', desc: 'सहकार्य, मुत्सद्देगिरी आणि भागीदारीचा मार्ग.' },
+        3: { title: 'अभिव्यक्ती मार्ग', desc: 'संवाद, सर्जनशीलता आणि आनंद पसरवण्याचा मार्ग.' },
+        4: { title: 'स्थिरता मार्ग', desc: 'मजबूत पाया रचण्याचा, शिस्त आणि सेवेचा मार्ग.' },
+        5: { title: 'बदल मार्ग', desc: 'अष्टपैलू पात्रता, साहस आणि जीवन अनुभवांचा मार्ग.' },
+        6: { title: 'सेवा मार्ग', desc: 'कौटुंबिक जबाबदारी, प्रेम आणि सेवा करण्याचा मार्ग.' },
+        7: { title: 'ज्ञान मार्ग', desc: 'बुद्धी, ध्यान आणि आध्यात्मिक शोधाचा मार्ग.' },
+        8: { title: 'यशस्वी मार्ग', desc: 'अधिकार, आर्थिक नियोजन आणि व्यवस्थापनाचा मार्ग.' },
+        9: { title: 'मानवता मार्ग', desc: 'वैश्विक प्रेम, सहानुभूती आणि जागतिक कल्याणाचा मार्ग.' },
+      }
+    };
+  }
+  // English default
+  return {
+    personality: {
+      1: { title: 'Leader', desc: 'Independent, ambitious, and strong-willed.' },
+      2: { title: 'Peacemaker', desc: 'Cooperative, sensitive, and diplomatic.' },
+      3: { title: 'Creative', desc: 'Expressive, joyful, and highly social.' },
+      4: { title: 'Builder', desc: 'Practical, disciplined, and detail-oriented.' },
+      5: { title: 'Explorer', desc: 'Adventurous, dynamic, and freedom-loving.' },
+      6: { title: 'Nurturer', desc: 'Responsible, caring, and harmonious.' },
+      7: { title: 'Seeker', desc: 'Analytical, spiritual, and introspective.' },
+      8: { title: 'Achiever', desc: 'Goal-oriented, powerful, and successful.' },
+      9: { title: 'Humanitarian', desc: 'Compassionate, idealistic, and generous.' },
+    },
+    destiny: {
+      1: { title: 'Leadership', desc: 'Path of self-reliance, innovation, and guiding others.' },
+      2: { title: 'Harmony', desc: 'Path of collaboration, diplomacy, and peace-keeping.' },
+      3: { title: 'Expression', desc: 'Path of communication, creativity, and spreading joy.' },
+      4: { title: 'Stability', desc: 'Path of building strong foundations, discipline, and service.' },
+      5: { title: 'Freedom', desc: 'Path of versatility, experiencing life, and adapting to change.' },
+      6: { title: 'Service', desc: 'Path of family responsibility, loving nurture, and healing.' },
+      7: { title: 'Wisdom', desc: 'Path of study, introspection, and spiritual analysis.' },
+      8: { title: 'Abundance', desc: 'Path of power, organizing, and material/financial success.' },
+      9: { title: 'Humanitarian', desc: 'Path of universal love, compassion, and global healing.' },
+    }
+  };
+};
+
 export default function BookAppointmentPage() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
+
+  const traits = getTraits(lang);
 
   const {
     register,
@@ -44,12 +116,16 @@ export default function BookAppointmentPage() {
     formState: { errors },
   } = useForm<AppointmentFormData>({
     resolver: zodResolver(appointmentSchema),
-    defaultValues: { serviceId: '', date: '', timeSlot: '', message: '' },
+    defaultValues: { serviceId: '', birthdate: '', message: '' },
   });
 
   const selectedServiceId = watch('serviceId');
-  const selectedSlot = watch('timeSlot');
+  const birthdate = watch('birthdate');
   const selectedService = services.find((s) => s.id === selectedServiceId);
+
+  const personalityNumber = birthdate ? getPersonalityNumber(birthdate) : 0;
+  const destinyNumber = birthdate ? getDestinyNumber(birthdate) : 0;
+  const zodiacSign = birthdate ? getZodiacSign(birthdate) : '';
 
   useEffect(() => {
     getServices()
@@ -66,8 +142,6 @@ export default function BookAppointmentPage() {
       .finally(() => setLoading(false));
   }, [setValue]);
 
-  const minDate = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-
   const onSubmit = async (data: AppointmentFormData) => {
     const service = services.find((s) => s.id === data.serviceId);
     setSubmitting(true);
@@ -79,8 +153,10 @@ export default function BookAppointmentPage() {
         serviceId: data.serviceId,
         serviceTitle: service?.title ?? '',
         fees: service?.fees ?? '',
-        date: data.date,
-        timeSlot: data.timeSlot,
+        birthdate: data.birthdate,
+        personalityNumber,
+        destinyNumber,
+        zodiacSign,
         message: data.message ?? '',
         status: 'pending',
         paid: false,
@@ -191,42 +267,99 @@ export default function BookAppointmentPage() {
                 {errors.serviceId && <p className="text-xs text-red-500 mt-2">{errors.serviceId.message}</p>}
               </div>
 
-              {/* Step 2: Date & Time */}
+              {/* Step 2: Date of Birth */}
               <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-gray-100">
                 <div className="flex items-center gap-2 mb-5">
                   <Calendar className="w-5 h-5 text-primary" />
                   <h2 className="font-playfair text-xl font-bold text-text">
-                    {t('book.selectDate')} &amp; {t('book.selectTime')}
+                    {t('book.birthdate')}
                   </h2>
                 </div>
                 <div className="mb-5">
-                  <label className="block text-sm font-medium text-text mb-1.5">{t('book.selectDate')}</label>
-                  <input type="date" min={minDate} {...register('date')} className={inputClass} />
-                  {errors.date && <p className="text-xs text-red-500 mt-1">{errors.date.message}</p>}
+                  <label className="block text-sm font-medium text-text mb-1.5">{t('book.birthdate')}</label>
+                  <input
+                    type="date"
+                    max={new Date().toISOString().split('T')[0]}
+                    {...register('birthdate')}
+                    className={inputClass}
+                  />
+                  {errors.birthdate && <p className="text-xs text-red-500 mt-1">{errors.birthdate.message}</p>}
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-text mb-1.5">
-                    <Clock className="w-3.5 h-3.5 inline mr-1 text-primary/70" />
-                    {t('book.selectTime')}
-                  </label>
-                  <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
-                    {TIME_SLOTS.map((slot) => (
-                      <button
-                        type="button"
-                        key={slot}
-                        onClick={() => setValue('timeSlot', slot, { shouldValidate: true })}
-                        className={`px-2 py-2.5 text-xs font-semibold rounded-xl border-2 transition-all ${
-                          selectedSlot === slot
-                            ? 'border-primary bg-primary text-white'
-                            : 'border-gray-100 text-text/60 hover:border-primary/30'
-                        }`}
-                      >
-                        {formatSlot(slot)}
-                      </button>
-                    ))}
-                  </div>
-                  {errors.timeSlot && <p className="text-xs text-red-500 mt-2">{errors.timeSlot.message}</p>}
-                </div>
+
+                {/* Dynamically computed Numerology profile */}
+                {birthdate && personalityNumber > 0 && destinyNumber > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mt-6 p-6 rounded-2xl bg-gradient-to-br from-primary/5 to-secondary/5 border border-primary/10"
+                  >
+                    <div className="flex items-center gap-2 mb-4">
+                      <Sparkles className="w-4 h-4 text-primary animate-pulse" />
+                      <h3 className="font-playfair font-bold text-text text-base">
+                        {t('book.numerologyDetails')}
+                      </h3>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {/* Personality Number */}
+                      <div className="bg-white/60 backdrop-blur-sm p-4 rounded-xl border border-gray-100/50 flex flex-col items-center text-center shadow-sm">
+                        <span className="text-xs font-semibold text-text/50 uppercase tracking-wider">
+                          {t('book.personalityNumber')}
+                        </span>
+                        <span className="text-4xl font-extrabold text-primary my-2 bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent drop-shadow-sm">
+                          {personalityNumber}
+                        </span>
+                        <span className="text-xs font-bold text-text/80 mb-1">
+                          {traits.personality[personalityNumber as keyof typeof traits.personality]?.title}
+                        </span>
+                        <p className="text-[11px] text-text/60 leading-relaxed">
+                          {traits.personality[personalityNumber as keyof typeof traits.personality]?.desc}
+                        </p>
+                      </div>
+
+                      {/* Destiny Number */}
+                      <div className="bg-white/60 backdrop-blur-sm p-4 rounded-xl border border-gray-100/50 flex flex-col items-center text-center shadow-sm">
+                        <span className="text-xs font-semibold text-text/50 uppercase tracking-wider">
+                          {t('book.destinyNumber')}
+                        </span>
+                        <span className="text-4xl font-extrabold text-secondary my-2 bg-gradient-to-r from-secondary to-secondary/80 bg-clip-text text-transparent drop-shadow-sm">
+                          {destinyNumber}
+                        </span>
+                        <span className="text-xs font-bold text-text/80 mb-1">
+                          {traits.destiny[destinyNumber as keyof typeof traits.destiny]?.title}
+                        </span>
+                        <p className="text-[11px] text-text/60 leading-relaxed">
+                          {traits.destiny[destinyNumber as keyof typeof traits.destiny]?.desc}
+                        </p>
+                      </div>
+
+                      {/* Zodiac Sign */}
+                      <div className="bg-white/60 backdrop-blur-sm p-4 rounded-xl border border-gray-100/50 flex flex-col items-center justify-center text-center shadow-sm">
+                        <span className="text-xs font-semibold text-text/50 uppercase tracking-wider">
+                          {t('book.zodiacSign')}
+                        </span>
+                        <span className="text-3xl font-extrabold text-text my-2.5">
+                          {zodiacSign === 'Aries' && '♈'}
+                          {zodiacSign === 'Taurus' && '♉'}
+                          {zodiacSign === 'Gemini' && '♊'}
+                          {zodiacSign === 'Cancer' && '♋'}
+                          {zodiacSign === 'Leo' && '♌'}
+                          {zodiacSign === 'Virgo' && '♍'}
+                          {zodiacSign === 'Libra' && '♎'}
+                          {zodiacSign === 'Scorpio' && '♏'}
+                          {zodiacSign === 'Sagittarius' && '♐'}
+                          {zodiacSign === 'Capricorn' && '♑'}
+                          {zodiacSign === 'Aquarius' && '♒'}
+                          {zodiacSign === 'Pisces' && '♓'}
+                          <span className="ml-1 bg-gradient-to-r from-text to-text/70 bg-clip-text text-transparent">{zodiacSign}</span>
+                        </span>
+                        <p className="text-[11px] text-text/50 leading-relaxed mt-1">
+                          Your sun sign based on Western astrology.
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
               </div>
 
               {/* Step 3: Details */}

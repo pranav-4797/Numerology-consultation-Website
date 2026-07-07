@@ -91,8 +91,12 @@ export interface Appointment {
   serviceId: string;
   serviceTitle: string;
   fees: string;
-  date: string;
-  timeSlot: string;
+  date?: string;
+  timeSlot?: string;
+  birthdate?: string;
+  personalityNumber?: number;
+  destinyNumber?: number;
+  zodiacSign?: string;
   message: string;
   status: AppointmentStatus;
   paid: boolean;

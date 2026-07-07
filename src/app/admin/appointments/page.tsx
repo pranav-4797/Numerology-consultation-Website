@@ -128,15 +128,41 @@ export default function AdminAppointmentsPage() {
                 </select>
               </div>
 
-              {/* Slot */}
-              <div className="flex items-center gap-4 p-3 bg-gray-50 rounded-xl border border-gray-100 mb-3">
-                <div className="flex items-center gap-1.5 text-sm font-semibold text-text">
-                  <Calendar className="w-4 h-4 text-primary" /> {formatDate(appointment.date)}
+              {/* Slot / Numerology Profile */}
+              {appointment.birthdate ? (
+                <div className="space-y-2 p-3 bg-gray-50 rounded-xl border border-gray-100 mb-3 text-xs">
+                  <div className="flex items-center gap-1.5 font-semibold text-text">
+                    <Calendar className="w-3.5 h-3.5 text-primary" /> 
+                    <span>Birthdate: {formatDate(appointment.birthdate)}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 mt-1">
+                    <div className="bg-white p-1.5 rounded border border-gray-200/60 text-center">
+                      <span className="block text-[10px] text-text/40 font-medium">Personality No.</span>
+                      <span className="text-xs font-bold text-primary">{appointment.personalityNumber}</span>
+                    </div>
+                    <div className="bg-white p-1.5 rounded border border-gray-200/60 text-center">
+                      <span className="block text-[10px] text-text/40 font-medium">Destiny No.</span>
+                      <span className="text-xs font-bold text-secondary">{appointment.destinyNumber}</span>
+                    </div>
+                  </div>
+                  <div className="bg-white p-1.5 rounded border border-gray-200/60 text-center font-bold text-text/80">
+                    <span>✨ {appointment.zodiacSign}</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1.5 text-sm font-semibold text-text">
-                  <Clock className="w-4 h-4 text-primary" /> {formatTime(appointment.timeSlot)}
+              ) : (
+                <div className="flex items-center gap-4 p-3 bg-gray-50 rounded-xl border border-gray-100 mb-3">
+                  {appointment.date && (
+                    <div className="flex items-center gap-1.5 text-sm font-semibold text-text">
+                      <Calendar className="w-4 h-4 text-primary" /> {formatDate(appointment.date)}
+                    </div>
+                  )}
+                  {appointment.timeSlot && (
+                    <div className="flex items-center gap-1.5 text-sm font-semibold text-text">
+                      <Clock className="w-4 h-4 text-primary" /> {formatTime(appointment.timeSlot)}
+                    </div>
+                  )}
                 </div>
-              </div>
+              )}
 
               {/* Contact + fee */}
               <div className="space-y-2 mb-3 flex-grow">
@@ -176,7 +202,9 @@ export default function AdminAppointmentsPage() {
                 <a
                   href={getWhatsAppUrl(
                     appointment.phone.replace(/[^\d]/g, ''),
-                    `Hello ${appointment.name}, your ${appointment.serviceTitle} consultation on ${formatDate(appointment.date)} at ${formatTime(appointment.timeSlot)} is confirmed.`
+                    appointment.birthdate
+                      ? `Hello ${appointment.name}, thank you for booking a ${appointment.serviceTitle} consultation. Your Numerology Profile shows Personality No: ${appointment.personalityNumber}, Destiny No: ${appointment.destinyNumber}, Zodiac Sign: ${appointment.zodiacSign}. We will contact you soon.`
+                      : `Hello ${appointment.name}, your ${appointment.serviceTitle} consultation on ${appointment.date ? formatDate(appointment.date) : ''} at ${appointment.timeSlot ? formatTime(appointment.timeSlot) : ''} is confirmed.`
                   )}
                   target="_blank"
                   rel="noopener noreferrer"

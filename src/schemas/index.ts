@@ -50,8 +50,7 @@ export const appointmentSchema = z.object({
   phone: z.string().min(10, 'Enter a valid phone number'),
   email: z.string().email('Enter a valid email address'),
   serviceId: z.string().min(1, 'Please select a service'),
-  date: z.string().min(1, 'Please select a date'),
-  timeSlot: z.string().min(1, 'Please select a time slot'),
+  birthdate: z.string().min(1, 'Please select your birthdate'),
   message: z.string().optional(),
 });
 
