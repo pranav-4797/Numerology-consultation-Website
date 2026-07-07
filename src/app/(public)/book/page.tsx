@@ -105,6 +105,11 @@ export default function BookAppointmentPage() {
   const [submitting, setSubmitting] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
 
+  // Split Birthdate selection states for better UX
+  const [dobDay, setDobDay] = useState('');
+  const [dobMonth, setDobMonth] = useState('');
+  const [dobYear, setDobYear] = useState('');
+
   const traits = getTraits(lang);
 
   const {
@@ -142,6 +147,50 @@ export default function BookAppointmentPage() {
       .finally(() => setLoading(false));
   }, [setValue]);
 
+  // Combined Date Handler
+  const handleDobChange = (type: 'day' | 'month' | 'year', value: string) => {
+    let day = dobDay;
+    let month = dobMonth;
+    let year = dobYear;
+
+    if (type === 'day') {
+      setDobDay(value);
+      day = value;
+    } else if (type === 'month') {
+      setDobMonth(value);
+      month = value;
+    } else if (type === 'year') {
+      setDobYear(value);
+      year = value;
+    }
+
+    if (day && month && year) {
+      const combined = `${year}-${month}-${day}`;
+      setValue('birthdate', combined, { shouldValidate: true });
+    } else {
+      setValue('birthdate', '');
+    }
+  };
+
+  const getMonths = (l: string) => {
+    if (l === 'hi') {
+      return [
+        'जनवरी', 'फरवरी', 'मार्च', 'अप्रैल', 'मई', 'जून',
+        'जुलाई', 'अगस्त', 'सितंबर', 'अक्टूबर', 'नवंबर', 'दिसंबर'
+      ];
+    }
+    if (l === 'mr') {
+      return [
+        'जानेवारी', 'फेब्रुवारी', 'मार्च', 'एप्रिल', 'मे', 'जून',
+        'जुलै', 'ऑगस्ट', 'सप्टेंबर', 'ऑक्टोबर', 'नोव्हेंबर', 'डिसेंबर'
+      ];
+    }
+    return [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+  };
+
   const onSubmit = async (data: AppointmentFormData) => {
     const service = services.find((s) => s.id === data.serviceId);
     setSubmitting(true);
@@ -164,6 +213,9 @@ export default function BookAppointmentPage() {
       setConfirmed(true);
       toast.success(t('book.success'));
       reset();
+      setDobDay('');
+      setDobMonth('');
+      setDobYear('');
     } catch (error) {
       console.error('Error creating appointment:', error);
       toast.error(t('book.error'));
@@ -277,13 +329,56 @@ export default function BookAppointmentPage() {
                 </div>
                 <div className="mb-5">
                   <label className="block text-sm font-medium text-text mb-1.5">{t('book.birthdate')}</label>
-                  <input
-                    type="date"
-                    max={new Date().toISOString().split('T')[0]}
-                    {...register('birthdate')}
-                    className={inputClass}
-                  />
-                  {errors.birthdate && <p className="text-xs text-red-500 mt-1">{errors.birthdate.message}</p>}
+                  <div className="grid grid-cols-3 gap-3">
+                    {/* Day Selector */}
+                    <select
+                      value={dobDay}
+                      onChange={(e) => handleDobChange('day', e.target.value)}
+                      className={`${inputClass} cursor-pointer`}
+                    >
+                      <option value="">{lang === 'hi' ? 'दिन' : lang === 'mr' ? 'दिवस' : 'Day'}</option>
+                      {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => {
+                        const val = d < 10 ? `0${d}` : `${d}`;
+                        return (
+                          <option key={d} value={val}>
+                            {d}
+                          </option>
+                        );
+                      })}
+                    </select>
+
+                    {/* Month Selector */}
+                    <select
+                      value={dobMonth}
+                      onChange={(e) => handleDobChange('month', e.target.value)}
+                      className={`${inputClass} cursor-pointer`}
+                    >
+                      <option value="">{lang === 'hi' ? 'महीना' : lang === 'mr' ? 'महिना' : 'Month'}</option>
+                      {getMonths(lang).map((m, idx) => {
+                        const val = idx + 1 < 10 ? `0${idx + 1}` : `${idx + 1}`;
+                        return (
+                          <option key={m} value={val}>
+                            {m}
+                          </option>
+                        );
+                      })}
+                    </select>
+
+                    {/* Year Selector */}
+                    <select
+                      value={dobYear}
+                      onChange={(e) => handleDobChange('year', e.target.value)}
+                      className={`${inputClass} cursor-pointer`}
+                    >
+                      <option value="">{lang === 'hi' ? 'वर्ष' : lang === 'mr' ? 'वर्ष' : 'Year'}</option>
+                      {Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i).map((y) => (
+                        <option key={y} value={y.toString()}>
+                          {y}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {errors.birthdate && <p className="text-xs text-red-500 mt-2">{errors.birthdate.message}</p>}
                 </div>
 
                 {/* Dynamically computed Numerology profile */}
