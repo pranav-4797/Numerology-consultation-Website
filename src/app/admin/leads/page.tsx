@@ -3,11 +3,11 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import {
-  Trash2, Mail, Phone, Calendar, MessageCircle, StickyNote, Save, AlarmClock,
+  Trash2, Mail, Phone, Calendar, MessageCircle, StickyNote, Save, AlarmClock, Search, Edit, X,
 } from 'lucide-react';
 import { useFirestoreCollection } from '@/hooks/useFirestore';
 import {
-  deleteLead, updateLeadStatus, updateLeadNotes, updateLeadFollowUp,
+  deleteLead, updateLeadStatus, updateLeadNotes, updateLeadFollowUp, updateLead,
 } from '@/services/firestore';
 import { formatDate, getWhatsAppUrl } from '@/utils/helpers';
 import DeleteConfirmModal from '@/components/admin/DeleteConfirmModal';
@@ -23,6 +23,9 @@ const STATUS_META: Record<LeadStatus, { label: string; badge: string; select: st
 };
 
 const STATUS_ORDER: LeadStatus[] = ['new', 'contacted', 'converted', 'closed'];
+
+const inputClass =
+  'w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-text placeholder:text-text/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all';
 
 function getLeadStatus(lead: Lead): LeadStatus {
   return lead.status ?? (lead.contacted ? 'contacted' : 'new');
@@ -42,12 +45,56 @@ export default function AdminLeadsPage() {
   const [notesDraft, setNotesDraft] = useState<Record<string, string>>({});
   const [savingNotes, setSavingNotes] = useState<string | null>(null);
 
-  const filtered = filter === 'all' ? leads : leads.filter((l) => getLeadStatus(l) === filter);
+  // Search & Edit States
+  const [searchQuery, setSearchQuery] = useState('');
+  const [editModal, setEditModal] = useState<{ open: boolean; item: Lead | null }>({ open: false, item: null });
+  const [editForm, setEditForm] = useState({ name: '', phone: '', email: '' });
+  const [editingItem, setEditingItem] = useState(false);
+
+  const filtered = (filter === 'all' ? leads : leads.filter((l) => getLeadStatus(l) === filter))
+    .filter((l) => {
+      const q = searchQuery.toLowerCase().trim();
+      if (!q) return true;
+      return (
+        l.name?.toLowerCase().includes(q) ||
+        l.email?.toLowerCase().includes(q) ||
+        l.phone?.toLowerCase().includes(q) ||
+        l.service?.toLowerCase().includes(q) ||
+        l.message?.toLowerCase().includes(q)
+      );
+    });
 
   const counts = STATUS_ORDER.reduce(
     (acc, s) => ({ ...acc, [s]: leads.filter((l) => getLeadStatus(l) === s).length }),
     {} as Record<LeadStatus, number>
   );
+
+  const handleOpenEdit = (item: Lead) => {
+    setEditModal({ open: true, item });
+    setEditForm({
+      name: item.name || '',
+      phone: item.phone || '',
+      email: item.email || '',
+    });
+  };
+
+  const handleEditSubmit = async () => {
+    if (!editModal.item) return;
+    setEditingItem(true);
+    try {
+      await updateLead(editModal.item.id, {
+        name: editForm.name,
+        phone: editForm.phone,
+        email: editForm.email,
+      });
+      toast.success('Lead updated successfully');
+      setEditModal({ open: false, item: null });
+    } catch {
+      toast.error('Failed to update lead');
+    } finally {
+      setEditingItem(false);
+    }
+  };
 
   const handleStatusChange = async (lead: Lead, status: LeadStatus) => {
     try {
@@ -125,6 +172,22 @@ export default function AdminLeadsPage() {
             {STATUS_META[s].label} ({counts[s]})
           </button>
         ))}
+      </div>
+
+      {/* Search Panel */}
+      <div className="mb-8 w-full max-w-md">
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search by lead name, email, phone, or service..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-text/30 text-text font-medium"
+          />
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-text/30">
+            <Search className="w-4 h-4" />
+          </div>
+        </div>
       </div>
 
       {filtered.length === 0 ? (
@@ -242,6 +305,13 @@ export default function AdminLeadsPage() {
                     <Phone className="w-4 h-4" /> Call
                   </a>
                   <button
+                    onClick={() => handleOpenEdit(lead)}
+                    title="Edit lead"
+                    className="p-2 bg-blue-50 text-blue-500 hover:bg-blue-100 rounded-lg transition-colors"
+                  >
+                    <Edit className="w-4 h-4" />
+                  </button>
+                  <button
                     onClick={() => setDeleteModal({ open: true, id: lead.id })}
                     title="Delete lead"
                     className="p-2 bg-red-50 text-red-500 hover:bg-red-100 rounded-lg transition-colors"
@@ -256,6 +326,69 @@ export default function AdminLeadsPage() {
       )}
 
       <DeleteConfirmModal isOpen={deleteModal.open} onClose={() => setDeleteModal({ open: false, id: '' })} onConfirm={handleDelete} loading={deleting} title="Delete Lead" message="Are you sure you want to delete this lead? This action cannot be undone." />
+
+      {editModal.open && editModal.item && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-md shadow-xl border border-gray-100 relative">
+            <button
+              onClick={() => setEditModal({ open: false, item: null })}
+              className="absolute top-4 right-4 p-1.5 hover:bg-gray-100 rounded-full transition-colors text-text/40"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            
+            <h3 className="font-playfair text-xl font-bold text-text mb-5">Edit Lead Information</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-text/50 uppercase tracking-wider mb-1.5">Lead Name</label>
+                <input
+                  type="text"
+                  value={editForm.name}
+                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-text/50 uppercase tracking-wider mb-1.5">Phone Number</label>
+                <input
+                  type="text"
+                  value={editForm.phone}
+                  onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-text/50 uppercase tracking-wider mb-1.5">Email Address</label>
+                <input
+                  type="email"
+                  value={editForm.email}
+                  onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                  className={inputClass}
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 mt-6">
+              <button
+                type="button"
+                onClick={() => setEditModal({ open: false, item: null })}
+                className="px-4 py-2 border border-gray-200 text-sm font-semibold rounded-xl text-text/60 hover:bg-gray-50 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleEditSubmit}
+                disabled={editingItem}
+                className="px-5 py-2 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-primary/90 transition-all disabled:opacity-50 flex items-center gap-1.5"
+              >
+                {editingItem && <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

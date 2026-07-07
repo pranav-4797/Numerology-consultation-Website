@@ -153,6 +153,7 @@ export const getContacts = () => getCollection<ContactSubmission>('contacts');
 export const createContact = (data: Record<string, unknown>) => createDocument('contacts', data);
 export const deleteLead = (id: string) => deleteDocument('contacts', id);
 export const markLeadAsContacted = (id: string, contacted: boolean) => updateDocument('contacts', id, { contacted });
+export const updateLead = (id: string, data: Record<string, unknown>) => updateDocument('contacts', id, data);
 export const updateLeadStatus = (id: string, status: LeadStatus) =>
   updateDocument('contacts', id, { status, contacted: status !== 'new' });
 export const updateLeadNotes = (id: string, notes: string) => updateDocument('contacts', id, { notes });

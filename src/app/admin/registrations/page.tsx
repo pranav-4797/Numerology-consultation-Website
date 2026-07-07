@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
-import { Trash2, Phone, MessageCircle, Download } from 'lucide-react';
+import { Trash2, Phone, MessageCircle, Download, Search, Edit, X } from 'lucide-react';
 import { useFirestoreCollection } from '@/hooks/useFirestore';
 import { updateRegistration, deleteRegistration } from '@/services/firestore';
 import { formatDate, getWhatsAppUrl } from '@/utils/helpers';
@@ -18,6 +18,9 @@ const STATUS_META: Record<RegistrationStatus, { label: string; badge: string }> 
 };
 
 const STATUS_ORDER: RegistrationStatus[] = ['registered', 'confirmed', 'cancelled'];
+
+const inputClass =
+  'w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-text placeholder:text-text/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all';
 
 function exportToCsv(registrations: WorkshopRegistration[]) {
   const header = ['Name', 'Phone', 'Email', 'Workshop', 'Status', 'Paid', 'Registered On'];
@@ -43,14 +46,29 @@ export default function AdminRegistrationsPage() {
   const [deleteModal, setDeleteModal] = useState<{ open: boolean; id: string }>({ open: false, id: '' });
   const [deleting, setDeleting] = useState(false);
 
+  // Search & Edit States
+  const [searchQuery, setSearchQuery] = useState('');
+  const [editModal, setEditModal] = useState<{ open: boolean; item: WorkshopRegistration | null }>({ open: false, item: null });
+  const [editForm, setEditForm] = useState({ name: '', phone: '', email: '' });
+  const [editingItem, setEditingItem] = useState(false);
+
   const workshops = useMemo(() => {
     const titles = new Map<string, string>();
     registrations.forEach((r) => titles.set(r.workshopId, r.workshopTitle));
     return Array.from(titles.entries()).map(([id, title]) => ({ id, title }));
   }, [registrations]);
 
-  const filtered =
-    workshopFilter === 'all' ? registrations : registrations.filter((r) => r.workshopId === workshopFilter);
+  const filtered = (workshopFilter === 'all' ? registrations : registrations.filter((r) => r.workshopId === workshopFilter))
+    .filter((r) => {
+      const q = searchQuery.toLowerCase().trim();
+      if (!q) return true;
+      return (
+        r.name?.toLowerCase().includes(q) ||
+        r.email?.toLowerCase().includes(q) ||
+        r.phone?.toLowerCase().includes(q) ||
+        r.workshopTitle?.toLowerCase().includes(q)
+      );
+    });
 
   const handleStatusChange = async (registration: WorkshopRegistration, status: RegistrationStatus) => {
     try {
@@ -67,6 +85,33 @@ export default function AdminRegistrationsPage() {
       toast.success(registration.paid ? 'Marked as unpaid' : 'Marked as paid');
     } catch {
       toast.error('Failed to update payment status');
+    }
+  };
+
+  const handleOpenEdit = (item: WorkshopRegistration) => {
+    setEditModal({ open: true, item });
+    setEditForm({
+      name: item.name || '',
+      phone: item.phone || '',
+      email: item.email || '',
+    });
+  };
+
+  const handleEditSubmit = async () => {
+    if (!editModal.item) return;
+    setEditingItem(true);
+    try {
+      await updateRegistration(editModal.item.id, {
+        name: editForm.name,
+        phone: editForm.phone,
+        email: editForm.email,
+      });
+      toast.success('Registration updated successfully');
+      setEditModal({ open: false, item: null });
+    } catch {
+      toast.error('Failed to update registration');
+    } finally {
+      setEditingItem(false);
     }
   };
 
@@ -114,6 +159,22 @@ export default function AdminRegistrationsPage() {
           >
             <Download className="w-4 h-4" /> Export CSV
           </button>
+        </div>
+      </div>
+
+      {/* Search Panel */}
+      <div className="mb-6 w-full max-w-md">
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search by participant name, email, or phone..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-text/30 text-text font-medium"
+          />
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-text/30">
+            <Search className="w-4 h-4" />
+          </div>
         </div>
       </div>
 
@@ -194,6 +255,13 @@ export default function AdminRegistrationsPage() {
                           <Phone className="w-4 h-4" />
                         </a>
                         <button
+                          onClick={() => handleOpenEdit(r)}
+                          title="Edit"
+                          className="p-2 bg-blue-50 text-blue-500 hover:bg-blue-100 rounded-lg transition-colors"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
                           onClick={() => setDeleteModal({ open: true, id: r.id })}
                           title="Delete"
                           className="p-2 bg-red-50 text-red-500 hover:bg-red-100 rounded-lg transition-colors"
@@ -218,6 +286,69 @@ export default function AdminRegistrationsPage() {
         title="Delete Registration"
         message="Deleting a registration does not restore the workshop seat automatically. Continue?"
       />
+
+      {editModal.open && editModal.item && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-md shadow-xl border border-gray-100 relative">
+            <button
+              onClick={() => setEditModal({ open: false, item: null })}
+              className="absolute top-4 right-4 p-1.5 hover:bg-gray-100 rounded-full transition-colors text-text/40"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            
+            <h3 className="font-playfair text-xl font-bold text-text mb-5">Edit Registration Information</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-text/50 uppercase tracking-wider mb-1.5">Participant Name</label>
+                <input
+                  type="text"
+                  value={editForm.name}
+                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-text/50 uppercase tracking-wider mb-1.5">Phone Number</label>
+                <input
+                  type="text"
+                  value={editForm.phone}
+                  onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-text/50 uppercase tracking-wider mb-1.5">Email Address</label>
+                <input
+                  type="email"
+                  value={editForm.email}
+                  onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                  className={inputClass}
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 mt-6">
+              <button
+                type="button"
+                onClick={() => setEditModal({ open: false, item: null })}
+                className="px-4 py-2 border border-gray-200 text-sm font-semibold rounded-xl text-text/60 hover:bg-gray-50 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleEditSubmit}
+                disabled={editingItem}
+                className="px-5 py-2 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-primary/90 transition-all disabled:opacity-50 flex items-center gap-1.5"
+              >
+                {editingItem && <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

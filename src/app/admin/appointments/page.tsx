@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import {
-  Trash2, Phone, MessageCircle, Calendar, Clock, IndianRupee, Mail, Sparkles,
+  Trash2, Phone, MessageCircle, Calendar, Clock, IndianRupee, Mail, Sparkles, Search, Edit, X,
 } from 'lucide-react';
 import { useFirestoreCollection } from '@/hooks/useFirestore';
 import { updateAppointment, deleteAppointment } from '@/services/firestore';
@@ -12,7 +12,13 @@ import DeleteConfirmModal from '@/components/admin/DeleteConfirmModal';
 import Loader from '@/components/ui/Loader';
 import EmptyState from '@/components/ui/EmptyState';
 import type { Appointment, AppointmentStatus } from '@/types';
-import { getChaldeanNameDetails, getPythagoreanNameDetails } from '@/utils/numerology';
+import {
+  getChaldeanNameDetails,
+  getPythagoreanNameDetails,
+  getPersonalityNumber,
+  getDestinyNumber,
+  getZodiacSign,
+} from '@/utils/numerology';
 
 const STATUS_META: Record<AppointmentStatus, { label: string; badge: string }> = {
   pending: { label: 'Pending', badge: 'bg-amber-100 text-amber-700' },
@@ -23,19 +29,75 @@ const STATUS_META: Record<AppointmentStatus, { label: string; badge: string }> =
 
 const STATUS_ORDER: AppointmentStatus[] = ['pending', 'confirmed', 'completed', 'cancelled'];
 
+const inputClass =
+  'w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-text placeholder:text-text/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all';
+
 export default function AdminAppointmentsPage() {
   const { data: appointments, loading } = useFirestoreCollection<Appointment>('appointments', 'createdAt');
   const [filter, setFilter] = useState<AppointmentStatus | 'all'>('all');
   const [deleteModal, setDeleteModal] = useState<{ open: boolean; id: string }>({ open: false, id: '' });
   const [deleting, setDeleting] = useState(false);
   const [spellingQuery, setSpellingQuery] = useState('');
+  
+  // Search & Edit States
+  const [searchQuery, setSearchQuery] = useState('');
+  const [editModal, setEditModal] = useState<{ open: boolean; item: Appointment | null }>({ open: false, item: null });
+  const [editForm, setEditForm] = useState({ name: '', phone: '', email: '', birthdate: '' });
+  const [editingItem, setEditingItem] = useState(false);
 
-  const filtered = filter === 'all' ? appointments : appointments.filter((a) => a.status === filter);
+  const filtered = (filter === 'all' ? appointments : appointments.filter((a) => a.status === filter))
+    .filter((a) => {
+      const q = searchQuery.toLowerCase().trim();
+      if (!q) return true;
+      return (
+        a.name?.toLowerCase().includes(q) ||
+        a.email?.toLowerCase().includes(q) ||
+        a.phone?.toLowerCase().includes(q) ||
+        a.serviceTitle?.toLowerCase().includes(q)
+      );
+    });
 
   const counts = STATUS_ORDER.reduce(
     (acc, s) => ({ ...acc, [s]: appointments.filter((a) => a.status === s).length }),
     {} as Record<AppointmentStatus, number>
   );
+
+  const handleOpenEdit = (item: Appointment) => {
+    setEditModal({ open: true, item });
+    setEditForm({
+      name: item.name || '',
+      phone: item.phone || '',
+      email: item.email || '',
+      birthdate: item.birthdate || '',
+    });
+  };
+
+  const handleEditSubmit = async () => {
+    if (!editModal.item) return;
+    setEditingItem(true);
+    try {
+      const updates: Record<string, any> = {
+        name: editForm.name,
+        phone: editForm.phone,
+        email: editForm.email,
+      };
+
+      if (editForm.birthdate) {
+        updates.birthdate = editForm.birthdate;
+        updates.personalityNumber = getPersonalityNumber(editForm.birthdate);
+        updates.destinyNumber = getDestinyNumber(editForm.birthdate);
+        updates.zodiacSign = getZodiacSign(editForm.birthdate);
+      }
+
+      await updateAppointment(editModal.item.id, updates);
+      toast.success('Consultation updated successfully');
+      setEditModal({ open: false, item: null });
+    } catch {
+      toast.error('Failed to update consultation');
+    } finally {
+      setEditingItem(false);
+    }
+  };
 
   const handleStatusChange = async (appointment: Appointment, status: AppointmentStatus) => {
     try {
@@ -158,6 +220,22 @@ export default function AdminAppointmentsPage() {
             {STATUS_META[s].label} ({counts[s]})
           </button>
         ))}
+      </div>
+
+      {/* Search Panel */}
+      <div className="mb-8 w-full max-w-md">
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search by client name, email, phone, or service..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-text/30 text-text font-medium"
+          />
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-text/30">
+            <Search className="w-4 h-4" />
+          </div>
+        </div>
       </div>
 
       {filtered.length === 0 ? (
@@ -297,6 +375,13 @@ export default function AdminAppointmentsPage() {
                   <Phone className="w-4 h-4" /> Call
                 </a>
                 <button
+                  onClick={() => handleOpenEdit(appointment)}
+                  title="Edit appointment"
+                  className="p-2 bg-blue-50 text-blue-500 hover:bg-blue-100 rounded-lg transition-colors"
+                >
+                  <Edit className="w-4 h-4" />
+                </button>
+                <button
                   onClick={() => setDeleteModal({ open: true, id: appointment.id })}
                   title="Delete appointment"
                   className="p-2 bg-red-50 text-red-500 hover:bg-red-100 rounded-lg transition-colors"
@@ -317,6 +402,78 @@ export default function AdminAppointmentsPage() {
         title="Delete Appointment"
         message="Are you sure you want to delete this appointment? This action cannot be undone."
       />
+
+      {editModal.open && editModal.item && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-md shadow-xl border border-gray-100 relative">
+            <button
+              onClick={() => setEditModal({ open: false, item: null })}
+              className="absolute top-4 right-4 p-1.5 hover:bg-gray-100 rounded-full transition-colors text-text/40"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            
+            <h3 className="font-playfair text-xl font-bold text-text mb-5">Edit Consultation Information</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-text/50 uppercase tracking-wider mb-1.5">Client Name</label>
+                <input
+                  type="text"
+                  value={editForm.name}
+                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-text/50 uppercase tracking-wider mb-1.5">Phone Number</label>
+                <input
+                  type="text"
+                  value={editForm.phone}
+                  onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-text/50 uppercase tracking-wider mb-1.5">Email Address</label>
+                <input
+                  type="email"
+                  value={editForm.email}
+                  onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-text/50 uppercase tracking-wider mb-1.5">Birthdate (YYYY-MM-DD)</label>
+                <input
+                  type="date"
+                  value={editForm.birthdate}
+                  onChange={(e) => setEditForm({ ...editForm, birthdate: e.target.value })}
+                  className={inputClass}
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 mt-6">
+              <button
+                type="button"
+                onClick={() => setEditModal({ open: false, item: null })}
+                className="px-4 py-2 border border-gray-200 text-sm font-semibold rounded-xl text-text/60 hover:bg-gray-50 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleEditSubmit}
+                disabled={editingItem}
+                className="px-5 py-2 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-primary/90 transition-all disabled:opacity-50 flex items-center gap-1.5"
+              >
+                {editingItem && <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
