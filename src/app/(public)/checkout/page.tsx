@@ -135,7 +135,7 @@ ${itemsBillList}
 ----------------------------------
 *Grand Total: ₹${total.toLocaleString('en-IN')}*
 ----------------------------------
-Thank you for your order! Please share payment confirmation details.`;
+Please share payment details.`;
 
       // Clear cart
       localStorage.removeItem('divyaurja_cart');
