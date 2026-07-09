@@ -220,8 +220,9 @@ export default function AdminOrdersPage() {
                 <div class="logo-area">
                   <h1>DIVYA URJA</h1>
                   <p>Ancient Sciences & Spiritual Store</p>
-                  <p>Pune, Maharashtra, India</p>
-                  <p>Email: info@divyaurja.com</p>
+                  <p>Akola, Maharashtra, India</p>
+                  <p>Phone: +91 7218733125</p>
+                  <p>Email: divyaurja37@gmail.com</p>
                 </div>
                 <div class="invoice-details">
                   <h2>INVOICE</h2>
@@ -579,8 +580,9 @@ export default function AdminOrdersPage() {
                 <div>
                   <h1 className="font-playfair text-xl font-bold text-red-800">DIVYA URJA</h1>
                   <p className="text-xs text-text/50">Ancient Sciences & Spiritual Store</p>
-                  <p className="text-[11px] text-text/40">Pune, Maharashtra, India</p>
-                  <p className="text-[11px] text-text/40">Email: billing@divyaurja.com</p>
+                  <p className="text-[11px] text-text/40">Akola, Maharashtra, India</p>
+                  <p className="text-[11px] text-text/40">Phone: +91 7218733125</p>
+                  <p className="text-[11px] text-text/40">Email: divyaurja37@gmail.com</p>
                 </div>
                 <div className="text-right">
                   <h2 className="text-lg font-bold text-text uppercase tracking-wider mb-1">INVOICE</h2>
