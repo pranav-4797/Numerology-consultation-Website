@@ -111,8 +111,10 @@ export type CertificateFormData = z.infer<typeof certificateSchema>;
 export const orderSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   phone: z.string().min(10, 'Enter a valid 10-digit phone number').max(15, 'Enter a valid phone number'),
-  email: z.string().email('Enter a valid email address'),
-  address: z.string().min(10, 'Please enter your complete shipping address (at least 10 characters)'),
+  address: z.string().min(5, 'Please enter your street address (at least 5 characters)'),
+  district: z.string().min(2, 'Please enter your district name'),
+  state: z.string().min(2, 'Please enter your state name'),
+  pincode: z.string().min(6, 'Enter a valid 6-digit pin code').max(10, 'Enter a valid pin code'),
 });
 
 export type OrderFormData = z.infer<typeof orderSchema>;

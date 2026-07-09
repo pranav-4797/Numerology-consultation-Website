@@ -286,9 +286,11 @@ export default function AdminOrdersPage() {
                 <p className="text-sm text-text/60 flex items-center gap-1.5">
                   <Phone className="w-3.5 h-3.5 text-text/40" /> {selectedOrder.phone}
                 </p>
-                <p className="text-sm text-text/60 flex items-center gap-1.5">
-                  <Mail className="w-3.5 h-3.5 text-text/40" /> {selectedOrder.email}
-                </p>
+                {selectedOrder.email && (
+                  <p className="text-sm text-text/60 flex items-center gap-1.5">
+                    <Mail className="w-3.5 h-3.5 text-text/40" /> {selectedOrder.email}
+                  </p>
+                )}
               </div>
 
               {/* Shipping Address */}
@@ -296,7 +298,13 @@ export default function AdminOrdersPage() {
                 <h3 className="text-xs font-semibold text-text/50 uppercase tracking-wider flex items-center gap-1.5">
                   <MapPin className="w-3.5 h-3.5" /> Shipping Address
                 </h3>
-                <p className="text-sm text-text/70 leading-relaxed whitespace-pre-wrap">{selectedOrder.address}</p>
+                <div className="text-sm text-text/70 leading-relaxed whitespace-pre-wrap">
+                  <p className="font-semibold">{selectedOrder.address}</p>
+                  {(selectedOrder.district || selectedOrder.state) && (
+                    <p>{[selectedOrder.district, selectedOrder.state].filter(Boolean).join(', ')}</p>
+                  )}
+                  {selectedOrder.pincode && <p className="font-medium">PIN: {selectedOrder.pincode}</p>}
+                </div>
               </div>
             </div>
 
@@ -408,11 +416,17 @@ export default function AdminOrdersPage() {
                   <h3 className="text-xs font-bold text-text/40 uppercase mb-2">Billed To:</h3>
                   <p className="text-sm font-bold text-text">{selectedOrder.name}</p>
                   <p className="text-xs text-text/60">Phone: {selectedOrder.phone}</p>
-                  <p className="text-xs text-text/60">Email: {selectedOrder.email}</p>
+                  {selectedOrder.email && <p className="text-xs text-text/60">Email: {selectedOrder.email}</p>}
                 </div>
                 <div className="details-box">
                   <h3 className="text-xs font-bold text-text/40 uppercase mb-2">Shipping Destination:</h3>
-                  <p className="text-xs text-text/70 whitespace-pre-wrap leading-relaxed">{selectedOrder.address}</p>
+                  <div className="text-xs text-text/70 leading-relaxed whitespace-pre-wrap">
+                    <p className="font-semibold">{selectedOrder.address}</p>
+                    {(selectedOrder.district || selectedOrder.state) && (
+                      <p>{[selectedOrder.district, selectedOrder.state].filter(Boolean).join(', ')}</p>
+                    )}
+                    {selectedOrder.pincode && <p className="font-medium">PIN: {selectedOrder.pincode}</p>}
+                  </div>
                 </div>
               </div>
 

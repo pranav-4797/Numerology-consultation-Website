@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
-import { ArrowLeft, ShoppingCart, Sparkles, MapPin, Phone, Mail, User, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, Sparkles, MapPin, Phone, User, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 
 import { orderSchema, type OrderFormData } from '@/schemas';
@@ -76,9 +76,11 @@ export default function CheckoutPage() {
 
       const orderData = {
         name: formData.name,
-        email: formData.email,
         phone: formData.phone,
         address: formData.address,
+        district: formData.district,
+        state: formData.state,
+        pincode: formData.pincode,
         items: orderItems,
         subtotal,
         shippingCharges,
@@ -117,8 +119,12 @@ export default function CheckoutPage() {
 *Customer Details:*
 • Name: ${formData.name}
 • Phone: ${formData.phone}
-• Email: ${formData.email}
-• Shipping Address: ${formData.address}
+
+*Shipping Address:*
+*${formData.address}*
+*District: ${formData.district}*
+*State: ${formData.state}*
+*Pin Code: ${formData.pincode}*
 
 *Items Ordered:*
 ${itemsBillList}
@@ -214,45 +220,71 @@ Thank you for your order! Please share payment confirmation details.`;
                 {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name.message}</p>}
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div>
-                  <label className="block text-xs font-semibold text-text/75 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                    <Phone className="w-3.5 h-3.5 text-text/40" /> Phone Number
-                  </label>
-                  <input
-                    type="tel"
-                    {...register('phone')}
-                    placeholder="e.g. 9876543210"
-                    className="w-full px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all"
-                  />
-                  {errors.phone && <p className="text-xs text-red-500 mt-1">{errors.phone.message}</p>}
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-text/75 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                    <Mail className="w-3.5 h-3.5 text-text/40" /> Email Address
-                  </label>
-                  <input
-                    type="email"
-                    {...register('email')}
-                    placeholder="e.g. rahul@example.com"
-                    className="w-full px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all"
-                  />
-                  {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>}
-                </div>
+              <div>
+                <label className="block text-xs font-semibold text-text/75 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                  <Phone className="w-3.5 h-3.5 text-text/40" /> Phone Number
+                </label>
+                <input
+                  type="tel"
+                  {...register('phone')}
+                  placeholder="e.g. 9876543210"
+                  className="w-full px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all"
+                />
+                {errors.phone && <p className="text-xs text-red-500 mt-1">{errors.phone.message}</p>}
               </div>
 
               <div>
                 <label className="block text-xs font-semibold text-text/75 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-text/40" /> Shipping Address
+                  <MapPin className="w-3.5 h-3.5 text-text/40" /> Flat, House no., Building, Street Address
                 </label>
-                <textarea
-                  rows={4}
+                <input
+                  type="text"
                   {...register('address')}
-                  placeholder="Complete home/office address, flat no, building name, area, city, state, pincode..."
-                  className="w-full px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all resize-none"
+                  placeholder="e.g. Flat 102, Shanti Niwas, Sector 4"
+                  className="w-full px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all"
                 />
                 {errors.address && <p className="text-xs text-red-500 mt-1">{errors.address.message}</p>}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                <div>
+                  <label className="block text-xs font-semibold text-text/75 uppercase tracking-wider mb-2">
+                    District
+                  </label>
+                  <input
+                    type="text"
+                    {...register('district')}
+                    placeholder="e.g. Pune"
+                    className="w-full px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all"
+                  />
+                  {errors.district && <p className="text-xs text-red-500 mt-1">{errors.district.message}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-text/75 uppercase tracking-wider mb-2">
+                    State
+                  </label>
+                  <input
+                    type="text"
+                    {...register('state')}
+                    placeholder="e.g. Maharashtra"
+                    className="w-full px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all"
+                  />
+                  {errors.state && <p className="text-xs text-red-500 mt-1">{errors.state.message}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-text/75 uppercase tracking-wider mb-2">
+                    Pin Code
+                  </label>
+                  <input
+                    type="text"
+                    {...register('pincode')}
+                    placeholder="e.g. 411001"
+                    className="w-full px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all"
+                  />
+                  {errors.pincode && <p className="text-xs text-red-500 mt-1">{errors.pincode.message}</p>}
+                </div>
               </div>
 
               <div className="pt-4">

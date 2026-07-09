@@ -176,9 +176,12 @@ export interface OrderItem {
 export interface Order {
   id: string;
   name: string;
-  email: string;
+  email?: string;
   phone: string;
   address: string;
+  district?: string;
+  state?: string;
+  pincode?: string;
   items: OrderItem[];
   subtotal: number;
   shippingCharges: number;
