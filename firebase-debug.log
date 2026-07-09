@@ -1,0 +1,17 @@
+[debug] [2026-07-09T06:14:21.393Z] ----------------------------------------------------------------------
+[debug] [2026-07-09T06:14:21.398Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\PRANAV\AppData\Local\npm-cache\_npx\7750544ccf494d8b\node_modules\firebase-tools\lib\bin\firebase.js deploy
+[debug] [2026-07-09T06:14:21.398Z] CLI Version:   15.22.4
+[debug] [2026-07-09T06:14:21.398Z] Platform:      win32
+[debug] [2026-07-09T06:14:21.399Z] Node Version:  v24.14.1
+[debug] [2026-07-09T06:14:21.399Z] Detected Agent: antigravity
+[debug] [2026-07-09T06:14:21.399Z] Time:          Thu Jul 09 2026 11:44:21 GMT+0530 (India Standard Time)
+[debug] [2026-07-09T06:14:21.399Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-07-09T06:14:24.256Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-07-09T06:14:24.257Z] > authorizing via signed-in user (chopadepranav2007@gmail.com)
+[debug] [2026-07-09T06:14:24.257Z] [iam] checking project divya-urja for permissions ["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2026-07-09T06:14:24.259Z] Checked if tokens are valid: true, expires at: 1783580992750
+[debug] [2026-07-09T06:14:24.259Z] Checked if tokens are valid: true, expires at: 1783580992750
+[debug] [2026-07-09T06:14:24.260Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/divya-urja:testIamPermissions [none]
+[debug] [2026-07-09T06:14:24.261Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/divya-urja:testIamPermissions  x-goog-user-project=divya-urja
+[debug] [2026-07-09T06:14:24.261Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/divya-urja:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebasehosting.sites.update"]}
