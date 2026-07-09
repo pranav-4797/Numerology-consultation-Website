@@ -1,14 +1,15 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { Award, Target, Eye, BookOpen, Trophy, Sparkles } from 'lucide-react';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Award, Target, Eye, BookOpen, Trophy, Sparkles, X, Calendar, Hash, User, ExternalLink } from 'lucide-react';
 import ScrollReveal from '@/components/ui/ScrollReveal';
 import SectionHeading from '@/components/ui/SectionHeading';
 import { useIsMobile } from '@/hooks/useIsMobile';
 
 const achievements = [
-  '5000+ Happy Clients Worldwide',
-  '15+ Years of Dedicated Practice',
+  '700+ Happy Clients Worldwide',
+  '8+ Years of Dedicated Practice',
   'Certified Vedic Numerologist',
   'Published Author & Speaker',
   'Workshop Leader & Mentor',
@@ -22,8 +23,44 @@ const specializations = [
   { icon: Award, title: 'Name Correction', desc: 'Aligning your name with your destiny numbers.' },
 ];
 
+const certificates = [
+  {
+    title: 'Advanced Professional Course in Vastu Energy Science',
+    caption: 'Mastery in balancing cosmic and earth energies to create harmonious, high-vibe spaces.',
+    image: '/certificates/vastu-energy-science.jpg',
+    regNo: 'VES-26',
+    date: 'April 3, 2026',
+    instructor: 'Dr. Rohit Gadkari (PHD Gold Medalist)',
+  },
+  {
+    title: 'Advanced Name Placement Course',
+    caption: 'Professional training in name vibrations, cosmic alignment, and destiny number styling.',
+    image: '/certificates/advanced-name-placement.jpg',
+    regNo: 'B-24-107',
+    date: 'May 15, 2025',
+    instructor: 'Dr. Rohit Gadkari (Ace Numerologist)',
+  },
+  {
+    title: 'Advanced Name Correction Course',
+    caption: 'Comprehensive training in tuning spelling vibrations to unlock positive life transitions.',
+    image: '/certificates/advance-name-correction.jpg',
+    regNo: 'B-24-145',
+    date: 'May 1, 2025',
+    instructor: 'Dr. Rohit Gadkari (PHD Gold Medalist)',
+  },
+  {
+    title: 'Advanced Numerology Course Trophy',
+    caption: 'Appreciation award recognizing excellence and completion in ancient numerology sciences.',
+    image: '/certificates/advanced-numerology-trophy.jpg',
+    regNo: 'N/A',
+    date: 'December 15, 2024',
+    instructor: 'Dr. Rohit Gadkari (Ace Numerologist, Ph.D Gold Medalist)',
+  },
+];
+
 export default function AboutPage() {
   const isMobile = useIsMobile();
+  const [selectedCert, setSelectedCert] = useState<typeof certificates[0] | null>(null);
   return (
     <>
       {/* Hero */}
@@ -90,7 +127,7 @@ export default function AboutPage() {
                     <Trophy className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <p className="text-xl font-bold text-primary">5000+</p>
+                    <p className="text-xl font-bold text-primary">700+</p>
                     <p className="text-xs text-text/50">Happy Clients</p>
                   </div>
                 </div>
@@ -106,9 +143,9 @@ export default function AboutPage() {
                 <span className="text-primary"> Ancient Sciences</span>
               </h2>
               <p className="text-text/60 leading-relaxed mb-5">
-                With over 15 years of dedicated practice and research in the field of Numerology,
+                With over 8 years of dedicated practice and research in the field of Numerology,
                 Vastu Shastra, and allied occult sciences, our consultant has been a guiding light
-                for thousands of individuals and businesses.
+                for over 700 individuals and businesses.
               </p>
               <p className="text-text/60 leading-relaxed mb-5">
                 Specializing in Vedic Numerology, Name Correction, Switch Words, Yantra Numerology,
@@ -195,6 +232,153 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
+
+      {/* Certifications & Credentials */}
+      <section className="py-20 bg-white border-t border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <ScrollReveal>
+            <SectionHeading
+              badge="Credentials"
+              title="Professional Certifications"
+              subtitle="Verified academic achievements and awards in Vastu and Vedic Numerology."
+            />
+          </ScrollReveal>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {certificates.map((cert, i) => (
+              <ScrollReveal key={i} delay={i * 0.1}>
+                <div
+                  onClick={() => setSelectedCert(cert)}
+                  className="group cursor-pointer bg-background rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full"
+                >
+                  <div className="relative aspect-[4/3] bg-gray-100 overflow-hidden flex items-center justify-center">
+                    <img
+                      src={cert.image}
+                      alt={cert.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
+                      <span className="px-4 py-2 bg-white/95 text-text text-sm font-semibold rounded-xl flex items-center gap-2 shadow-lg scale-90 group-hover:scale-100 transition-transform duration-300">
+                        <Eye className="w-4 h-4 text-primary" /> View Details
+                      </span>
+                    </div>
+                  </div>
+                  <div className="p-6 flex flex-col flex-grow">
+                    <span className="text-[10px] uppercase font-bold tracking-widest text-primary mb-2">
+                      {cert.regNo !== 'N/A' ? 'Certificate' : 'Trophy Award'}
+                    </span>
+                    <h3 className="font-playfair text-base font-bold text-text mb-2 group-hover:text-primary transition-colors line-clamp-2">
+                      {cert.title}
+                    </h3>
+                    <p className="text-xs text-text/60 leading-relaxed mb-4 flex-grow italic">
+                      "{cert.caption}"
+                    </p>
+                    <div className="pt-4 border-t border-gray-100 flex items-center justify-between text-[11px] text-text/50">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-3.5 h-3.5" /> {cert.date}
+                      </span>
+                      <span className="font-medium text-primary flex items-center gap-0.5 hover:underline">
+                        Verify <ExternalLink className="w-3 h-3" />
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Lightbox Modal */}
+      <AnimatePresence>
+        {selectedCert && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
+            onClick={() => setSelectedCert(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative bg-white rounded-3xl overflow-hidden max-w-4xl w-full shadow-2xl border border-gray-100 grid grid-cols-1 md:grid-cols-12"
+            >
+              {/* Close Button */}
+              <button
+                onClick={() => setSelectedCert(null)}
+                className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center backdrop-blur-sm transition-all hover:scale-105"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              {/* Image Section */}
+              <div className="md:col-span-7 bg-gray-900 flex items-center justify-center p-6 md:p-12 aspect-[4/3] md:aspect-auto md:min-h-[500px]">
+                <img
+                  src={selectedCert.image}
+                  alt={selectedCert.title}
+                  className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-lg"
+                />
+              </div>
+
+              {/* Details Section */}
+              <div className="md:col-span-5 p-8 flex flex-col justify-between bg-white border-t md:border-t-0 md:border-l border-gray-100">
+                <div>
+                  <span className="inline-block px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-primary bg-primary/10 rounded-full mb-4">
+                    {selectedCert.regNo !== 'N/A' ? 'Verified Certificate' : 'Recognition Award'}
+                  </span>
+                  <h3 className="font-playfair text-xl font-bold text-text mb-3">
+                    {selectedCert.title}
+                  </h3>
+                  <p className="text-xs text-text/60 leading-relaxed italic mb-6">
+                    "{selectedCert.caption}"
+                  </p>
+
+                  <div className="space-y-4 border-t border-gray-100 pt-6">
+                    <div className="flex items-start gap-3">
+                      <User className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-[10px] text-text/40 uppercase tracking-wider font-semibold">Issued By</p>
+                        <p className="text-xs text-text font-medium">{selectedCert.instructor}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <Calendar className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-[10px] text-text/40 uppercase tracking-wider font-semibold">Date of Issuance</p>
+                        <p className="text-xs text-text font-medium">{selectedCert.date}</p>
+                      </div>
+                    </div>
+
+                    {selectedCert.regNo !== 'N/A' && (
+                      <div className="flex items-start gap-3">
+                        <Hash className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-[10px] text-text/40 uppercase tracking-wider font-semibold">Registration Number</p>
+                          <p className="text-xs font-mono text-text font-medium">{selectedCert.regNo}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="pt-6 border-t border-gray-100 mt-8 flex flex-col gap-3">
+                  <div className="flex items-center gap-2 text-xs text-text/50">
+                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                    Government ISO 9001:2015 Compliant
+                  </div>
+                  <button
+                    onClick={() => setSelectedCert(null)}
+                    className="w-full py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary/90 transition-colors shadow-lg shadow-primary/10 hover:shadow-primary/20"
+                  >
+                    Close Viewer
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Achievements */}
       <section className="py-20 bg-gradient-to-br from-text via-gray-900 to-text">

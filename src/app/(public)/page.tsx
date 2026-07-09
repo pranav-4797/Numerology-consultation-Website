@@ -23,12 +23,12 @@ import type { Service, Workshop, Event, Testimonial } from '@/types';
 const whyChooseUs = [
   {
     icon: Star,
-    title: '15+ Years Experience',
-    description: 'Over a decade of expertise in Numerology, Vastu, and holistic sciences.',
+    title: '8+ Years Experience',
+    description: 'Over 8 years of expertise in Numerology, Vastu, and holistic sciences.',
   },
   {
     icon: Shield,
-    title: 'Trusted by 5000+ Clients',
+    title: 'Trusted by 700+ Clients',
     description: 'Proven track record of transforming lives with accurate consultations.',
   },
   {
@@ -116,7 +116,7 @@ export default function HomePage() {
                   </motion.div>
                 </div>
                 <div className="absolute -bottom-6 -right-6 px-6 py-4 bg-white rounded-2xl shadow-xl border border-gray-100">
-                  <p className="text-3xl font-bold text-primary">15+</p>
+                  <p className="text-3xl font-bold text-primary">8+</p>
                   <p className="text-xs text-text/50">Years Experience</p>
                 </div>
               </div>
@@ -136,8 +136,8 @@ export default function HomePage() {
                 for every aspect of your life.
               </p>
               <p className="text-text/60 leading-relaxed mb-8">
-                Our founder brings over 15 years of dedicated practice and research in occult sciences,
-                having helped thousands of clients across India and worldwide to unlock their true potential.
+                Our founder brings over 8 years of dedicated practice and research in occult sciences,
+                having helped over 700 clients across India and worldwide to unlock their true potential.
               </p>
               <Link
                 href="/about"
