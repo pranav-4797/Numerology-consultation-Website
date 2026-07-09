@@ -150,6 +150,7 @@ export interface DashboardStats {
   totalWorkshops: number;
   totalLeads: number;
   totalProducts: number;
+  totalOrders: number;
 }
 
 export interface Certificate {
@@ -160,6 +161,29 @@ export interface Certificate {
   regNo: string;
   date: string;
   instructor: string;
+  createdAt: string;
+}
+
+export type OrderStatus = 'pending' | 'completed' | 'cancelled';
+
+export interface OrderItem {
+  productId: string;
+  productName: string;
+  quantity: number;
+  price: number;
+}
+
+export interface Order {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  items: OrderItem[];
+  subtotal: number;
+  shippingCharges: number;
+  total: number;
+  status: OrderStatus;
   createdAt: string;
 }
 

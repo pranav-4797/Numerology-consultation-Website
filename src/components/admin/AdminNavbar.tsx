@@ -9,7 +9,7 @@ import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
 import { Menu, X, LogOut, ExternalLink,
   LayoutDashboard, Layers, FileText, Calendar, GraduationCap,
-  MessageSquare, Image, Users, CalendarCheck, ClipboardList, Settings, ShoppingBag
+  MessageSquare, Image, Users, CalendarCheck, ClipboardList, Settings, ShoppingBag, ShoppingCart
 } from 'lucide-react';
 
 const menuItems = [
@@ -20,6 +20,7 @@ const menuItems = [
   { href: '/admin/workshops', label: 'Workshops', icon: GraduationCap },
   { href: '/admin/appointments', label: 'Appointments', icon: CalendarCheck },
   { href: '/admin/registrations', label: 'Registrations', icon: ClipboardList },
+  { href: '/admin/orders', label: 'Orders', icon: ShoppingCart },
   { href: '/admin/testimonials', label: 'Testimonials', icon: MessageSquare },
   { href: '/admin/gallery', label: 'Gallery', icon: Image },
   { href: '/admin/products', label: 'Products', icon: ShoppingBag },

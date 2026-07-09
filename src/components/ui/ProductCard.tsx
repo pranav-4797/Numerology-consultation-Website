@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { ShoppingCart, MessageCircle, Sparkles } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import type { Product } from '@/types';
 
 const CATEGORY_LABELS: Record<string, { label: string; color: string }> = {
@@ -21,13 +22,12 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, index, whatsappNumber, onAddToCart }: ProductCardProps) {
+  const router = useRouter();
   const category = CATEGORY_LABELS[product.category] || CATEGORY_LABELS.other;
 
   const handleBuyNow = () => {
-    const message = encodeURIComponent(
-      `Hi, I'm interested in buying *${product.name}* (₹${product.price.toLocaleString('en-IN')}). Please share more details.`
-    );
-    window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
+    onAddToCart(product);
+    router.push('/checkout');
   };
 
   return (

@@ -29,6 +29,7 @@ import type {
   LeadStatus,
   Product,
   Certificate,
+  Order,
 } from '@/types';
 
 // ─── Generic Helpers ────────────────────────────────────────
@@ -232,15 +233,25 @@ export const createCertificate = (data: Record<string, unknown>) => createDocume
 export const updateCertificate = (id: string, data: Record<string, unknown>) => updateDocument('certificates', id, data);
 export const deleteCertificate = (id: string) => deleteDocument('certificates', id);
 
+// ─── Orders ─────────────────────────────────────────────────
+
+export const getOrders = () => getCollection<Order>('orders');
+export const getOrderById = (id: string) => getDocById<Order>('orders', id);
+export const createOrder = (data: Record<string, unknown>) => createDocument('orders', data);
+export const updateOrder = (id: string, data: Record<string, unknown>) => updateDocument('orders', id, data);
+export const deleteOrder = (id: string) => deleteDocument('orders', id);
+
+
 // ─── Dashboard Stats ────────────────────────────────────────
 
 export async function getDashboardStats() {
-  const [blogs, events, workshops, contacts, products] = await Promise.all([
+  const [blogs, events, workshops, contacts, products, orders] = await Promise.all([
     getDocs(collection(db, 'blogs')),
     getDocs(collection(db, 'events')),
     getDocs(collection(db, 'workshops')),
     getDocs(collection(db, 'contacts')),
     getDocs(collection(db, 'products')),
+    getDocs(collection(db, 'orders')),
   ]);
   return {
     totalPosts: blogs.size,
@@ -248,6 +259,7 @@ export async function getDashboardStats() {
     totalWorkshops: workshops.size,
     totalLeads: contacts.size,
     totalProducts: products.size,
+    totalOrders: orders.size,
   };
 }
 

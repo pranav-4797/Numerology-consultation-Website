@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingCart, X, MessageCircle, Trash2, Sparkles } from 'lucide-react';
+import { ShoppingCart, X, Trash2, Sparkles, Search } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import ProductCard from '@/components/ui/ProductCard';
 import SectionHeading from '@/components/ui/SectionHeading';
 import ScrollReveal from '@/components/ui/ScrollReveal';
@@ -28,12 +29,14 @@ interface CartItem {
 }
 
 export default function CataloguePage() {
+  const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<ProductCategory | 'all'>('all');
   const [cart, setCart] = useState<CartItem[]>([]);
   const [showCart, setShowCart] = useState(false);
   const [whatsappNumber, setWhatsappNumber] = useState('919822492488');
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Load cart from localStorage
   useEffect(() => {
@@ -69,9 +72,13 @@ export default function CataloguePage() {
     fetchData();
   }, []);
 
-  const filteredProducts = activeCategory === 'all'
-    ? products
-    : products.filter((p) => p.category === activeCategory);
+  const filteredProducts = products.filter((product) => {
+    const matchesCategory = activeCategory === 'all' || product.category === activeCategory;
+    const matchesSearch =
+      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.description.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
   const addToCart = (product: Product) => {
     const existing = cart.find((item) => item.product.id === product.id);
@@ -105,15 +112,10 @@ export default function CataloguePage() {
   const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
   const cartTotal = cart.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
 
-  const handleCheckoutWhatsApp = () => {
+  const handleProceedToCheckout = () => {
     if (cart.length === 0) return;
-    const items = cart
-      .map((item) => `• ${item.product.name} x${item.quantity} — ₹${(item.product.price * item.quantity).toLocaleString('en-IN')}`)
-      .join('\n');
-    const message = encodeURIComponent(
-      `Hi, I'd like to order the following items:\n\n${items}\n\n*Total: ₹${cartTotal.toLocaleString('en-IN')}*\n\nPlease share payment and delivery details.`
-    );
-    window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
+    setShowCart(false);
+    router.push('/checkout');
   };
 
   return (
@@ -178,6 +180,28 @@ export default function CataloguePage() {
                   subtitle="Handpicked sacred items charged with numerological energy to bring harmony, prosperity, and protection into your life."
                 />
               </ScrollReveal>
+
+              {/* Search Bar */}
+              <div className="max-w-md mx-auto mb-10 px-4">
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search products (e.g. crystal, bracelet)..."
+                    className="w-full pl-12 pr-10 py-3 bg-white border border-gray-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-300"
+                  />
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text/30" />
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery('')}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-semibold text-text/40 hover:text-primary transition-colors"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+              </div>
 
               {/* Category Tabs */}
               <div className="flex flex-wrap justify-center gap-2 mb-12">
@@ -362,18 +386,18 @@ export default function CataloguePage() {
               {cart.length > 0 && (
                 <div className="border-t border-gray-100 px-6 py-5 space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-text/50">Total</span>
+                    <span className="text-sm font-medium text-text/50">Subtotal</span>
                     <span className="text-xl font-bold text-text">₹{cartTotal.toLocaleString('en-IN')}</span>
                   </div>
                   <button
-                    onClick={handleCheckoutWhatsApp}
-                    className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-green-700 hover:shadow-lg hover:shadow-green-500/20 transition-all duration-300"
+                    onClick={handleProceedToCheckout}
+                    className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-primary text-white font-semibold rounded-xl hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20 transition-all duration-300"
                   >
-                    <MessageCircle className="w-5 h-5" />
-                    Order via WhatsApp
+                    <ShoppingCart className="w-5 h-5" />
+                    Proceed to Checkout
                   </button>
                   <p className="text-[11px] text-text/30 text-center">
-                    Payment details will be shared on WhatsApp after placing the order.
+                    Shipping details and delivery charges will be calculated on the next page.
                   </p>
                 </div>
               )}

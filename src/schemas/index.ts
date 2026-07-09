@@ -108,3 +108,13 @@ export const certificateSchema = z.object({
 
 export type CertificateFormData = z.infer<typeof certificateSchema>;
 
+export const orderSchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+  phone: z.string().min(10, 'Enter a valid 10-digit phone number').max(15, 'Enter a valid phone number'),
+  email: z.string().email('Enter a valid email address'),
+  address: z.string().min(10, 'Please enter your complete shipping address (at least 10 characters)'),
+});
+
+export type OrderFormData = z.infer<typeof orderSchema>;
+
+

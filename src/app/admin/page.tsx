@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { FileText, Calendar, GraduationCap, Users, Eye, EyeOff, Settings, ShoppingBag } from 'lucide-react';
+import { FileText, Calendar, GraduationCap, Users, Eye, EyeOff, Settings, ShoppingBag, ShoppingCart } from 'lucide-react';
 import { toast } from 'sonner';
 import StatCard from '@/components/ui/StatCard';
 import Loader from '@/components/ui/Loader';
@@ -69,12 +69,13 @@ export default function AdminDashboard() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-10">
         <StatCard title="Total Posts" value={stats?.totalPosts || 0} icon={FileText} color="#0F766E" index={0} />
         <StatCard title="Total Events" value={stats?.totalEvents || 0} icon={Calendar} color="#D4AF37" index={1} />
         <StatCard title="Total Workshops" value={stats?.totalWorkshops || 0} icon={GraduationCap} color="#8B5CF6" index={2} />
         <StatCard title="Total Leads" value={stats?.totalLeads || 0} icon={Users} color="#EF4444" index={3} />
         <StatCard title="Total Products" value={stats?.totalProducts || 0} icon={ShoppingBag} color="#F59E0B" index={4} />
+        <StatCard title="Total Orders" value={stats?.totalOrders || 0} icon={ShoppingCart} color="#EC4899" index={5} />
       </div>
 
       {/* Section Visibility Toggles */}
