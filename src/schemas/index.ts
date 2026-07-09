@@ -97,3 +97,14 @@ export type BlogFormData = z.infer<typeof blogSchema>;
 export type TestimonialFormData = z.infer<typeof testimonialSchema>;
 export type ContactFormData = z.infer<typeof contactSchema>;
 export type ProductFormData = z.infer<typeof productSchema>;
+
+export const certificateSchema = z.object({
+  title: z.string().min(2, 'Certificate title is required'),
+  caption: z.string().min(5, 'Caption must be at least 5 characters'),
+  regNo: z.string().min(1, 'Registration number is required (use N/A if none)'),
+  date: z.string().min(1, 'Date of Issuance is required'),
+  instructor: z.string().min(2, 'Issued by is required'),
+});
+
+export type CertificateFormData = z.infer<typeof certificateSchema>;
+

@@ -151,3 +151,15 @@ export interface DashboardStats {
   totalLeads: number;
   totalProducts: number;
 }
+
+export interface Certificate {
+  id: string;
+  title: string;
+  caption: string;
+  image: string;
+  regNo: string;
+  date: string;
+  instructor: string;
+  createdAt: string;
+}
+

@@ -100,20 +100,12 @@ export default function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <ScrollReveal direction="left">
               <div className="relative">
-                <div className="w-full h-96 rounded-3xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center overflow-hidden">
-                  <motion.div
-                    animate={isMobile ? undefined : { rotate: 360 }}
-                    transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
-                    className="w-64 h-64 border border-primary/10 rounded-full flex items-center justify-center"
-                  >
-                    <motion.div
-                      animate={isMobile ? undefined : { rotate: -360 }}
-                      transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                      className="w-48 h-48 border border-secondary/20 rounded-full flex items-center justify-center"
-                    >
-                      <Sparkles className="w-16 h-16 text-primary/40" />
-                    </motion.div>
-                  </motion.div>
+                <div className="w-full h-96 rounded-3xl bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden relative shadow-sm group">
+                  <img
+                    src="/certificates/advance-numerology-course.jpg"
+                    alt="Certificate of Completion"
+                    className="w-full h-full object-contain p-4 group-hover:scale-102 transition-transform duration-500"
+                  />
                 </div>
                 <div className="absolute -bottom-6 -right-6 px-6 py-4 bg-white rounded-2xl shadow-xl border border-gray-100">
                   <p className="text-3xl font-bold text-primary">8+</p>

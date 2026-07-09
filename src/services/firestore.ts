@@ -28,6 +28,7 @@ import type {
   SiteSettings,
   LeadStatus,
   Product,
+  Certificate,
 } from '@/types';
 
 // ─── Generic Helpers ────────────────────────────────────────
@@ -222,6 +223,14 @@ export const getProductById = (id: string) => getDocById<Product>('products', id
 export const createProduct = (data: Record<string, unknown>) => createDocument('products', data);
 export const updateProduct = (id: string, data: Record<string, unknown>) => updateDocument('products', id, data);
 export const deleteProduct = (id: string) => deleteDocument('products', id);
+
+// ─── Certificates ───────────────────────────────────────────
+
+export const getCertificates = () => getCollection<Certificate>('certificates');
+export const getCertificateById = (id: string) => getDocById<Certificate>('certificates', id);
+export const createCertificate = (data: Record<string, unknown>) => createDocument('certificates', data);
+export const updateCertificate = (id: string, data: Record<string, unknown>) => updateDocument('certificates', id, data);
+export const deleteCertificate = (id: string) => deleteDocument('certificates', id);
 
 // ─── Dashboard Stats ────────────────────────────────────────
 

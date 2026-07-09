@@ -6,6 +6,8 @@ import { Award, Target, Eye, BookOpen, Trophy, Sparkles, X, Calendar, Hash, User
 import ScrollReveal from '@/components/ui/ScrollReveal';
 import SectionHeading from '@/components/ui/SectionHeading';
 import { useIsMobile } from '@/hooks/useIsMobile';
+import { useFirestoreCollection } from '@/hooks/useFirestore';
+import type { Certificate } from '@/types';
 
 const achievements = [
   '700+ Happy Clients Worldwide',
@@ -23,44 +25,54 @@ const specializations = [
   { icon: Award, title: 'Name Correction', desc: 'Aligning your name with your destiny numbers.' },
 ];
 
-const certificates = [
+const defaultCertificates: Certificate[] = [
   {
+    id: 'default-1',
     title: 'Advanced Professional Course in Vastu Energy Science',
     caption: 'Mastery in balancing cosmic and earth energies to create harmonious, high-vibe spaces.',
     image: '/certificates/vastu-energy-science.jpg',
     regNo: 'VES-26',
     date: 'April 3, 2026',
     instructor: 'Dr. Rohit Gadkari (PHD Gold Medalist)',
+    createdAt: '',
   },
   {
+    id: 'default-2',
     title: 'Advanced Name Placement Course',
     caption: 'Professional training in name vibrations, cosmic alignment, and destiny number styling.',
     image: '/certificates/advanced-name-placement.jpg',
     regNo: 'B-24-107',
     date: 'May 15, 2025',
     instructor: 'Dr. Rohit Gadkari (Ace Numerologist)',
+    createdAt: '',
   },
   {
+    id: 'default-3',
     title: 'Advanced Name Correction Course',
     caption: 'Comprehensive training in tuning spelling vibrations to unlock positive life transitions.',
     image: '/certificates/advance-name-correction.jpg',
     regNo: 'B-24-145',
     date: 'May 1, 2025',
     instructor: 'Dr. Rohit Gadkari (PHD Gold Medalist)',
+    createdAt: '',
   },
   {
+    id: 'default-4',
     title: 'Advanced Numerology Course Trophy',
     caption: 'Appreciation award recognizing excellence and completion in ancient numerology sciences.',
     image: '/certificates/advanced-numerology-trophy.jpg',
     regNo: 'N/A',
     date: 'December 15, 2024',
     instructor: 'Dr. Rohit Gadkari (Ace Numerologist, Ph.D Gold Medalist)',
+    createdAt: '',
   },
 ];
 
 export default function AboutPage() {
   const isMobile = useIsMobile();
-  const [selectedCert, setSelectedCert] = useState<typeof certificates[0] | null>(null);
+  const { data: dbCertificates } = useFirestoreCollection<Certificate>('certificates');
+  const displayCertificates = dbCertificates.length > 0 ? dbCertificates : defaultCertificates;
+  const [selectedCert, setSelectedCert] = useState<Certificate | null>(null);
   return (
     <>
       {/* Hero */}
@@ -105,22 +117,12 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <ScrollReveal direction="left">
               <div className="relative">
-                <div className="w-full h-[480px] rounded-3xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center overflow-hidden">
-                  <motion.div
-                    animate={isMobile ? undefined : { rotate: 360 }}
-                    transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
-                    className="w-72 h-72 border border-primary/10 rounded-full flex items-center justify-center"
-                  >
-                    <motion.div
-                      animate={isMobile ? undefined : { rotate: -360 }}
-                      transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
-                      className="w-52 h-52 border border-secondary/20 rounded-full flex items-center justify-center"
-                    >
-                      <div className="w-32 h-32 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-                        <Sparkles className="w-12 h-12 text-primary/50" />
-                      </div>
-                    </motion.div>
-                  </motion.div>
+                <div className="w-full h-[480px] rounded-3xl bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden relative shadow-sm group">
+                  <img
+                    src="/certificates/advance-numerology-course.jpg"
+                    alt="Certificate of Completion"
+                    className="w-full h-full object-contain p-4 group-hover:scale-102 transition-transform duration-500"
+                  />
                 </div>
                 <div className="absolute -bottom-4 left-6 px-5 py-3 bg-white rounded-xl shadow-xl border border-gray-100 flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -245,7 +247,7 @@ export default function AboutPage() {
           </ScrollReveal>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {certificates.map((cert, i) => (
+            {displayCertificates.map((cert, i) => (
               <ScrollReveal key={i} delay={i * 0.1}>
                 <div
                   onClick={() => setSelectedCert(cert)}
