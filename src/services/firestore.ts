@@ -27,6 +27,7 @@ import type {
   WorkshopRegistration,
   SiteSettings,
   LeadStatus,
+  Product,
 } from '@/types';
 
 // ─── Generic Helpers ────────────────────────────────────────
@@ -209,20 +210,35 @@ export async function registerForWorkshop(
   });
 }
 
+// ─── Products (Catalogue) ───────────────────────────────────
+
+export const getProducts = () => getCollection<Product>('products');
+export const getProductsByCategory = async (category: string): Promise<Product[]> => {
+  const q = query(collection(db, 'products'), where('category', '==', category), orderBy('createdAt', 'desc'));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Product));
+};
+export const getProductById = (id: string) => getDocById<Product>('products', id);
+export const createProduct = (data: Record<string, unknown>) => createDocument('products', data);
+export const updateProduct = (id: string, data: Record<string, unknown>) => updateDocument('products', id, data);
+export const deleteProduct = (id: string) => deleteDocument('products', id);
+
 // ─── Dashboard Stats ────────────────────────────────────────
 
 export async function getDashboardStats() {
-  const [blogs, events, workshops, contacts] = await Promise.all([
+  const [blogs, events, workshops, contacts, products] = await Promise.all([
     getDocs(collection(db, 'blogs')),
     getDocs(collection(db, 'events')),
     getDocs(collection(db, 'workshops')),
     getDocs(collection(db, 'contacts')),
+    getDocs(collection(db, 'products')),
   ]);
   return {
     totalPosts: blogs.size,
     totalEvents: events.size,
     totalWorkshops: workshops.size,
     totalLeads: contacts.size,
+    totalProducts: products.size,
   };
 }
 
@@ -235,6 +251,7 @@ export interface SectionVisibility {
   blog: boolean;
   gallery: boolean;
   testimonials: boolean;
+  catalogue: boolean;
 }
 
 const DEFAULT_VISIBILITY: SectionVisibility = {
@@ -244,6 +261,7 @@ const DEFAULT_VISIBILITY: SectionVisibility = {
   blog: true,
   gallery: true,
   testimonials: true,
+  catalogue: true,
 };
 
 export async function getSectionVisibility(): Promise<SectionVisibility> {

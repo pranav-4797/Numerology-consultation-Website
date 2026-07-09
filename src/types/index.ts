@@ -130,9 +130,24 @@ export interface SiteSettings {
   heroSubtitle: string;
 }
 
+export type ProductCategory = 'bracelets' | 'crystals' | 'yantras' | 'rudraksha' | 'pendants' | 'other';
+
+export interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  category: ProductCategory;
+  image: string;
+  inStock: boolean;
+  featured: boolean;
+  createdAt: string;
+}
+
 export interface DashboardStats {
   totalPosts: number;
   totalEvents: number;
   totalWorkshops: number;
   totalLeads: number;
+  totalProducts: number;
 }

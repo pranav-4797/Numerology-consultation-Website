@@ -154,6 +154,18 @@ body {
   }
 }
 
+/* Global Mobile Animation Simplification */
+@media (max-width: 768px) {
+  /* Disable heavy infinite rendering of large blurred layers */
+  .blur-3xl {
+    transform: none !important;
+    animation: none !important;
+    transition: none !important;
+    filter: blur(40px) !important; /* Smaller blur radius is much faster to render on mobile GPUs */
+    will-change: auto !important;
+  }
+}
+
 /* Disable hover effects on touch devices */
 @media (hover: none) {
   *:hover {

@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
+import { useIsMobile } from '@/hooks/useIsMobile';
 
 interface HeroProps {
   title: string;
@@ -14,6 +15,8 @@ interface HeroProps {
 
 export default function Hero({ title, subtitle, ctaText, ctaLink, showParticles = true }: HeroProps) {
   const { t } = useLanguage();
+  const isMobile = useIsMobile();
+
   return (
     <section className="relative min-h-[70vh] sm:min-h-[85vh] flex items-center justify-center overflow-hidden bg-gradient-to-br from-text via-gray-900 to-text">
       {/* Animated Background */}
@@ -21,23 +24,23 @@ export default function Hero({ title, subtitle, ctaText, ctaLink, showParticles 
         <div className="absolute inset-0">
           {/* Gradient Orbs */}
           <motion.div
-            animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+            animate={isMobile ? undefined : { scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
             transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute top-1/4 -left-20 w-96 h-96 bg-primary/20 rounded-full blur-3xl"
+            className="absolute top-1/4 -left-20 w-96 h-96 bg-primary/20 rounded-full blur-3xl opacity-30"
           />
           <motion.div
-            animate={{ scale: [1.2, 1, 1.2], opacity: [0.2, 0.4, 0.2] }}
+            animate={isMobile ? undefined : { scale: [1.2, 1, 1.2], opacity: [0.2, 0.4, 0.2] }}
             transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute bottom-1/4 -right-20 w-96 h-96 bg-secondary/20 rounded-full blur-3xl"
+            className="absolute bottom-1/4 -right-20 w-96 h-96 bg-secondary/20 rounded-full blur-3xl opacity-20"
           />
           <motion.div
-            animate={{ scale: [1, 1.3, 1], opacity: [0.15, 0.3, 0.15] }}
+            animate={isMobile ? undefined : { scale: [1, 1.3, 1], opacity: [0.15, 0.3, 0.15] }}
             transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/10 rounded-full blur-3xl"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/10 rounded-full blur-3xl opacity-15"
           />
 
-          {/* Floating Geometric Shapes */}
-          {[...Array(6)].map((_, i) => (
+          {/* Floating Geometric Shapes - only render on desktop */}
+          {!isMobile && [...Array(6)].map((_, i) => (
             <motion.div
               key={i}
               animate={{

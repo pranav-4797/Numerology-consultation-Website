@@ -17,6 +17,7 @@ import TestimonialCard from '@/components/ui/TestimonialCard';
 import Loader from '@/components/ui/Loader';
 import { getServices, getWorkshops, getEvents, getTestimonials } from '@/services/firestore';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
+import { useIsMobile } from '@/hooks/useIsMobile';
 import type { Service, Workshop, Event, Testimonial } from '@/types';
 
 const whyChooseUs = [
@@ -59,6 +60,7 @@ export default function HomePage() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
   const { settings } = useSiteSettings();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     async function fetchData() {
@@ -100,12 +102,12 @@ export default function HomePage() {
               <div className="relative">
                 <div className="w-full h-96 rounded-3xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center overflow-hidden">
                   <motion.div
-                    animate={{ rotate: 360 }}
+                    animate={isMobile ? undefined : { rotate: 360 }}
                     transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
                     className="w-64 h-64 border border-primary/10 rounded-full flex items-center justify-center"
                   >
                     <motion.div
-                      animate={{ rotate: -360 }}
+                      animate={isMobile ? undefined : { rotate: -360 }}
                       transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
                       className="w-48 h-48 border border-secondary/20 rounded-full flex items-center justify-center"
                     >
@@ -298,14 +300,14 @@ export default function HomePage() {
       <section className="py-20 bg-gradient-to-r from-primary to-primary/90 relative overflow-hidden">
         <div className="absolute inset-0">
           <motion.div
-            animate={{ x: [0, 100, 0], y: [0, -50, 0] }}
+            animate={isMobile ? undefined : { x: [0, 100, 0], y: [0, -50, 0] }}
             transition={{ duration: 20, repeat: Infinity }}
-            className="absolute top-0 left-0 w-96 h-96 bg-white/5 rounded-full blur-3xl"
+            className="absolute top-0 left-0 w-96 h-96 bg-white/5 rounded-full blur-3xl opacity-40"
           />
           <motion.div
-            animate={{ x: [0, -100, 0], y: [0, 50, 0] }}
+            animate={isMobile ? undefined : { x: [0, -100, 0], y: [0, 50, 0] }}
             transition={{ duration: 25, repeat: Infinity }}
-            className="absolute bottom-0 right-0 w-96 h-96 bg-secondary/10 rounded-full blur-3xl"
+            className="absolute bottom-0 right-0 w-96 h-96 bg-secondary/10 rounded-full blur-3xl opacity-30"
           />
         </div>
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">

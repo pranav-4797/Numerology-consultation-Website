@@ -20,6 +20,7 @@ const allNavLinks: { href: string; labelKey: string; key: keyof SectionVisibilit
   { href: '/blog', labelKey: 'nav.blog', key: 'blog' },
   { href: '/gallery', labelKey: 'nav.gallery', key: 'gallery' },
   { href: '/testimonials', labelKey: 'nav.testimonials', key: 'testimonials' },
+  { href: '/catalogue', labelKey: 'nav.catalogue', key: 'catalogue' },
   { href: '/contact', labelKey: 'nav.contact', key: null },
 ];
 

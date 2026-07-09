@@ -76,6 +76,17 @@ export const siteSettingsSchema = z.object({
   heroSubtitle: z.string().min(5, 'Hero subtitle is required'),
 });
 
+export const productSchema = z.object({
+  name: z.string().min(2, 'Product name is required'),
+  description: z.string().min(10, 'Description must be at least 10 characters'),
+  price: z.number().min(1, 'Price must be at least ₹1'),
+  category: z.enum(['bracelets', 'crystals', 'yantras', 'rudraksha', 'pendants', 'other'], {
+    message: 'Please select a category',
+  }),
+  inStock: z.boolean(),
+  featured: z.boolean(),
+});
+
 export type ServiceFormData = z.infer<typeof serviceSchema>;
 export type AppointmentFormData = z.infer<typeof appointmentSchema>;
 export type RegistrationFormData = z.infer<typeof registrationSchema>;
@@ -85,3 +96,4 @@ export type EventFormData = z.infer<typeof eventSchema>;
 export type BlogFormData = z.infer<typeof blogSchema>;
 export type TestimonialFormData = z.infer<typeof testimonialSchema>;
 export type ContactFormData = z.infer<typeof contactSchema>;
+export type ProductFormData = z.infer<typeof productSchema>;

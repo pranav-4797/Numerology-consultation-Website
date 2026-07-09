@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { FileText, Calendar, GraduationCap, Users, Eye, EyeOff, Settings } from 'lucide-react';
+import { FileText, Calendar, GraduationCap, Users, Eye, EyeOff, Settings, ShoppingBag } from 'lucide-react';
 import { toast } from 'sonner';
 import StatCard from '@/components/ui/StatCard';
 import Loader from '@/components/ui/Loader';
@@ -16,6 +16,7 @@ const sectionLabels: { key: keyof SectionVisibility; label: string; icon: string
   { key: 'blog', label: 'Blog', icon: '📝' },
   { key: 'gallery', label: 'Gallery', icon: '🖼️' },
   { key: 'testimonials', label: 'Testimonials', icon: '⭐' },
+  { key: 'catalogue', label: 'Catalogue', icon: '🛍️' },
 ];
 
 export default function AdminDashboard() {
@@ -73,6 +74,7 @@ export default function AdminDashboard() {
         <StatCard title="Total Events" value={stats?.totalEvents || 0} icon={Calendar} color="#D4AF37" index={1} />
         <StatCard title="Total Workshops" value={stats?.totalWorkshops || 0} icon={GraduationCap} color="#8B5CF6" index={2} />
         <StatCard title="Total Leads" value={stats?.totalLeads || 0} icon={Users} color="#EF4444" index={3} />
+        <StatCard title="Total Products" value={stats?.totalProducts || 0} icon={ShoppingBag} color="#F59E0B" index={4} />
       </div>
 
       {/* Section Visibility Toggles */}

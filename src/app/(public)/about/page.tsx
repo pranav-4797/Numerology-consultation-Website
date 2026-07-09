@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Award, Target, Eye, BookOpen, Trophy, Sparkles } from 'lucide-react';
 import ScrollReveal from '@/components/ui/ScrollReveal';
 import SectionHeading from '@/components/ui/SectionHeading';
+import { useIsMobile } from '@/hooks/useIsMobile';
 
 const achievements = [
   '5000+ Happy Clients Worldwide',
@@ -22,6 +23,7 @@ const specializations = [
 ];
 
 export default function AboutPage() {
+  const isMobile = useIsMobile();
   return (
     <>
       {/* Hero */}
@@ -68,12 +70,12 @@ export default function AboutPage() {
               <div className="relative">
                 <div className="w-full h-[480px] rounded-3xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center overflow-hidden">
                   <motion.div
-                    animate={{ rotate: 360 }}
+                    animate={isMobile ? undefined : { rotate: 360 }}
                     transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
                     className="w-72 h-72 border border-primary/10 rounded-full flex items-center justify-center"
                   >
                     <motion.div
-                      animate={{ rotate: -360 }}
+                      animate={isMobile ? undefined : { rotate: -360 }}
                       transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
                       className="w-52 h-52 border border-secondary/20 rounded-full flex items-center justify-center"
                     >
