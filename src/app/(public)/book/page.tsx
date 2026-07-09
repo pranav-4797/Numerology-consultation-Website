@@ -126,7 +126,15 @@ export default function BookAppointmentPage() {
 
   const selectedServiceId = watch('serviceId');
   const birthdate = watch('birthdate');
-  const selectedService = services.find((s) => s.id === selectedServiceId);
+  const selectedIds = selectedServiceId ? selectedServiceId.split(',') : [];
+  const selectedServices = services.filter((s) => selectedIds.includes(s.id));
+  const selectedService = selectedServices[0];
+
+  const totalFees = selectedServices.reduce((sum, s) => {
+    if (!s.fees) return sum;
+    const numericFee = parseFloat(s.fees.replace(/[^\d.]/g, ''));
+    return isNaN(numericFee) ? sum : sum + numericFee;
+  }, 0);
 
   const personalityNumber = birthdate ? getPersonalityNumber(birthdate) : 0;
   const destinyNumber = birthdate ? getDestinyNumber(birthdate) : 0;
@@ -192,7 +200,8 @@ export default function BookAppointmentPage() {
   };
 
   const onSubmit = async (data: AppointmentFormData) => {
-    const service = services.find((s) => s.id === data.serviceId);
+    const serviceTitles = selectedServices.map((s) => s.title).join(', ');
+    const displayFees = totalFees > 0 ? `₹${totalFees.toLocaleString('en-IN')}` : t('book.feeOnRequest');
     setSubmitting(true);
     try {
       await createAppointment({
@@ -200,8 +209,8 @@ export default function BookAppointmentPage() {
         phone: data.phone,
         email: data.email,
         serviceId: data.serviceId,
-        serviceTitle: service?.title ?? '',
-        fees: service?.fees ?? '',
+        serviceTitle: serviceTitles,
+        fees: displayFees,
         birthdate: data.birthdate,
         personalityNumber,
         destinyNumber,
@@ -286,12 +295,21 @@ export default function BookAppointmentPage() {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {services.map((service) => {
-                    const active = selectedServiceId === service.id;
+                    const active = selectedIds.includes(service.id);
+                    const handleServiceToggle = () => {
+                      let newIds: string[];
+                      if (active) {
+                        newIds = selectedIds.filter((id) => id !== service.id);
+                      } else {
+                        newIds = [...selectedIds, service.id];
+                      }
+                      setValue('serviceId', newIds.join(','), { shouldValidate: true });
+                    };
                     return (
                       <button
                         type="button"
                         key={service.id}
-                        onClick={() => setValue('serviceId', service.id, { shouldValidate: true })}
+                        onClick={handleServiceToggle}
                         className={`text-left p-4 rounded-2xl border-2 transition-all ${
                           active
                             ? 'border-primary bg-primary/5 shadow-sm'
@@ -489,9 +507,9 @@ export default function BookAppointmentPage() {
               <div className="flex items-start gap-3 p-4 bg-secondary/10 border border-secondary/20 rounded-2xl">
                 <Info className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
                 <div className="text-sm text-text/70">
-                  {selectedService?.fees && (
+                  {selectedServices.length > 0 && (
                     <p className="font-semibold text-text mb-1">
-                      {t('book.fee')}: ₹{selectedService.fees}
+                      {t('book.fee')}: {totalFees > 0 ? `₹${totalFees.toLocaleString('en-IN')}` : t('book.feeOnRequest')}
                     </p>
                   )}
                   <p>{t('book.paymentNote')}</p>
