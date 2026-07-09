@@ -68,50 +68,230 @@ export default function AdminOrdersPage() {
   };
 
   const handlePrint = () => {
-    const printContent = document.getElementById('printable-invoice')?.innerHTML;
-    const originalContent = document.body.innerHTML;
+    if (!selectedOrder) return;
 
-    if (printContent) {
-      // Create a temporary print stylesheet and content container
-      const printWindow = window.open('', '_blank');
-      if (printWindow) {
-        printWindow.document.write(`
-          <html>
-            <head>
-              <title>Invoice - Divya Urja</title>
-              <style>
-                body { font-family: system-ui, -apple-system, sans-serif; padding: 40px; color: #333; }
-                .invoice-header { display: flex; justify-between; border-bottom: 2px solid #f3f4f6; padding-bottom: 20px; margin-bottom: 30px; }
-                .invoice-header h1 { font-family: Georgia, serif; font-size: 24px; color: #851C1C; margin: 0 0 5px 0; }
-                .invoice-header p { font-size: 12px; color: #666; margin: 2px 0; }
-                .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
-                .details-box h3 { font-size: 13px; text-transform: uppercase; color: #999; margin: 0 0 10px 0; }
-                .details-box p { font-size: 13px; line-height: 1.5; margin: 4px 0; }
-                table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-                th { border-bottom: 1px solid #e5e7eb; padding: 12px 8px; text-align: left; font-size: 12px; color: #666; text-transform: uppercase; }
-                td { padding: 12px 8px; border-bottom: 1px solid #f3f4f6; font-size: 13px; }
-                .totals { float: right; width: 300px; margin-top: 10px; }
-                .totals-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 13px; }
-                .totals-row.grand-total { border-top: 2px solid #f3f4f6; font-weight: bold; font-size: 16px; color: #851C1C; padding-top: 12px; }
-                .text-right { text-align: right; }
-                @media print {
-                  body { padding: 0; }
-                }
-              </style>
-            </head>
-            <body>
-              ${printContent}
-              <script>
-                window.onload = function() {
-                  window.print();
-                  window.close();
-                };
-              </script>
-            </body>
-          </html>
-        `);
-        printWindow.document.close();
-      }
+    const dateStr = selectedOrder.createdAt 
+      ? new Date(selectedOrder.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+      : 'N/A';
+
+    const itemsRows = selectedOrder.items.map(item => `
+      <tr>
+        <td style="padding: 12px 10px; border-bottom: 1px solid #eee; text-align: left;">${item.productName}</td>
+        <td style="padding: 12px 10px; border-bottom: 1px solid #eee; text-align: right;">₹${item.price.toLocaleString('en-IN')}</td>
+        <td style="padding: 12px 10px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
+        <td style="padding: 12px 10px; border-bottom: 1px solid #eee; text-align: right; font-weight: bold;">₹${(item.price * item.quantity).toLocaleString('en-IN')}</td>
+      </tr>
+    `).join('');
+
+    const emailRow = selectedOrder.email ? `<p style="margin: 4px 0; font-size: 13px; color: #555;"><strong>Email:</strong> ${selectedOrder.email}</p>` : '';
+    const districtState = [selectedOrder.district, selectedOrder.state].filter(Boolean).join(', ');
+
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Invoice - Divya Urja</title>
+            <style>
+              @media print {
+                body { padding: 0; margin: 0; }
+                .no-print { display: none; }
+              }
+              body {
+                font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                color: #333;
+                margin: 0;
+                padding: 40px;
+                background-color: #fff;
+              }
+              .invoice-container {
+                max-width: 750px;
+                margin: 0 auto;
+                background: #fff;
+              }
+              .header {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                border-bottom: 2px solid #f3f4f6;
+                padding-bottom: 20px;
+                margin-bottom: 30px;
+              }
+              .logo-area h1 {
+                font-family: Georgia, serif;
+                font-size: 28px;
+                color: #851C1C;
+                margin: 0 0 5px 0;
+                font-weight: bold;
+              }
+              .logo-area p {
+                margin: 2px 0;
+                font-size: 12px;
+                color: #666;
+              }
+              .invoice-details {
+                text-align: right;
+              }
+              .invoice-details h2 {
+                font-size: 24px;
+                margin: 0 0 10px 0;
+                color: #111;
+                letter-spacing: 1px;
+                font-weight: bold;
+              }
+              .invoice-details p {
+                margin: 3px 0;
+                font-size: 12px;
+                color: #555;
+              }
+              .billing-info {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 35px;
+                gap: 40px;
+              }
+              .info-block {
+                flex: 1;
+              }
+              .info-block h3 {
+                font-size: 11px;
+                text-transform: uppercase;
+                color: #999;
+                border-bottom: 1px solid #e5e7eb;
+                padding-bottom: 6px;
+                margin-bottom: 12px;
+                letter-spacing: 0.5px;
+                font-weight: bold;
+              }
+              .info-block p {
+                margin: 4px 0;
+                font-size: 13px;
+                line-height: 1.5;
+              }
+              .invoice-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 30px;
+              }
+              .invoice-table th {
+                background-color: #f9fafb;
+                border-bottom: 2px solid #e5e7eb;
+                padding: 12px 10px;
+                text-align: left;
+                font-size: 11px;
+                font-weight: bold;
+                color: #4b5563;
+                text-transform: uppercase;
+              }
+              .totals-section {
+                display: flex;
+                justify-content: flex-end;
+                margin-top: 20px;
+              }
+              .totals-table {
+                width: 250px;
+                border-collapse: collapse;
+              }
+              .totals-table td {
+                padding: 8px 10px;
+                font-size: 13px;
+                color: #4b5563;
+              }
+              .totals-table tr.grand-total td {
+                border-top: 2px solid #e5e7eb;
+                font-weight: bold;
+                font-size: 16px;
+                color: #851C1C;
+                padding-top: 10px;
+              }
+              .footer-note {
+                margin-top: 50px;
+                text-align: center;
+                font-size: 11px;
+                color: #9ca3af;
+                border-top: 1px dashed #e5e7eb;
+                padding-top: 15px;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="invoice-container">
+              <div class="header">
+                <div class="logo-area">
+                  <h1>DIVYA URJA</h1>
+                  <p>Ancient Sciences & Spiritual Store</p>
+                  <p>Pune, Maharashtra, India</p>
+                  <p>Email: info@divyaurja.com</p>
+                </div>
+                <div class="invoice-details">
+                  <h2>INVOICE</h2>
+                  <p><strong>Invoice ID:</strong> #${selectedOrder.id?.substring(0, 8).toUpperCase()}</p>
+                  <p><strong>Date:</strong> ${dateStr}</p>
+                  <p><strong>Status:</strong> ${selectedOrder.status.toUpperCase()}</p>
+                </div>
+              </div>
+
+              <div class="billing-info">
+                <div class="info-block">
+                  <h3>Billed To</h3>
+                  <p><strong>${selectedOrder.name}</strong></p>
+                  <p>Phone: ${selectedOrder.phone}</p>
+                  ${emailRow}
+                </div>
+                <div class="info-block">
+                  <h3>Shipping Destination</h3>
+                  <p><strong>${selectedOrder.address}</strong></p>
+                  ${districtState ? `<p><strong>${districtState}</strong></p>` : ''}
+                  ${selectedOrder.pincode ? `<p><strong>PIN: ${selectedOrder.pincode}</strong></p>` : ''}
+                </div>
+              </div>
+
+              <table class="invoice-table">
+                <thead>
+                  <tr>
+                    <th style="text-align: left;">Description</th>
+                    <th style="text-align: right;">Unit Price</th>
+                    <th style="text-align: center;">Qty</th>
+                    <th style="text-align: right;">Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${itemsRows}
+                </tbody>
+              </table>
+
+              <div class="totals-section">
+                <table class="totals-table">
+                  <tr>
+                    <td>Subtotal:</td>
+                    <td style="text-align: right;">₹${selectedOrder.subtotal.toLocaleString('en-IN')}</td>
+                  </tr>
+                  <tr>
+                    <td>Shipping Charges:</td>
+                    <td style="text-align: right;">₹${selectedOrder.shippingCharges.toLocaleString('en-IN')}</td>
+                  </tr>
+                  <tr class="grand-total">
+                    <td>Grand Total:</td>
+                    <td style="text-align: right;">₹${selectedOrder.total.toLocaleString('en-IN')}</td>
+                  </tr>
+                </table>
+              </div>
+
+              <div class="footer-note">
+                <p>Thank you for shopping with Divya Urja!</p>
+                <p>This is a computer generated invoice and requires no signature.</p>
+              </div>
+            </div>
+            <script>
+              window.onload = function() {
+                window.print();
+                window.close();
+              };
+            </script>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
     }
   };
 
