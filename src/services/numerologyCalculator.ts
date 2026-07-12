@@ -404,10 +404,11 @@ export function calculateNumerology(
 
   const expression = reduceNumber(totalNameSum, true);
   const soulUrge = reduceNumber(vowelsSum, true);
-  const personality = reduceNumber(consonantsSum, true);
-  const destiny = expression; // Synonymous in Pythagorean
+  const namePersonality = reduceNumber(consonantsSum, true);
+  const destiny = conductorNum; // Conductor (DOB sum)
+  const personality = driverNum; // Driver (DOB day)
   const birthdayNum = reduceNumber(dob.day, true);
-  const maturityNum = reduceNumber(lifePath + destiny, false);
+  const maturityNum = reduceNumber(lifePath + expression, false);
   const attitudeNum = reduceNumber(dob.day + dob.month, false);
 
   // Balance Number (Initials)
@@ -419,7 +420,7 @@ export function calculateNumerology(
   const balanceNum = reduceNumber(initialsSum, false);
 
   // Bridge Number
-  const bridgeNum = Math.abs(reduceToSingleDigit(lifePath) - reduceToSingleDigit(destiny));
+  const bridgeNum = Math.abs(reduceToSingleDigit(lifePath) - reduceToSingleDigit(expression));
 
   // Hidden Passion (Most frequent letter value)
   const letterCounts: Record<number, number> = {};
@@ -780,7 +781,7 @@ export function calculateNumerology(
   const nameAnalysis = {
     expression,
     soulUrge,
-    personality,
+    personality: namePersonality,
     nameNumber: reduceToSingleDigit(expression),
     compoundNumber: totalNameSum,
     luckyAlphabets: ['A', 'E', 'I', 'O', 'U'].filter((_, idx) => (driverNum + idx) % 2 === 0),
@@ -941,19 +942,20 @@ export function calculateNumerology(
   // 11. AI Report Generator (dynamic and professional)
   const lpDesc = CORE_NUMBERS_INFO[lifePath] || { name: 'Unknown', meaning: 'Universal vibration.', strength: 'Adaptability.' };
   const destDesc = CORE_NUMBERS_INFO[destiny] || { name: 'Unknown', meaning: 'Destiny path.', strength: 'Action.' };
+  const exprDesc = CORE_NUMBERS_INFO[expression] || { name: 'Unknown', meaning: 'Expression path.', strength: 'Communication.' };
 
   const aiReport = `### Divya Urja Professional Numerology Audit
 
 Dear ${name}, 
 
-Based on your birth signature profile calculated for the Date of Birth **${dobStr}**, you possess a highly unique vibrational design led by **Psychic/Driver Number ${driverNum}** and **Destiny/Conductor Number ${conductorNum}**.
+Based on your birth signature profile calculated for the Date of Birth **${dobStr}**, you possess a highly unique vibrational design led by **Psychic/Personality/Driver Number ${personality}** and **Destiny/Conductor Number ${destiny}**.
 
 #### Part 1: Core Vibrational Architecture
 Your **Life Path Number is ${lifePath}** (${lpDesc.name}). This governs your primary lesson and path of evolution in this incarnation. ${lpDesc.meaning} In daily life, this manifests as: *${lpDesc.strength}*
 
-Your **Destiny/Expression Number is ${destiny}** (${destDesc.name}). Calculated from the letters of your full name, it represents your innate talents, targets, and how you express yourself to the public. ${destDesc.meaning}
+Your **Destiny Number is ${destiny}** (${destDesc.name}). This represents your overall path, goals, and opportunities, while your **Expression Number is ${expression}** (${exprDesc.name}) calculated from the letters of your full name. ${exprDesc.meaning}
 
-The emotional blueprint of your soul is guided by **Soul Urge Number ${soulUrge}** and **Personality Number ${personality}**, showing a beautiful synergy between what you desire internally versus what you project externally to others.
+The emotional blueprint of your soul is guided by **Soul Urge Number ${soulUrge}** and **Name Personality Number ${namePersonality}**, showing a beautiful synergy between what you desire internally versus what you project externally to others.
 
 #### Part 2: Grid Interpretations
 - **Lo Shu Grid**: Mapping your DOB digits reveals a strong presence in the **${loShuArrows.filter(a => a.type === 'strength').map(a => a.name).join(', ') || 'basic'} planes**. The dominant energy is focused around the number ${loShuDominant.join(', ')}. Your grid is missing the number ${missingNumbers.join(', ')}, which indicates that you need to consciously build qualities like ${missingNumbers.map(n => n === 8 ? 'Discipline' : n === 5 ? 'Stability/Communication' : n === 6 ? 'Family Responsibility' : 'Foresight').join(', ')} using our custom Vastu and habit remedies.

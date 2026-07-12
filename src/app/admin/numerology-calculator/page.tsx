@@ -587,9 +587,9 @@ export default function NumerologyCalculatorPage() {
             <h2 class="section-title">1. Core Numerology Vibration</h2>
             <div class="core-list">
               <div class="core-item"><span class="lbl">Life Path Number</span><span class="val">${result.lifePath}</span></div>
-              <div class="core-item"><span class="lbl">Destiny Number</span><span class="val">${result.destiny}</span></div>
+              <div class="core-item" style="font-weight: bold; background-color: #f0fdfa; border-radius: 6px; padding: 6px 12px; border: 1px solid #ccfbf1;"><span class="lbl" style="color: #0F766E;">Destiny Number *</span><span class="val" style="color: #0F766E; font-size: 16px;">${result.destiny}</span></div>
               <div class="core-item"><span class="lbl">Soul Urge Number</span><span class="val">${result.soulUrge}</span></div>
-              <div class="core-item"><span class="lbl">Personality Number</span><span class="val">${result.personality}</span></div>
+              <div class="core-item" style="font-weight: bold; background-color: #f0fdfa; border-radius: 6px; padding: 6px 12px; border: 1px solid #ccfbf1;"><span class="lbl" style="color: #0F766E;">Personality Number *</span><span class="val" style="color: #0F766E; font-size: 16px;">${result.personality}</span></div>
               <div class="core-item"><span class="lbl">Driver (Moolank)</span><span class="val">${result.driverNum}</span></div>
               <div class="core-item"><span class="lbl">Conductor (Bhagyank)</span><span class="val">${result.conductorNum}</span></div>
               <div class="core-item"><span class="lbl">Maturity Number</span><span class="val">${result.maturityNum}</span></div>
@@ -1015,9 +1015,9 @@ export default function NumerologyCalculatorPage() {
                         <span className="text-xs text-text/60">Life Path Number</span>
                         <span className="text-sm font-bold text-primary">{result.lifePath}</span>
                       </div>
-                      <div className="flex items-center justify-between border-b border-gray-50 pb-2">
-                        <span className="text-xs text-text/60">Destiny Number</span>
-                        <span className="text-sm font-bold text-primary">{result.destiny}</span>
+                      <div className="flex items-center justify-between border border-teal-100 bg-teal-50/70 p-2 rounded-xl">
+                        <span className="text-xs font-bold text-teal-800">Destiny Number *</span>
+                        <span className="text-base font-extrabold text-teal-800">{result.destiny}</span>
                       </div>
                       <div className="flex items-center justify-between border-b border-gray-50 pb-2">
                         <span className="text-xs text-text/60">Expression Number</span>
@@ -1027,9 +1027,9 @@ export default function NumerologyCalculatorPage() {
                         <span className="text-xs text-text/60">Soul Urge Number</span>
                         <span className="text-sm font-bold text-primary">{result.soulUrge}</span>
                       </div>
-                      <div className="flex items-center justify-between border-b border-gray-50 pb-2">
-                        <span className="text-xs text-text/60">Personality Number</span>
-                        <span className="text-sm font-bold text-primary">{result.personality}</span>
+                      <div className="flex items-center justify-between border border-teal-100 bg-teal-50/70 p-2 rounded-xl">
+                        <span className="text-xs font-bold text-teal-800">Personality Number *</span>
+                        <span className="text-base font-extrabold text-teal-800">{result.personality}</span>
                       </div>
                       <div className="flex items-center justify-between border-b border-gray-50 pb-2">
                         <span className="text-xs text-text/60">Birthday Number</span>
