@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { toast } from 'sonner';
 import {
   Trash2, Phone, MessageCircle, Calendar, Clock, IndianRupee, Mail, Sparkles, Search, Edit, X,
@@ -381,6 +382,13 @@ export default function AdminAppointmentsPage() {
                 >
                   <Edit className="w-4 h-4" />
                 </button>
+                <Link
+                  href={`/admin/numerology-calculator?name=${encodeURIComponent(appointment.name)}&dob=${appointment.birthdate || ''}&phone=${encodeURIComponent(appointment.phone)}&email=${encodeURIComponent(appointment.email || '')}`}
+                  title="Send to Numerology Calculator"
+                  className="p-2 bg-purple-50 text-purple-600 hover:bg-purple-100 rounded-lg transition-colors flex items-center justify-center"
+                >
+                  <Sparkles className="w-4 h-4" />
+                </Link>
                 <button
                   onClick={() => setDeleteModal({ open: true, id: appointment.id })}
                   title="Delete appointment"

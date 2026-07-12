@@ -5,7 +5,8 @@ import NextImage from 'next/image';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, Layers, FileText, Calendar, GraduationCap,
-  MessageSquare, Image, Users, CalendarCheck, ClipboardList, Settings, ShoppingBag, ShoppingCart
+  MessageSquare, Image, Users, CalendarCheck, ClipboardList, Settings, ShoppingBag, ShoppingCart,
+  Calculator
 } from 'lucide-react';
 
 const menuItems = [
@@ -21,6 +22,7 @@ const menuItems = [
   { href: '/admin/gallery', label: 'Gallery', icon: Image },
   { href: '/admin/products', label: 'Products', icon: ShoppingBag },
   { href: '/admin/leads', label: 'Leads', icon: Users },
+  { href: '/admin/numerology-calculator', label: 'Numerology Calculator', icon: Calculator },
   { href: '/admin/settings', label: 'Settings', icon: Settings },
 ];
 
