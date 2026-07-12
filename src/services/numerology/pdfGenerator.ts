@@ -307,6 +307,18 @@ export function printReport(
             <div class="core-item"><span class="lbl">Bridge Number</span><span class="val">${result.bridgeNum}</span></div>
           </div>
 
+          <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; padding: 15px; border-radius: 8px; margin-top: 20px; font-size: 13px;">
+            <p style="color: #0F766E; margin: 0 0 6px 0; font-size: 14px; font-weight: bold; border-bottom: 1px solid #e5e7eb; padding-bottom: 6px;">🪐 Planetary Compatibility (Moolank & Bhagyank)</p>
+            <p style="margin: 4px 0;"><strong>Moolank (Personality Number):</strong> ${result.compatibilityAnalysis.driverNum} | <strong>Bhagyank (Destiny Number):</strong> ${result.compatibilityAnalysis.conductorNum}</p>
+            <p style="margin: 4px 0;"><strong>Vibrational Relationship:</strong> <span style="color: ${result.compatibilityAnalysis.status === 'Friendly' ? '#10b981' : result.compatibilityAnalysis.status === 'Enemy' ? '#ef4444' : '#b45309'}; font-weight: bold;">${result.compatibilityAnalysis.status}</span></p>
+            <p style="margin: 6px 0 0 0; color: #555; font-style: italic;">${result.compatibilityAnalysis.description}</p>
+            <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; font-size: 11px; text-align: center;">
+              <div style="background: #ecfdf5; padding: 6px; border-radius: 4px; border: 1px solid #d1fae5;"><strong>Friends:</strong> ${result.compatibilityAnalysis.friendlyList.join(', ') || 'None'}</div>
+              <div style="background: #fef2f2; padding: 6px; border-radius: 4px; border: 1px solid #fee2e2;"><strong>Enemies:</strong> ${result.compatibilityAnalysis.enemyList.join(', ') || 'Nil'}</div>
+              <div style="background: #fffbeb; padding: 6px; border-radius: 4px; border: 1px solid #fef3c7;"><strong>Neutrals:</strong> ${result.compatibilityAnalysis.neutralList.slice(0, 4).join(', ')}${result.compatibilityAnalysis.neutralList.length > 4 ? '...' : ''}</div>
+            </div>
+          </div>
+
           <h2 class="section-title">2. Core Numerological Grids</h2>
           <div class="grid-container">
             <div class="grid-box">

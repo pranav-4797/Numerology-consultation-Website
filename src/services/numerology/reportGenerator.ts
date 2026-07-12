@@ -1,4 +1,4 @@
-import { DOB, PLANET_INFO, FRIENDLY_PLANETS, ENEMY_PLANETS, VOWELS, numerologyConfig } from './config';
+import { DOB, PLANET_INFO, FRIENDLY_PLANETS, ENEMY_PLANETS, NEUTRAL_PLANETS, VOWELS, numerologyConfig } from './config';
 import { calculateBirthNumber, calculateBirthdayNum, calculateAttitudeNum, reduceNumber, reduceToSingleDigit } from './birthNumber';
 import { calculateLifePath, calculateConductorNumber } from './destinyNumber';
 import { calculateExpression } from './expression';
@@ -117,6 +117,15 @@ export interface NumerologyReport {
   luckySuggestions: LuckySuggestions;
   remedies: Remedies;
   aiReport: string;
+  compatibilityAnalysis: {
+    driverNum: number;
+    conductorNum: number;
+    status: 'Friendly' | 'Enemy' | 'Neutral';
+    description: string;
+    friendlyList: number[];
+    enemyList: number[];
+    neutralList: number[];
+  };
 }
 
 // Parse date string (YYYY-MM-DD or DD-MM-YYYY)
@@ -325,12 +334,12 @@ export function calculateNumerology(
   const pin4 = reduceToSingleDigit(dob.month + dob.year);
   const pinnacles = [pin1, pin2, pin3, pin4];
 
-  // Exclude century digits (first 2 digits of 4-digit year) from Vedic grid DOB digits list
+  // Exclude century digits (first 2 digits of 4-digit year) from Vedic and Lo Shu grid DOB digits list
   const yearPart = (dob.year % 100).toString();
   const vedicDobDigits = `${dob.day}${dob.month}${yearPart}`.replace(/\D/g, '');
 
   // Grid Calculations
-  const { loShuGrid, loShuFrequencies, loShuRepeated, loShuDominant, loShuArrows } = calculateLoShuGrid(dobDigits);
+  const { loShuGrid, loShuFrequencies, loShuRepeated, loShuDominant, loShuArrows } = calculateLoShuGrid(vedicDobDigits, driverNum, conductorNum);
   const { vedicGrid, vedicFrequencies, vedicStrongPlanets, vedicWeakPlanets, vedicPlanetStrengthPct, luckyNumbers, unluckyNumbers, planetsAnalysis } = calculateVedicGrid(vedicDobDigits, driverNum, conductorNum);
   const { pythagoreanGrid, pythagoreanFrequencies, workingNumbers, pythagoreanPlanes } = calculatePythagoreanGrid(dob, dobDigits);
 
@@ -500,6 +509,34 @@ export function calculateNumerology(
   const destiny = conductorNum;
   const personalityNumVal = driverNum;
 
+  const relFriends = FRIENDLY_PLANETS[personalityNumVal] || [];
+  const relEnemies = ENEMY_PLANETS[personalityNumVal] || [];
+  const relNeutrals = NEUTRAL_PLANETS[personalityNumVal] || [];
+
+  let compStatus: 'Friendly' | 'Enemy' | 'Neutral' = 'Neutral';
+  let compDescription = '';
+
+  if (relFriends.includes(destiny)) {
+    compStatus = 'Friendly';
+    compDescription = `Highly harmonious combination. The personality drive (Moolank ${personalityNumVal}) matches the destiny path (Bhagyank ${destiny}), indicating smooth execution of life goals, low internal friction, and high compatibility.`;
+  } else if (relEnemies.includes(destiny)) {
+    compStatus = 'Enemy';
+    compDescription = `Challenging combination. The personality drive (Moolank ${personalityNumVal}) and destiny path (Bhagyank ${destiny}) are planetary enemies. This can create internal conflict, delays in success, and requires balancing remedies to reduce obstacles.`;
+  } else {
+    compStatus = 'Neutral';
+    compDescription = `Balanced and stable combination. The personality drive (Moolank ${personalityNumVal}) and destiny path (Bhagyank ${destiny}) are neutral to each other, indicating that life progress depends directly on personal efforts and actions.`;
+  }
+
+  const compatibilityAnalysis = {
+    driverNum: personalityNumVal,
+    conductorNum: destiny,
+    status: compStatus,
+    description: compDescription,
+    friendlyList: relFriends,
+    enemyList: relEnemies,
+    neutralList: relNeutrals,
+  };
+
   const resultWithoutAI: Omit<NumerologyReport, 'aiReport'> = {
     name: cleanName,
     dob: safeDobStr,
@@ -551,6 +588,7 @@ export function calculateNumerology(
     houseAnalysis,
     luckySuggestions,
     remedies,
+    compatibilityAnalysis,
   };
 
   const aiReport = generateAIReport(resultWithoutAI);

@@ -507,29 +507,91 @@ export default function NumerologyCalculatorPage() {
                 >
                   {/* OVERVIEW TAB */}
                   {activeTab === 'overview' && (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                      {[
-                        { label: 'Birth Number', value: result.driverNum, desc: 'Personality vibration (Moolank)' },
-                        { label: 'Destiny Number', value: result.conductorNum, desc: 'Conductor / Destiny (Bhagyank)' },
-                        { label: 'Name Number', value: result.nameAnalysis.nameNumber, desc: 'Vibration of spelling expression' },
-                        { label: 'Soul Urge Number', value: result.soulUrge, desc: 'Inner desire & spiritual motivation' },
-                        { label: 'Personality Number', value: result.personality, desc: 'Social persona & outer projection' },
-                        { label: 'Expression Number', value: result.expression, desc: 'Overall expression vibration' },
-                        { label: 'Maturity Number', value: result.maturityNum, desc: 'Attained power in second half of life' },
-                        { label: 'Balance Number', value: result.balanceNum, desc: 'Guidance under crisis situations' },
-                        { label: 'Birthday Number', value: result.birthdayNum, desc: 'Natural talents & birth gifts' },
-                        { label: 'Personal Year', value: result.personalYear, desc: 'Current calendar year energy cycle' },
-                        { label: 'Personal Month', value: result.personalMonth, desc: 'Current month energy cycle' },
-                        { label: 'Personal Day', value: result.personalDay, desc: 'Current day energy cycle' }
-                      ].map((item, idx) => (
-                        <div key={idx} className="bg-white border border-gray-100 rounded-2xl p-5 shadow-xs flex flex-col justify-between">
-                          <div>
-                            <span className="block text-[10px] font-bold text-text/40 uppercase tracking-wider mb-1">{item.label}</span>
-                            <p className="text-[10px] text-text/50 leading-tight">{item.desc}</p>
+                    <div className="flex flex-col gap-6">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                        {[
+                          { label: 'Birth Number', value: result.driverNum, desc: 'Personality vibration (Moolank)' },
+                          { label: 'Destiny Number', value: result.conductorNum, desc: 'Conductor / Destiny (Bhagyank)' },
+                          { label: 'Name Number', value: result.nameAnalysis.nameNumber, desc: 'Vibration of spelling expression' },
+                          { label: 'Soul Urge Number', value: result.soulUrge, desc: 'Inner desire & spiritual motivation' },
+                          { label: 'Personality Number', value: result.personality, desc: 'Social persona & outer projection' },
+                          { label: 'Expression Number', value: result.expression, desc: 'Overall expression vibration' },
+                          { label: 'Maturity Number', value: result.maturityNum, desc: 'Attained power in second half of life' },
+                          { label: 'Balance Number', value: result.balanceNum, desc: 'Guidance under crisis situations' },
+                          { label: 'Birthday Number', value: result.birthdayNum, desc: 'Natural talents & birth gifts' },
+                          { label: 'Personal Year', value: result.personalYear, desc: 'Current calendar year energy cycle' },
+                          { label: 'Personal Month', value: result.personalMonth, desc: 'Current month energy cycle' },
+                          { label: 'Personal Day', value: result.personalDay, desc: 'Current day energy cycle' }
+                        ].map((item, idx) => (
+                          <div key={idx} className="bg-white border border-gray-100 rounded-2xl p-5 shadow-xs flex flex-col justify-between">
+                            <div>
+                              <span className="block text-[10px] font-bold text-text/40 uppercase tracking-wider mb-1">{item.label}</span>
+                              <p className="text-[10px] text-text/50 leading-tight">{item.desc}</p>
+                            </div>
+                            <span className="text-3xl font-extrabold text-primary my-2 bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent drop-shadow-sm leading-none pt-2">{item.value}</span>
                           </div>
-                          <span className="text-3xl font-extrabold text-primary my-2 bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent drop-shadow-sm leading-none pt-2">{item.value}</span>
+                        ))}
+                      </div>
+
+                      {/* Compatibility Section */}
+                      <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm flex flex-col gap-4">
+                        <div className="flex justify-between items-center border-b border-gray-100 pb-3">
+                          <div>
+                            <h3 className="text-xs font-bold text-text/60 uppercase tracking-wider">Planetary Compatibility</h3>
+                            <p className="text-[10px] text-text/40">Relationship between Moolank (Personality) and Bhagyank (Destiny) numbers</p>
+                          </div>
+                          <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                            result.compatibilityAnalysis.status === 'Friendly'
+                              ? 'bg-green-50 text-green-700 border border-green-200'
+                              : result.compatibilityAnalysis.status === 'Enemy'
+                              ? 'bg-red-50 text-red-700 border border-red-200'
+                              : 'bg-amber-50 text-amber-700 border border-amber-200'
+                          }`}>
+                            {result.compatibilityAnalysis.status} Relation
+                          </span>
                         </div>
-                      ))}
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                          <div className="flex flex-col gap-2">
+                            <p className="text-xs font-semibold text-text/70">
+                              Moolank (Personality): <span className="text-primary font-bold">{result.compatibilityAnalysis.driverNum}</span>
+                            </p>
+                            <p className="text-xs font-semibold text-text/70">
+                              Bhagyank (Destiny): <span className="text-primary font-bold">{result.compatibilityAnalysis.conductorNum}</span>
+                            </p>
+                            <p className="text-xs text-text/65 mt-1 leading-relaxed">
+                              {result.compatibilityAnalysis.description}
+                            </p>
+                          </div>
+
+                          <div className="bg-gray-50/50 rounded-xl p-4 border border-gray-100 flex flex-col gap-2.5">
+                            <h4 className="text-[10px] font-bold text-text/50 uppercase tracking-wider border-b border-gray-100 pb-1.5">
+                              Planetary Relationship Chart for Number {result.compatibilityAnalysis.driverNum}
+                            </h4>
+                            <div className="grid grid-cols-3 gap-2 text-center">
+                              <div className="bg-green-50/30 border border-green-100/50 p-2 rounded-lg">
+                                <span className="block text-[8px] font-bold text-green-700 uppercase mb-0.5">Friends</span>
+                                <span className="text-xs font-bold text-green-800">
+                                  {result.compatibilityAnalysis.friendlyList.join(', ') || 'None'}
+                                </span>
+                              </div>
+                              <div className="bg-red-50/30 border border-red-100/50 p-2 rounded-lg">
+                                <span className="block text-[8px] font-bold text-red-700 uppercase mb-0.5">Enemies</span>
+                                <span className="text-xs font-bold text-red-800">
+                                  {result.compatibilityAnalysis.enemyList.join(', ') || 'Nil'}
+                                </span>
+                              </div>
+                              <div className="bg-amber-50/30 border border-amber-100/50 p-2 rounded-lg">
+                                <span className="block text-[8px] font-bold text-amber-700 uppercase mb-0.5">Neutrals</span>
+                                <span className="text-xs font-bold text-amber-800 mb-0.5">
+                                  {result.compatibilityAnalysis.neutralList.slice(0, 4).join(', ')}
+                                  {result.compatibilityAnalysis.neutralList.length > 4 && '...'}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   )}
 
@@ -764,9 +826,9 @@ export default function NumerologyCalculatorPage() {
                             {result.pythagoreanGrid.map((row, rIdx) =>
                               row.map((val, cIdx) => {
                                 const baseVal = [
-                                  [1, 2, 3],
-                                  [4, 5, 6],
-                                  [7, 8, 9]
+                                  [3, 6, 9],
+                                  [2, 5, 8],
+                                  [1, 4, 7]
                                 ][rIdx][cIdx];
                                 const isMissing = !val;
                                 return (

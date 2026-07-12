@@ -16,7 +16,7 @@ export interface LoShuResult {
   loShuArrows: LoShuArrow[];
 }
 
-export function calculateLoShuGrid(dobDigits: string): LoShuResult {
+export function calculateLoShuGrid(dobDigits: string, driverNum: number, conductorNum: number): LoShuResult {
   const loShuFrequencies: Record<number, number> = {};
   for (let i = 1; i <= 9; i++) loShuFrequencies[i] = 0;
 
@@ -25,6 +25,13 @@ export function calculateLoShuGrid(dobDigits: string): LoShuResult {
       loShuFrequencies[digit]++;
     }
   });
+
+  if (driverNum >= 1 && driverNum <= 9) {
+    loShuFrequencies[driverNum]++;
+  }
+  if (conductorNum >= 1 && conductorNum <= 9) {
+    loShuFrequencies[conductorNum]++;
+  }
 
   const loShuGrid = LO_SHU_LAYOUT.map(row =>
     row.map(val => {

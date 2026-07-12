@@ -41,6 +41,9 @@ export function calculateVedicGrid(dobDigits: string, driverNum: number, conduct
   if (driverNum >= 1 && driverNum <= 9) {
     vedicFrequencies[driverNum]++;
   }
+  if (conductorNum >= 1 && conductorNum <= 9) {
+    vedicFrequencies[conductorNum]++;
+  }
 
   const vedicGrid = VEDIC_LAYOUT.map(row =>
     row.map(val => {

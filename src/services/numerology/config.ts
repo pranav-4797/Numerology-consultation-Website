@@ -54,33 +54,45 @@ export const VEDIC_LAYOUT = [
 ];
 
 export const PYTHAGOREAN_LAYOUT = [
-  [1, 2, 3],
-  [4, 5, 6],
-  [7, 8, 9]
+  [3, 6, 9],
+  [2, 5, 8],
+  [1, 4, 7]
 ];
 
 export const FRIENDLY_PLANETS: Record<number, number[]> = {
-  1: [2, 3, 9, 5],
-  2: [1, 3, 5],
-  3: [1, 2, 9, 7],
-  4: [5, 6, 8, 7],
-  5: [1, 6, 4, 8],
-  6: [5, 8, 4, 7],
-  7: [1, 3, 4, 5, 6],
-  8: [5, 6, 4, 7],
-  9: [1, 2, 3]
+  1: [2, 3, 9],
+  2: [1, 5],
+  3: [9, 2, 1],
+  4: [6, 8],
+  5: [1, 6],
+  6: [4, 5, 7, 8],
+  7: [6, 9],
+  8: [4, 5, 6],
+  9: [1, 3, 7]
 };
 
 export const ENEMY_PLANETS: Record<number, number[]> = {
-  1: [8, 7, 4],
-  2: [4, 7, 8, 9],
-  3: [6, 8],
-  4: [1, 2, 9],
+  1: [4, 6, 7, 8],
+  2: [],
+  3: [5, 6],
+  4: [9, 2, 1],
   5: [2],
   6: [1, 2],
-  7: [2, 8, 9],
-  8: [1, 2, 9],
-  9: [4, 7, 8]
+  7: [1, 2, 4, 8],
+  8: [1, 2, 7, 9],
+  9: [4, 5]
+};
+
+export const NEUTRAL_PLANETS: Record<number, number[]> = {
+  1: [1, 5],
+  2: [2, 3, 4, 6, 7, 8, 9],
+  3: [3, 4, 7, 8],
+  4: [3, 4, 5, 7],
+  5: [5, 4, 3, 7, 8, 9],
+  6: [9, 3, 6],
+  7: [3, 5, 7],
+  8: [3, 8],
+  9: [2, 6, 8, 9]
 };
 
 export const PLANET_INFO: Record<string, PlanetDetail> = {
@@ -220,9 +232,9 @@ export const ARROWS_DEFINITIONS = [
 
 export const PYTHAGOREAN_PLANES = [
   {
-    name: 'Physical Plane (1-4-7)',
-    scoreNumbers: [1, 4, 7],
-    description: 'Physical vitality, materialization, duty execution, and coordination.',
+    name: 'Mental Plane (3-6-9)',
+    scoreNumbers: [3, 6, 9],
+    description: 'Intellectual potential, memory power, analytical reasoning, and creative vision.',
   },
   {
     name: 'Emotional Plane (2-5-8)',
@@ -230,9 +242,9 @@ export const PYTHAGOREAN_PLANES = [
     description: 'Social connections, family duties, intuition, stability under emotional stress.',
   },
   {
-    name: 'Mental Plane (3-6-9)',
-    scoreNumbers: [3, 6, 9],
-    description: 'Intellectual potential, memory power, analytical reasoning, and creative vision.',
+    name: 'Physical Plane (1-4-7)',
+    scoreNumbers: [1, 4, 7],
+    description: 'Physical vitality, materialization, duty execution, and coordination.',
   },
   {
     name: 'Spiritual Plane (Diagonal 3-5-7)',
