@@ -6,7 +6,6 @@ import { calculateSoulUrge } from './soulUrge';
 import { calculatePersonality } from './personality';
 import { calculateLoShuGrid } from './loshu';
 import { calculateVedicGrid } from './vedic';
-import { calculatePythagoreanGrid } from './pythagorean';
 import { calculatePersonalYear, calculatePersonalMonth, calculatePersonalDay } from './personalYear';
 import { calculateLuckySuggestions, calculateRemedies, LuckySuggestions, Remedies } from './lucky';
 import { calculateMissingNumbers, calculateRepeatedNumbers, detectArrows } from './arrows';
@@ -63,16 +62,6 @@ export interface NumerologyReport {
   luckyNumbers: number[];
   unluckyNumbers: number[];
 
-  pythagoreanGrid: (string | null)[][];
-  pythagoreanFrequencies: Record<number, number>;
-  workingNumbers: number[];
-  pythagoreanPlanes: {
-    name: string;
-    score: number;
-    max: number;
-    status: string;
-    description: string;
-  }[];
 
   // Analysis
   planetsAnalysis: {
@@ -247,7 +236,6 @@ Your **Destiny Number is ${report.destiny}** and your **Expression Number is ${r
 #### Part 2: Grid Interpretations
 - **Lo Shu Grid**: Mapping your DOB digits reveals a strong presence in the **${strongArrows}**. Your grid is missing the number ${missingNumbersStr}, which indicates areas where you must consciously build stability, communication, and discipline using our custom lifestyle and color remedies.
 - **Vedic Grid Planetary Strength**: Your overall planetary charge is **${report.vedicPlanetStrengthPct}%**. The strong planetary entities are **${report.vedicStrongPlanets.join(', ')}**, bringing you public authority and communication power. The planetary entities **${report.vedicWeakPlanets.join(', ') || 'none'}** are currently weak or dormant, suggesting you perform targeted donations on their respective days.
-- **Pythagorean Psychomatrix**: Your working numbers are **${report.workingNumbers.join(', ')}**. The physical, emotional, and mental planes represent a balanced structure, reflecting high resilience.
 
 #### Part 3: Secondary Calculators & Suggestions
 - **Name Vibration**: Your current name spelling vibrates to the compound value **${report.nameAnalysis.compoundNumber}** which reduces to **${report.expression}**.
@@ -341,7 +329,6 @@ export function calculateNumerology(
   // Grid Calculations
   const { loShuGrid, loShuFrequencies, loShuRepeated, loShuDominant, loShuArrows } = calculateLoShuGrid(vedicDobDigits, driverNum, conductorNum);
   const { vedicGrid, vedicFrequencies, vedicStrongPlanets, vedicWeakPlanets, vedicPlanetStrengthPct, luckyNumbers, unluckyNumbers, planetsAnalysis } = calculateVedicGrid(vedicDobDigits, driverNum, conductorNum);
-  const { pythagoreanGrid, pythagoreanFrequencies, workingNumbers, pythagoreanPlanes } = calculatePythagoreanGrid(dob, dobDigits);
 
   // Name Analysis
   const nameAnalysis = {
@@ -577,10 +564,6 @@ export function calculateNumerology(
     conductorNum,
     luckyNumbers,
     unluckyNumbers,
-    pythagoreanGrid,
-    pythagoreanFrequencies,
-    workingNumbers,
-    pythagoreanPlanes,
     planetsAnalysis,
     nameAnalysis,
     mobileAnalysis,

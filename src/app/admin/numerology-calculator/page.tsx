@@ -43,31 +43,16 @@ export default function NumerologyCalculatorPage() {
   const [result, setResult] = useState<NumerologyReport | null>(null);
 
   // Active tab state
-  const [activeTab, setActiveTab] = useState<'overview' | 'loshu' | 'vedic' | 'pythagorean' | 'summary'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'loshu' | 'vedic' | 'summary'>('overview');
+
+  // Grid manual editing state
+  const [isEditingGrids, setIsEditingGrids] = useState(false);
 
   // Custom Print States
   const [showEditRemediesModal, setShowEditRemediesModal] = useState(false);
   const [customRemedies, setCustomRemedies] = useState('');
   const [customYantra, setCustomYantra] = useState('');
   const [customCrystals, setCustomCrystals] = useState('');
-
-  // Expandable cards state for Pythagorean planes
-  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
-    character: true,
-    energy: false,
-    interest: false,
-    health: false,
-    logic: false,
-    work: false,
-    luck: false,
-    responsibility: false,
-    memory: false,
-    familyLine: false,
-    talentLine: false,
-    spiritualLine: false,
-    temperament: false,
-    lifePurpose: false,
-  });
 
   // Load saved reports
   const fetchReports = async () => {
@@ -134,12 +119,6 @@ export default function NumerologyCalculatorPage() {
     setFilteredReports(filtered);
   }, [searchQuery, savedReports]);
 
-  const toggleSection = (sec: string) => {
-    setExpandedSections(prev => ({
-      ...prev,
-      [sec]: !prev[sec],
-    }));
-  };
 
   // Calculation handler
   const handleCalculate = () => {
@@ -253,6 +232,153 @@ export default function NumerologyCalculatorPage() {
       console.error(err);
       toast.error('Failed to delete report');
     }
+  };
+
+  // Lo Shu cell manual edit handler
+  const handleEditLoShuCell = (rIdx: number, cIdx: number, newVal: string) => {
+    if (!result) return;
+    
+    const newGrid = result.loShuGrid.map(row => [...row]);
+    const baseVal = [
+      [4, 9, 2],
+      [3, 5, 7],
+      [8, 1, 6]
+    ][rIdx][cIdx];
+    
+    const cleanVal = newVal.replace(new RegExp(`[^${baseVal}]`, 'g'), '');
+    newGrid[rIdx][cIdx] = cleanVal || '';
+
+    const loShuFrequencies: Record<number, number> = {};
+    for (let i = 1; i <= 9; i++) loShuFrequencies[i] = 0;
+    
+    newGrid.forEach((row, ri) => {
+      row.forEach((cellVal, ci) => {
+        const num = [
+          [4, 9, 2],
+          [3, 5, 7],
+          [8, 1, 6]
+        ][ri][ci];
+        if (cellVal) {
+          loShuFrequencies[num] = cellVal.length;
+        }
+      });
+    });
+
+    const checkArrowStatus = (nums: number[]): 'strength' | 'weakness' | 'none' => {
+      const presentCount = nums.filter(n => loShuFrequencies[n] > 0).length;
+      if (presentCount === 3) return 'strength';
+      if (presentCount === 0) return 'weakness';
+      return 'none';
+    };
+
+    const newArrows = result.loShuArrows.map(arrow => {
+      if (arrow.name === 'Arrow of Frustration') {
+        const frustrationStatus = checkArrowStatus([4, 5, 6]);
+        return {
+          ...arrow,
+          type: frustrationStatus === 'weakness' ? ('weakness' as const) : ('none' as const),
+          status: frustrationStatus === 'weakness' ? 'Active (Frustration)' : 'Inactive',
+          meaning: frustrationStatus === 'weakness' ? 'Prone to high expectations leading to disappointment, feel stuck in career.' : 'Emotional resilience and steady progression.',
+        };
+      }
+      const type = checkArrowStatus(arrow.numbers);
+      const status = type === 'strength' ? 'Active (Strength)' : type === 'weakness' ? 'Active (Weakness)' : 'Inactive';
+      return {
+        ...arrow,
+        type,
+        status,
+      };
+    });
+
+    const loShuRepeated = Object.keys(loShuFrequencies)
+      .map(Number)
+      .filter(k => loShuFrequencies[k] > 1);
+
+    let maxFreq = 0;
+    Object.values(loShuFrequencies).forEach(f => {
+      if (f > maxFreq) maxFreq = f;
+    });
+    const loShuDominant = maxFreq > 0
+      ? Object.keys(loShuFrequencies).map(Number).filter(k => loShuFrequencies[k] === maxFreq)
+      : [];
+
+    setResult({
+      ...result,
+      loShuGrid: newGrid,
+      loShuFrequencies,
+      loShuRepeated,
+      loShuDominant,
+      loShuArrows: newArrows,
+    });
+  };
+
+  // Vedic cell manual edit handler
+  const handleEditVedicCell = (rIdx: number, cIdx: number, newVal: string) => {
+    if (!result) return;
+    
+    const newGrid = result.vedicGrid.map(row => [...row]);
+    const baseVal = [
+      [3, 1, 9],
+      [6, 7, 5],
+      [2, 8, 4]
+    ][rIdx][cIdx];
+    
+    const cleanVal = newVal.replace(new RegExp(`[^${baseVal}]`, 'g'), '');
+    newGrid[rIdx][cIdx] = cleanVal || '';
+
+    const vedicFrequencies: Record<number, number> = {};
+    for (let i = 1; i <= 9; i++) vedicFrequencies[i] = 0;
+    
+    newGrid.forEach((row, ri) => {
+      row.forEach((cellVal, ci) => {
+        const num = [
+          [3, 1, 9],
+          [6, 7, 5],
+          [2, 8, 4]
+        ][ri][ci];
+        if (cellVal) {
+          vedicFrequencies[num] = cellVal.length;
+        }
+      });
+    });
+
+    const strongList: string[] = [];
+    const weakList: string[] = [];
+    let totalScore = 0;
+    const maxScore = 90;
+
+    const PLANET_NAMES: Record<number, string> = {
+      1: 'Sun', 2: 'Moon', 3: 'Jupiter', 4: 'Rahu',
+      5: 'Mercury', 6: 'Venus', 7: 'Ketu', 8: 'Saturn', 9: 'Mars'
+    };
+
+    const newPlanetsAnalysis = result.planetsAnalysis.map(planet => {
+      const num = Object.keys(PLANET_NAMES).find(k => PLANET_NAMES[Number(k)] === planet.name);
+      if (!num) return planet;
+      const freq = vedicFrequencies[Number(num)] || 0;
+      const strengthPct = freq === 0 ? 0 : freq === 1 ? 60 : freq === 2 ? 85 : 100;
+      
+      if (strengthPct >= 85) strongList.push(planet.name);
+      if (strengthPct === 0) weakList.push(planet.name);
+      totalScore += strengthPct;
+
+      return {
+        ...planet,
+        strengthPct,
+      };
+    });
+
+    const vedicPlanetStrengthPct = Math.round((totalScore / maxScore) * 100);
+
+    setResult({
+      ...result,
+      vedicGrid: newGrid,
+      vedicFrequencies,
+      vedicStrongPlanets: strongList,
+      vedicWeakPlanets: weakList,
+      vedicPlanetStrengthPct,
+      planetsAnalysis: newPlanetsAnalysis,
+    });
   };
 
   // Copy AI Report summary
@@ -468,7 +594,6 @@ export default function NumerologyCalculatorPage() {
               { id: 'overview', label: 'Overview' },
               { id: 'loshu', label: 'Lo Shu Grid' },
               { id: 'vedic', label: 'Vedic Grid' },
-              { id: 'pythagorean', label: 'Pythagorean Grid' },
               { id: 'summary', label: 'Report Summary' }
             ].map(tab => (
               <button
@@ -600,8 +725,29 @@ export default function NumerologyCalculatorPage() {
                     <div className="flex flex-col gap-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Lo Shu Visual Grid */}
-                        <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm flex flex-col items-center justify-center">
-                          <h3 className="text-xs font-bold text-text/60 uppercase tracking-wider mb-4 border-b border-gray-100 pb-2 w-full text-center">Visual Lo Shu Grid</h3>
+                        <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm flex flex-col items-center justify-center relative">
+                          <div className="flex justify-between items-center w-full mb-4 border-b border-gray-100 pb-2">
+                            <h3 className="text-xs font-bold text-text/60 uppercase tracking-wider text-left">Visual Lo Shu Grid</h3>
+                            <button
+                              onClick={() => setIsEditingGrids(!isEditingGrids)}
+                              className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase transition-all ${
+                                isEditingGrids 
+                                  ? 'bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 shadow-sm' 
+                                  : 'bg-gray-50 hover:bg-gray-100 border border-gray-200 text-text/60 shadow-xs'
+                              }`}
+                            >
+                              {isEditingGrids ? (
+                                <>
+                                  <Check className="w-3.5 h-3.5" /> Save Cells
+                                </>
+                              ) : (
+                                <>
+                                  <Edit className="w-3 h-3" /> Edit Cells
+                                </>
+                              )}
+                            </button>
+                          </div>
+                          
                           <div className="grid grid-cols-3 gap-2 w-full max-w-[240px]">
                             {result.loShuGrid.map((row, rIdx) =>
                               row.map((val, cIdx) => {
@@ -614,15 +760,27 @@ export default function NumerologyCalculatorPage() {
                                 return (
                                   <div
                                     key={`${rIdx}-${cIdx}`}
-                                    className={`aspect-square flex flex-col items-center justify-center border-2 rounded-xl transition-all ${
+                                    className={`aspect-square flex flex-col items-center justify-center border-2 rounded-xl transition-all relative ${
                                       isMissing
                                         ? 'border-gray-100 bg-gray-50/50 text-text/20'
                                         : 'border-primary bg-primary/5 text-primary'
                                     }`}
                                   >
-                                    <span className="text-base font-extrabold">{val || baseVal}</span>
-                                    {isMissing && <span className="text-[8px] uppercase font-bold text-text/25">Missing</span>}
-                                    {!isMissing && val.length > 1 && <span className="text-[8px] uppercase font-bold text-teal-600">Rep</span>}
+                                    {isEditingGrids ? (
+                                      <input
+                                        type="text"
+                                        value={val || ''}
+                                        onChange={(e) => handleEditLoShuCell(rIdx, cIdx, e.target.value)}
+                                        placeholder={baseVal.toString()}
+                                        className="w-full h-full text-center bg-transparent focus:outline-none text-base font-extrabold text-primary placeholder-text/15"
+                                      />
+                                    ) : (
+                                      <>
+                                        <span className="text-base font-extrabold">{val || baseVal}</span>
+                                        {isMissing && <span className="text-[8px] uppercase font-bold text-text/25">Missing</span>}
+                                        {!isMissing && val.length > 1 && <span className="text-[8px] uppercase font-bold text-teal-600">Rep</span>}
+                                      </>
+                                    )}
                                   </div>
                                 );
                               })
@@ -717,8 +875,29 @@ export default function NumerologyCalculatorPage() {
                     <div className="flex flex-col gap-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Vedic Square */}
-                        <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm flex flex-col items-center justify-center">
-                          <h3 className="text-xs font-bold text-text/60 uppercase tracking-wider mb-4 border-b border-gray-100 pb-2 w-full text-center">Vedic Square Layout</h3>
+                        <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm flex flex-col items-center justify-center relative">
+                          <div className="flex justify-between items-center w-full mb-4 border-b border-gray-100 pb-2">
+                            <h3 className="text-xs font-bold text-text/60 uppercase tracking-wider text-left">Vedic Square Layout</h3>
+                            <button
+                              onClick={() => setIsEditingGrids(!isEditingGrids)}
+                              className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase transition-all ${
+                                isEditingGrids 
+                                  ? 'bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 shadow-sm' 
+                                  : 'bg-gray-50 hover:bg-gray-100 border border-gray-200 text-text/60 shadow-xs'
+                              }`}
+                            >
+                              {isEditingGrids ? (
+                                <>
+                                  <Check className="w-3.5 h-3.5" /> Save Cells
+                                </>
+                              ) : (
+                                <>
+                                  <Edit className="w-3 h-3" /> Edit Cells
+                                </>
+                              )}
+                            </button>
+                          </div>
+                          
                           <div className="grid grid-cols-3 gap-2 w-full max-w-[240px]">
                             {result.vedicGrid.map((row, rIdx) =>
                               row.map((val, cIdx) => {
@@ -731,14 +910,26 @@ export default function NumerologyCalculatorPage() {
                                 return (
                                   <div
                                     key={`${rIdx}-${cIdx}`}
-                                    className={`aspect-square flex flex-col items-center justify-center border-2 rounded-xl transition-all ${
+                                    className={`aspect-square flex flex-col items-center justify-center border-2 rounded-xl transition-all relative ${
                                       isMissing
                                         ? 'border-gray-100 bg-gray-50/50 text-text/20'
                                         : 'border-teal-500 bg-teal-50/50 text-teal-700'
                                     }`}
                                   >
-                                    <span className="text-base font-extrabold">{val || baseVal}</span>
-                                    {isMissing && <span className="text-[8px] uppercase font-bold text-text/20">Empty</span>}
+                                    {isEditingGrids ? (
+                                      <input
+                                        type="text"
+                                        value={val || ''}
+                                        onChange={(e) => handleEditVedicCell(rIdx, cIdx, e.target.value)}
+                                        placeholder={baseVal.toString()}
+                                        className="w-full h-full text-center bg-transparent focus:outline-none text-base font-extrabold text-teal-700 placeholder-text/15"
+                                      />
+                                    ) : (
+                                      <>
+                                        <span className="text-base font-extrabold">{val || baseVal}</span>
+                                        {isMissing && <span className="text-[8px] uppercase font-bold text-text/20">Empty</span>}
+                                      </>
+                                    )}
                                   </div>
                                 );
                               })
@@ -815,108 +1006,6 @@ export default function NumerologyCalculatorPage() {
                     </div>
                   )}
 
-                  {/* PYTHAGOREAN GRID TAB */}
-                  {activeTab === 'pythagorean' && (
-                    <div className="flex flex-col gap-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Pythagorean Visual Square */}
-                        <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm flex flex-col items-center justify-center">
-                          <h3 className="text-xs font-bold text-text/60 uppercase tracking-wider mb-4 border-b border-gray-100 pb-2 w-full text-center">Visual Psychomatrix</h3>
-                          <div className="grid grid-cols-3 gap-2 w-full max-w-[240px]">
-                            {result.pythagoreanGrid.map((row, rIdx) =>
-                              row.map((val, cIdx) => {
-                                const baseVal = [
-                                  [3, 6, 9],
-                                  [2, 5, 8],
-                                  [1, 4, 7]
-                                ][rIdx][cIdx];
-                                const isMissing = !val;
-                                return (
-                                  <div
-                                    key={`${rIdx}-${cIdx}`}
-                                    className={`aspect-square flex flex-col items-center justify-center border-2 rounded-xl transition-all ${
-                                      isMissing
-                                        ? 'border-gray-100 bg-gray-50/50 text-text/20'
-                                        : 'border-indigo-500 bg-indigo-50/50 text-indigo-700'
-                                    }`}
-                                  >
-                                    <span className="text-base font-extrabold">{val || baseVal}</span>
-                                    {isMissing && <span className="text-[8px] uppercase font-bold text-text/20">Empty</span>}
-                                  </div>
-                                );
-                              })
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Working Numbers and plane summary */}
-                        <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm flex flex-col gap-4">
-                          <h3 className="text-xs font-bold text-text/60 uppercase tracking-wider border-b border-gray-100 pb-2">Psychomatrix Summary</h3>
-                          <div>
-                            <span className="block text-[10px] font-bold text-text/40 uppercase mb-1.5">Working Numbers</span>
-                            <div className="flex gap-2">
-                              {result.workingNumbers.map((num, idx) => (
-                                <span key={idx} className="bg-indigo-50 border border-indigo-100 text-indigo-700 px-3 py-1 rounded-lg text-xs font-bold">
-                                  {num}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                          <div>
-                            <span className="block text-[10px] font-bold text-text/40 uppercase mb-2">Psychomatrix planes</span>
-                            <div className="space-y-2">
-                              {result.pythagoreanPlanes.map((plane, idx) => (
-                                <div key={idx} className="flex justify-between items-center text-xs border-b border-gray-50 pb-1.5">
-                                  <span className="font-medium text-text/70">{plane.name}</span>
-                                  <span className={`font-bold px-2 py-0.5 rounded-full text-[9px] ${plane.status === 'Strong' ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-text/50'}`}>
-                                    Score: {plane.score} ({plane.status})
-                                  </span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Expandable cards for detailed parameters */}
-                      <div className="space-y-3">
-                        {[
-                          { id: 'character', label: 'Character (Cell 1)', desc: 'Self-hood, ego, willpower, individuality. Represents how the person expresses themselves.' },
-                          { id: 'energy', label: 'Energy (Cell 2)', desc: 'Vital force, energetic capacity, interaction with others, emotional charge.' },
-                          { id: 'interest', label: 'Interest (Cell 3)', desc: 'Curiosity, scientific outlook, interest in mystery or occult sciences.' },
-                          { id: 'health', label: 'Health (Cell 4)', desc: 'Body structure, physical stamina, resistance to ailments.' },
-                          { id: 'logic', label: 'Logic (Cell 5)', desc: 'Intelligent calculations, strategy, mental foresight, grounding force.' },
-                          { id: 'work', label: 'Work (Cell 6)', desc: 'Focus on manual creation, hard physical work, professional responsibility.' },
-                          { id: 'luck', label: 'Luck (Cell 7)', desc: 'Divine protection, luck factor, smooth flow of destiny cycles.' },
-                          { id: 'responsibility', label: 'Responsibility (Cell 8)', desc: 'Sense of duty, family responsibility, stability under stress.' },
-                          { id: 'memory', label: 'Memory (Cell 9)', desc: 'Mental capacity, memory power, analytical reasoning, and creative vision.' },
-                          { id: 'familyLine', label: 'Family Line (Row 2-5-8)', desc: 'Focus on social bounds, family duties, and relationship commitments.' },
-                          { id: 'talentLine', label: 'Talent Line (Diagonal 1-5-9)', desc: 'Individual talents, determination, and spiritual growth.' },
-                          { id: 'spiritualLine', label: 'Spiritual Line (Diagonal 3-5-7)', desc: 'Intuitive insight, connection to nature, healing capability.' },
-                          { id: 'temperament', label: 'Temperament', desc: 'Inner reactions, emotional threshold, adaptability under severe crisis.' },
-                          { id: 'lifePurpose', label: 'Life Purpose', desc: 'Overall purpose derived from the combinations of working numbers.' }
-                        ].map((item) => {
-                          const isOpen = expandedSections[item.id];
-                          return (
-                            <div key={item.id} className="bg-white border border-gray-100 rounded-xl shadow-xs overflow-hidden">
-                              <button
-                                onClick={() => toggleSection(item.id)}
-                                className="w-full flex justify-between items-center px-5 py-3.5 hover:bg-gray-50/50 transition-colors text-left"
-                              >
-                                <span className="text-xs font-bold text-text/80">{item.label}</span>
-                                {isOpen ? <ChevronUp className="w-4 h-4 text-text/40" /> : <ChevronDown className="w-4 h-4 text-text/40" />}
-                              </button>
-                              {isOpen && (
-                                <div className="px-5 pb-4 pt-1 border-t border-gray-50 text-xs text-text/60 leading-relaxed bg-gray-50/20">
-                                  {item.desc}
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
 
                   {/* REPORT SUMMARY TAB */}
                   {activeTab === 'summary' && (

@@ -53,11 +53,6 @@ export const VEDIC_LAYOUT = [
   [2, 8, 4]
 ];
 
-export const PYTHAGOREAN_LAYOUT = [
-  [3, 6, 9],
-  [2, 5, 8],
-  [1, 4, 7]
-];
 
 export const FRIENDLY_PLANETS: Record<number, number[]> = {
   1: [2, 3, 9],
@@ -230,28 +225,6 @@ export const ARROWS_DEFINITIONS = [
   }
 ];
 
-export const PYTHAGOREAN_PLANES = [
-  {
-    name: 'Mental Plane (3-6-9)',
-    scoreNumbers: [3, 6, 9],
-    description: 'Intellectual potential, memory power, analytical reasoning, and creative vision.',
-  },
-  {
-    name: 'Emotional Plane (2-5-8)',
-    scoreNumbers: [2, 5, 8],
-    description: 'Social connections, family duties, intuition, stability under emotional stress.',
-  },
-  {
-    name: 'Physical Plane (1-4-7)',
-    scoreNumbers: [1, 4, 7],
-    description: 'Physical vitality, materialization, duty execution, and coordination.',
-  },
-  {
-    name: 'Spiritual Plane (Diagonal 3-5-7)',
-    scoreNumbers: [3, 5, 7],
-    description: 'Connection with divine wisdom, mystical arts, inner strength and empathy.',
-  },
-];
 
 // Calculation Configurations
 export const numerologyConfig = {

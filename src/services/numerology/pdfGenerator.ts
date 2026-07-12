@@ -37,13 +37,6 @@ export function printReport(
     )
     .join('');
 
-  const pythagoreanGridHtml = result.pythagoreanGrid
-    .map(row =>
-      `<tr>` +
-      row.map(val => `<td class="grid-cell">${val || '&nbsp;'}</td>`).join('') +
-      `</tr>`
-    )
-    .join('');
 
   const planetsHtml = result.planetsAnalysis
     .filter(p => p.strengthPct > 0)
@@ -328,10 +321,6 @@ export function printReport(
             <div class="grid-box">
               <h3>Vedic Grid</h3>
               <table class="calc-grid">${vedicGridHtml}</table>
-            </div>
-            <div class="grid-box">
-              <h3>Pythagorean Square</h3>
-              <table class="calc-grid">${pythagoreanGridHtml}</table>
             </div>
           </div>
 

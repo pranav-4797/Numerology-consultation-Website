@@ -7,7 +7,6 @@ export * from './personality';
 export * from './expression';
 export * from './loshu';
 export * from './vedic';
-export * from './pythagorean';
 export * from './arrows';
 export * from './personalYear';
 export * from './lucky';
