@@ -200,6 +200,12 @@ export default function NumerologyCalculatorPage() {
       }
 
       toast.success('Numerology Audit calculated successfully!');
+      if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+        setTimeout(() => {
+          const el = document.getElementById('results-dashboard');
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }, 150);
+      }
     } catch (err) {
       console.error(err);
       toast.error('Error during calculations. Please verify input data.');
@@ -283,6 +289,12 @@ export default function NumerologyCalculatorPage() {
     setShowSearchDropdown(false);
     setSearchQuery('');
     toast.success(`Loaded profile for ${rep.name}`);
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      setTimeout(() => {
+        const el = document.getElementById('results-dashboard');
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }, 150);
+    }
   };
 
   // Delete saved report
@@ -808,7 +820,7 @@ export default function NumerologyCalculatorPage() {
       <div className="px-6 mt-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         {/* Left Input Sidebar Panel */}
-        <div className="lg:col-span-4 bg-white border border-gray-100 rounded-2xl p-6 shadow-sm flex flex-col gap-5 sticky top-24">
+        <div className="lg:col-span-4 bg-white border border-gray-100 rounded-2xl p-6 shadow-sm flex flex-col gap-5 lg:sticky lg:top-24">
           <div className="border-b border-gray-100 pb-3">
             <h2 className="text-sm font-bold uppercase tracking-wider text-text/60">Client Details</h2>
             <p className="text-[10px] text-text/40">Provide birth coordinates and contact info</p>
@@ -993,7 +1005,7 @@ export default function NumerologyCalculatorPage() {
         </div>
 
         {/* Right Dashboard Results View */}
-        <div className="lg:col-span-8 flex flex-col gap-4">
+        <div id="results-dashboard" className="lg:col-span-8 flex flex-col gap-4">
           
           {/* Expanded / Collapse Dashboard controller */}
           {result && (
