@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import {
   Search, Save, Printer, FileText, RotateCcw, ChevronDown, ChevronUp,
   Heart, Home, Car, Smartphone, Sparkles, CheckCircle2, AlertCircle,
-  HelpCircle, Trash2, Calendar, User, Mail, Phone, MapPin, Clock
+  HelpCircle, Trash2, Calendar, User, Mail, Phone, MapPin, Clock, X, Edit
 } from 'lucide-react';
 
 import {
@@ -51,6 +51,12 @@ export default function NumerologyCalculatorPage() {
   // Calculation results
   const [result, setResult] = useState<NumerologyReport | null>(null);
   const [compatibility, setCompatibility] = useState<CompatibilityResult | null>(null);
+
+  // Custom Print/Edit States
+  const [showEditRemediesModal, setShowEditRemediesModal] = useState(false);
+  const [customRemedies, setCustomRemedies] = useState('');
+  const [customYantra, setCustomYantra] = useState('');
+  const [customCrystals, setCustomCrystals] = useState('');
 
   // Expandable cards state (Section collapse states)
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
@@ -172,6 +178,9 @@ export default function NumerologyCalculatorPage() {
         houseNo
       );
       setResult(report);
+      setCustomRemedies(report.remedies.lifestyle.join('\n'));
+      setCustomYantra(report.driverNum === 1 ? 'Shree Surya Yantra' : report.driverNum === 3 ? 'Guru Yantra' : report.driverNum === 6 ? 'Shree Shukra Yantra' : 'Shree Yantra');
+      setCustomCrystals(report.luckySuggestions.gemstones.join(', '));
 
       // Partner compatibility calculation if partner details provided
       if (partnerName.trim() && partnerDob) {
@@ -211,6 +220,9 @@ export default function NumerologyCalculatorPage() {
     setResult(null);
     setCompatibility(null);
     setLoadedReportId(undefined);
+    setCustomRemedies('');
+    setCustomYantra('');
+    setCustomCrystals('');
     toast.success('Calculator inputs reset');
   };
 
@@ -222,16 +234,21 @@ export default function NumerologyCalculatorPage() {
     }
 
     // Run calculation first to ensure we save latest states
-    const reportToSave = calculateNumerology(
-      name,
-      dob,
-      gender,
-      mobile,
-      email,
-      mobileToCheck || mobile,
-      vehicleNo,
-      houseNo
-    );
+    const reportToSave = {
+      ...calculateNumerology(
+        name,
+        dob,
+        gender,
+        mobile,
+        email,
+        mobileToCheck || mobile,
+        vehicleNo,
+        houseNo
+      ),
+      customRemedies,
+      customYantra,
+      customCrystals
+    };
 
     try {
       const docId = await saveNumerologyReport(loadedReportId, reportToSave);
@@ -256,6 +273,9 @@ export default function NumerologyCalculatorPage() {
     setHouseNo(rep.houseAnalysis?.value ? rep.mobile : '');
 
     setResult(rep);
+    setCustomRemedies(rep.customRemedies || rep.remedies?.lifestyle?.join('\n') || '');
+    setCustomYantra(rep.customYantra || (rep.driverNum === 1 ? 'Shree Surya Yantra' : rep.driverNum === 3 ? 'Guru Yantra' : rep.driverNum === 6 ? 'Shree Shukra Yantra' : 'Shree Yantra'));
+    setCustomCrystals(rep.customCrystals || rep.luckySuggestions?.gemstones?.join(', ') || '');
     setLoadedReportId(rep.id);
     setShowSearchDropdown(false);
     setSearchQuery('');
@@ -334,6 +354,7 @@ export default function NumerologyCalculatorPage() {
       .join('');
 
     const planetsHtml = result.planetsAnalysis
+      .filter(p => p.strengthPct > 0)
       .map(p => `
         <div class="planet-card">
           <h4>${p.name} - Strength ${p.strengthPct}%</h4>
@@ -637,8 +658,21 @@ export default function NumerologyCalculatorPage() {
             <p><strong>Suitable Days:</strong> ${result.remedies.days.join(', ')}</p>
             <p><strong>Chant Mantra Daily:</strong> ${result.remedies.mantras.join(' or ')}</p>
             <p><strong>Suggested Donations:</strong> ${result.remedies.donations.join(', ')}</p>
-            <p><strong>Daily Habits to Form:</strong></p>
-            <ul>${remediesHtml}</ul>
+
+            <div style="background-color: #f0fdfa; border: 1px solid #ccfbf1; padding: 15px; border-radius: 8px; margin-top: 15px; margin-bottom: 15px; font-size: 13px; color: #111;">
+              <p style="color: #0F766E; margin: 0 0 6px 0; font-size: 14px; border-bottom: 1px solid #ccfbf1; padding-bottom: 6px; font-weight: bold;">🔮 Core Remedies & Daily Habits (Customized)</p>
+              <div style="white-space: pre-line; line-height: 1.6; font-weight: bold;">${customRemedies}</div>
+            </div>
+
+            <div style="background-color: #fef3c7; border: 1px solid #fde68a; padding: 15px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; color: #111;">
+              <p style="color: #b45309; margin: 0 0 6px 0; font-size: 14px; border-bottom: 1px solid #fde68a; padding-bottom: 6px; font-weight: bold;">🔱 Extra Suggested Yantras (Customized)</p>
+              <div style="white-space: pre-line; line-height: 1.6; font-weight: bold;">${customYantra}</div>
+            </div>
+
+            <div style="background-color: #eff6ff; border: 1px solid #dbeafe; padding: 15px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; color: #111;">
+              <p style="color: #1d4ed8; margin: 0 0 6px 0; font-size: 14px; border-bottom: 1px solid #dbeafe; padding-bottom: 6px; font-weight: bold;">💎 Crystals & Gemstones (Customized)</p>
+              <div style="white-space: pre-line; line-height: 1.6; font-weight: bold;">${customCrystals}</div>
+            </div>
 
             <h2 class="section-title">7. AI Spiritual Interpretation</h2>
             <div class="ai-text">${result.aiReport}</div>
@@ -743,6 +777,14 @@ export default function NumerologyCalculatorPage() {
           >
             <Printer className="w-3.5 h-3.5" /> Export PDF / Print
           </button>
+          {result && (
+            <button
+              onClick={() => setShowEditRemediesModal(true)}
+              className="flex items-center gap-1.5 px-4 py-2 bg-purple-50 hover:bg-purple-100 border border-purple-200 text-purple-700 rounded-xl text-xs font-semibold transition-all shadow-sm"
+            >
+              <Edit className="w-3.5 h-3.5" /> Edit print details
+            </button>
+          )}
           <button
             onClick={handleCopyReport}
             className="flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-200 text-text/75 rounded-xl text-xs font-semibold hover:bg-gray-50 transition-all shadow-sm"
@@ -1341,7 +1383,7 @@ export default function NumerologyCalculatorPage() {
 
                 {expandedSections.planets && (
                   <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[450px] overflow-y-auto">
-                    {result.planetsAnalysis.map((p, idx) => (
+                    {result.planetsAnalysis.filter(p => p.strengthPct > 0).map((p, idx) => (
                       <div key={idx} className="bg-gray-50 border border-gray-100 rounded-xl p-4 flex flex-col gap-2">
                         <div className="flex items-center justify-between border-b border-gray-100 pb-1.5">
                           <span className="font-bold text-primary text-xs">{p.details.ruler}</span>
@@ -1839,6 +1881,91 @@ export default function NumerologyCalculatorPage() {
         </div>
 
       </div>
+
+      {/* Edit print details modal */}
+      {showEditRemediesModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-2xl max-w-xl w-full max-h-[85vh] flex flex-col overflow-hidden">
+            {/* Modal Header */}
+            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+              <h3 className="font-playfair text-lg font-bold text-text flex items-center gap-2">
+                <span>🔮 Edit Recommendations & Remedies</span>
+              </h3>
+              <button
+                onClick={() => setShowEditRemediesModal(false)}
+                className="p-1 hover:bg-gray-100 rounded-lg transition-colors text-text/40 hover:text-text"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 overflow-y-auto space-y-4 text-xs">
+              <p className="text-text/50">
+                Customize the remedies, extra suggested Yantras, and crystals that will be printed in the PDF report. Changes will print instantly and can be saved to this client's profile.
+              </p>
+
+              <div>
+                <label className="block font-bold text-text/70 mb-1.5 uppercase tracking-wider text-[10px]">
+                  Core Remedies & Habits (One per line)
+                </label>
+                <textarea
+                  value={customRemedies}
+                  onChange={(e) => setCustomRemedies(e.target.value)}
+                  rows={6}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-medium leading-relaxed text-text"
+                  placeholder="e.g. Wear red clothes on Sundays&#10;Feed wheat to birds daily"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-text/70 mb-1.5 uppercase tracking-wider text-[10px]">
+                  Extra Suggested Yantras
+                </label>
+                <textarea
+                  value={customYantra}
+                  onChange={(e) => setCustomYantra(e.target.value)}
+                  rows={2}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-medium text-text"
+                  placeholder="e.g. Shree Surya Yantra, Shree Yantra"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-text/70 mb-1.5 uppercase tracking-wider text-[10px]">
+                  Crystals & Gemstones
+                </label>
+                <textarea
+                  value={customCrystals}
+                  onChange={(e) => setCustomCrystals(e.target.value)}
+                  rows={2}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-medium text-text"
+                  placeholder="e.g. Red Coral, Ruby"
+                />
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-4 border-t border-gray-100 flex justify-end gap-2">
+              <button
+                onClick={() => setShowEditRemediesModal(false)}
+                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-text/60 rounded-xl font-semibold transition-all"
+              >
+                Close & Use
+              </button>
+              <button
+                onClick={() => {
+                  handleSaveReport();
+                  setShowEditRemediesModal(false);
+                }}
+                className="px-4 py-2 bg-primary text-white hover:bg-primary-dark rounded-xl font-semibold transition-all shadow-md shadow-primary/10"
+              >
+                Save to Profile
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
