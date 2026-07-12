@@ -1,4 +1,4 @@
-import { DOB } from './coreCalculator';
+import { DOB, PYTHAGOREAN_LAYOUT, PYTHAGOREAN_PLANES } from './config';
 
 export interface PythagoreanResult {
   pythagoreanGrid: (string | null)[][];
@@ -12,12 +12,6 @@ export interface PythagoreanResult {
     description: string;
   }[];
 }
-
-export const PYTHAGOREAN_LAYOUT = [
-  [1, 4, 7],
-  [2, 5, 8],
-  [3, 6, 9],
-];
 
 export function sumDigits(num: number): number {
   return Math.abs(num)
@@ -70,36 +64,16 @@ export function calculatePythagoreanGrid(dob: DOB, dobDigits: string): Pythagore
     return nums.reduce((sum, val) => sum + pythagoreanFrequencies[val], 0);
   };
 
-  const pythagoreanPlanes = [
-    {
-      name: 'Physical Plane (1-4-7)',
-      score: getPlaneScore([1, 4, 7]),
+  const pythagoreanPlanes = PYTHAGOREAN_PLANES.map(plane => {
+    const score = getPlaneScore(plane.scoreNumbers);
+    return {
+      name: plane.name,
+      score,
       max: 9,
-      status: getPlaneScore([1, 4, 7]) >= 3 ? 'Strong' : 'Average',
-      description: 'Physical vitality, materialization, duty execution, and coordination.',
-    },
-    {
-      name: 'Emotional Plane (2-5-8)',
-      score: getPlaneScore([2, 5, 8]),
-      max: 9,
-      status: getPlaneScore([2, 5, 8]) >= 3 ? 'Strong' : 'Average',
-      description: 'Social connections, family duties, intuition, stability under emotional stress.',
-    },
-    {
-      name: 'Mental Plane (3-6-9)',
-      score: getPlaneScore([3, 6, 9]),
-      max: 9,
-      status: getPlaneScore([3, 6, 9]) >= 3 ? 'Strong' : 'Average',
-      description: 'Intellectual potential, memory power, analytical reasoning, and creative vision.',
-    },
-    {
-      name: 'Spiritual Plane (Diagonal 3-5-7)',
-      score: getPlaneScore([3, 5, 7]),
-      max: 9,
-      status: getPlaneScore([3, 5, 7]) >= 3 ? 'Active' : 'Average',
-      description: 'Connection with divine wisdom, mystical arts, inner strength and empathy.',
-    },
-  ];
+      status: score >= 3 ? 'Strong' : 'Average',
+      description: plane.description,
+    };
+  });
 
   return {
     pythagoreanGrid,

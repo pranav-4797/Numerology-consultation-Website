@@ -1,3 +1,9 @@
+export interface DOB {
+  day: number;
+  month: number;
+  year: number;
+}
+
 export interface PlanetDetail {
   ruler: string;
   strength: string;
@@ -7,6 +13,75 @@ export interface PlanetDetail {
   color: string;
   day: string;
 }
+
+export const PYTHAGOREAN_MAP: Record<string, number> = {
+  A: 1, J: 1, S: 1,
+  B: 2, K: 2, T: 2,
+  C: 3, L: 3, U: 3,
+  D: 4, M: 4, V: 4,
+  E: 5, N: 5, W: 5,
+  F: 6, O: 6, X: 6,
+  G: 7, P: 7, Y: 7,
+  H: 8, Q: 8, Z: 8,
+  I: 9, R: 9
+};
+
+export const CHALDEAN_MAP: Record<string, number> = {
+  A: 1, I: 1, J: 1, Q: 1, Y: 1,
+  B: 2, K: 2, R: 2,
+  C: 3, G: 3, L: 3, S: 3,
+  D: 4, M: 4, T: 4,
+  E: 5, H: 5, N: 5, X: 5,
+  U: 6, V: 6, W: 6,
+  O: 7, Z: 7,
+  F: 8, P: 8
+};
+
+export const VOWELS = new Set(['A', 'E', 'I', 'O', 'U']);
+
+export const MASTER_NUMBERS = [11, 22, 33];
+
+export const LO_SHU_LAYOUT = [
+  [4, 9, 2],
+  [3, 5, 7],
+  [8, 1, 6]
+];
+
+export const VEDIC_LAYOUT = [
+  [3, 1, 9],
+  [6, 7, 5],
+  [2, 8, 4]
+];
+
+export const PYTHAGOREAN_LAYOUT = [
+  [1, 4, 7],
+  [2, 5, 8],
+  [3, 6, 9]
+];
+
+export const FRIENDLY_PLANETS: Record<number, number[]> = {
+  1: [2, 3, 9, 5],
+  2: [1, 3, 5],
+  3: [1, 2, 9, 7],
+  4: [5, 6, 8, 7],
+  5: [1, 6, 4, 8],
+  6: [5, 8, 4, 7],
+  7: [1, 3, 4, 5, 6],
+  8: [5, 6, 4, 7],
+  9: [1, 2, 3]
+};
+
+export const ENEMY_PLANETS: Record<number, number[]> = {
+  1: [8, 7, 4],
+  2: [4, 7, 8, 9],
+  3: [6, 8],
+  4: [1, 2, 9],
+  5: [2],
+  6: [1, 2],
+  7: [2, 8, 9],
+  8: [1, 2, 9],
+  9: [4, 7, 8]
+};
 
 export const PLANET_INFO: Record<string, PlanetDetail> = {
   Sun: {
@@ -92,137 +167,85 @@ export const PLANET_INFO: Record<string, PlanetDetail> = {
   },
 };
 
-export interface NumerologyReport {
-  name: string;
-  dob: string;
-  gender: string;
-  mobile: string;
-  email: string;
+export const ARROWS_DEFINITIONS = [
+  {
+    name: 'Arrow of Intellect',
+    numbers: [4, 9, 2],
+    descStrength: 'Excellent mental ability, analytical prowess, and strategic mind.',
+    descWeak: 'Struggles with concentration, memory, or overly analytical delays.'
+  },
+  {
+    name: 'Arrow of Emotional Balance',
+    numbers: [2, 5, 8],
+    descStrength: 'Compassionate, emotionally balanced, stable in high stress.',
+    descWeak: 'Hypersensitive, emotional volatility, difficulty expressing feelings.'
+  },
+  {
+    name: 'Arrow of Practicality',
+    numbers: [8, 1, 6],
+    descStrength: 'Highly grounded, capable of hard physical work and manifestation.',
+    descWeak: 'Impractical expectations, struggles to finish manual projects.'
+  },
+  {
+    name: 'Arrow of Planning',
+    numbers: [4, 3, 8],
+    descStrength: 'Superb organizational skills, foresight, and detailed plans.',
+    descWeak: 'Disorganized lifestyle, failure to prepare for future challenges.'
+  },
+  {
+    name: 'Arrow of Will Power',
+    numbers: [9, 5, 1],
+    descStrength: 'Iron determination, persistence, refusal to accept defeat.',
+    descWeak: 'Lack of self-discipline, easily discouraged by setbacks.'
+  },
+  {
+    name: 'Arrow of Activity',
+    numbers: [2, 7, 6],
+    descStrength: 'Proactive, energetic, dynamic execution of ideas.',
+    descWeak: 'Procrastination, physical laziness, low drive.'
+  },
+  {
+    name: 'Arrow of Determination',
+    numbers: [1, 5, 9],
+    descStrength: 'Highly resilient, strong focused willpower to succeed.',
+    descWeak: 'Indecision, easily swayed by opinions of others.'
+  },
+  {
+    name: 'Arrow of Spirituality',
+    numbers: [3, 5, 7],
+    descStrength: 'Deep intuition, strong faith, interest in mystic sciences.',
+    descWeak: 'Skepticism, spiritual void, lack of inner guidance.'
+  }
+];
 
-  // Basic Numbers
-  lifePath: number;
-  destiny: number;
-  expression: number;
-  soulUrge: number;
-  personality: number;
-  birthdayNum: number;
-  maturityNum: number;
-  attitudeNum: number;
-  balanceNum: number;
-  bridgeNum: number;
-  hiddenPassion: number;
-  subconsciousSelf: number;
-  karmicDebts: number[];
-  karmicLessons: number[];
-  missingNumbers: number[];
-  personalYear: number;
-  personalMonth: number;
-  personalDay: number;
-  challenges: number[];
-  pinnacles: number[];
+export const PYTHAGOREAN_PLANES = [
+  {
+    name: 'Physical Plane (1-4-7)',
+    scoreNumbers: [1, 4, 7],
+    description: 'Physical vitality, materialization, duty execution, and coordination.',
+  },
+  {
+    name: 'Emotional Plane (2-5-8)',
+    scoreNumbers: [2, 5, 8],
+    description: 'Social connections, family duties, intuition, stability under emotional stress.',
+  },
+  {
+    name: 'Mental Plane (3-6-9)',
+    scoreNumbers: [3, 6, 9],
+    description: 'Intellectual potential, memory power, analytical reasoning, and creative vision.',
+  },
+  {
+    name: 'Spiritual Plane (Diagonal 3-5-7)',
+    scoreNumbers: [3, 5, 7],
+    description: 'Connection with divine wisdom, mystical arts, inner strength and empathy.',
+  },
+];
 
-  // Lo Shu Grid
-  loShuGrid: (string | null)[][];
-  loShuFrequencies: Record<number, number>;
-  loShuRepeated: number[];
-  loShuDominant: number[];
-  loShuArrows: {
-    name: string;
-    type: 'strength' | 'weakness' | 'none';
-    numbers: number[];
-    status: string;
-    meaning: string;
-  }[];
-
-  // Vedic Grid
-  vedicGrid: (string | null)[][];
-  vedicFrequencies: Record<number, number>;
-  vedicStrongPlanets: string[];
-  vedicWeakPlanets: string[];
-  vedicPlanetStrengthPct: number;
-  driverNum: number;
-  conductorNum: number;
-  luckyNumbers: number[];
-  unluckyNumbers: number[];
-
-  // Pythagorean Grid
-  pythagoreanGrid: (string | null)[][];
-  pythagoreanFrequencies: Record<number, number>;
-  workingNumbers: number[];
-  pythagoreanPlanes: {
-    name: string;
-    score: number;
-    max: number;
-    status: string;
-    description: string;
-  }[];
-
-  // Planets
-  planetsAnalysis: {
-    name: string;
-    details: PlanetDetail;
-    strengthPct: number;
-  }[];
-
-  // Other Analyses
-  nameAnalysis: {
-    expression: number;
-    soulUrge: number;
-    personality: number;
-    nameNumber: number;
-    compoundNumber: number;
-    luckyAlphabets: string[];
-    missingAlphabets: string[];
-    suggestedSpellings: string[];
-  };
-  mobileAnalysis: {
-    value: number;
-    planetInfluence: string;
-    luckyPercentage: number;
-    positiveEnergyPct: number;
-    negativeEnergyPct: number;
-  };
-  vehicleAnalysis: {
-    value: number;
-    vibration: string;
-    luckyScore: number;
-    compatibility: string;
-  };
-  houseAnalysis: {
-    value: number;
-    vibration: string;
-    planet: string;
-    luckyScore: number;
-  };
-
-  // Recommendations & AI
-  luckySuggestions: {
-    colors: string[];
-    gemstones: string[];
-    rudraksha: string[];
-    directions: string[];
-    dates: number[];
-    numbers: number[];
-    careers: string[];
-  };
-  remedies: {
-    mantras: string[];
-    donations: string[];
-    habits: string[];
-    meditation: string;
-    colors: string[];
-    days: string[];
-    lifestyle: string[];
-  };
-
-  aiReport: string;
-}
-
-export interface CompatibilityResult {
-  marriagePct: number;
-  lovePct: number;
-  friendshipPct: number;
-  businessPct: number;
-  overallPct: number;
-  explanation: string;
-}
+// Calculation Configurations
+export const numerologyConfig = {
+  alphabetMap: PYTHAGOREAN_MAP,
+  vowels: VOWELS,
+  masterNumbers: MASTER_NUMBERS,
+  preserveMasterNumbers: true,
+  reduceIndividualLifePath: false, // true = reduce components first, false = sum all dob digits
+};

@@ -18,6 +18,7 @@ const COLLECTION_NAME = 'numerology_reports';
 export interface SavedNumerologyReport extends NumerologyReport {
   id: string;
   createdAt: string;
+  notes?: string;
   customRemedies?: string;
   customYantra?: string;
   customCrystals?: string;
@@ -26,7 +27,7 @@ export interface SavedNumerologyReport extends NumerologyReport {
 // Save or Update Report
 export async function saveNumerologyReport(
   id: string | undefined,
-  report: NumerologyReport & { customRemedies?: string; customYantra?: string; customCrystals?: string }
+  report: NumerologyReport & { customRemedies?: string; customYantra?: string; customCrystals?: string; notes?: string }
 ): Promise<string> {
   const reportsCollection = collection(db, COLLECTION_NAME);
   

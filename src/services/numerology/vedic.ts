@@ -1,28 +1,4 @@
-import { PLANET_INFO, PlanetDetail } from './types';
-
-export const FRIENDLY_PLANETS: Record<number, number[]> = {
-  1: [2, 3, 9, 5],
-  2: [1, 3, 5],
-  3: [1, 2, 9, 7],
-  4: [5, 6, 8, 7],
-  5: [1, 6, 4, 8],
-  6: [5, 8, 4, 7],
-  7: [1, 3, 4, 5, 6],
-  8: [5, 6, 4, 7],
-  9: [1, 2, 3],
-};
-
-export const ENEMY_PLANETS: Record<number, number[]> = {
-  1: [8, 7, 4],
-  2: [4, 7, 8, 9],
-  3: [6, 8],
-  4: [1, 2, 9],
-  5: [2],
-  6: [1, 2],
-  7: [2, 8, 9],
-  8: [1, 2, 9],
-  9: [4, 7, 8],
-};
+import { PlanetDetail, PLANET_INFO, FRIENDLY_PLANETS, ENEMY_PLANETS, VEDIC_LAYOUT } from './config';
 
 export interface VedicResult {
   vedicGrid: (string | null)[][];
@@ -36,12 +12,6 @@ export interface VedicResult {
   unluckyNumbers: number[];
   planetsAnalysis: { name: string; details: PlanetDetail; strengthPct: number }[];
 }
-
-export const VEDIC_LAYOUT = [
-  [3, 1, 9],
-  [6, 7, 5],
-  [2, 8, 4]
-];
 
 export function getPlanetName(num: number): string {
   switch (num) {
@@ -104,7 +74,7 @@ export function calculateVedicGrid(dobDigits: string, driverNum: number, conduct
       case 'Mars': numVal = 9; break;
     }
     const freq = vedicFrequencies[numVal] || 0;
-    const strengthPct = freq === 0 ? 0 : freq === 1 ? 75 : freq === 2 ? 100 : 80; // Standard astro-numerology planetary balance curve
+    const strengthPct = freq === 0 ? 0 : freq === 1 ? 75 : freq === 2 ? 100 : 80;
 
     return {
       name,
