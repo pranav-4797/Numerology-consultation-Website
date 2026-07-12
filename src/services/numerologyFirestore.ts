@@ -11,7 +11,7 @@ import {
   Timestamp
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import type { NumerologyReport } from './numerologyCalculator';
+import type { NumerologyReport } from './numerology';
 
 const COLLECTION_NAME = 'numerology_reports';
 

@@ -14,7 +14,7 @@ import {
   reduceToSingleDigit,
   NumerologyReport,
   CompatibilityResult
-} from '@/services/numerologyCalculator';
+} from '@/services/numerology';
 import {
   saveNumerologyReport,
   getNumerologyReports,
