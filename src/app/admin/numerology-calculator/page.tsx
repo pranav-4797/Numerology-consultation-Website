@@ -114,9 +114,9 @@ export default function NumerologyCalculatorPage() {
             ''
           );
           setResult(report);
-          setCustomRemedies(report.remedies.lifestyle.join('\n'));
+          setCustomRemedies(report.remedies?.lifestyle?.join('\n') || '');
           setCustomYantra(report.driverNum === 1 ? 'Shree Surya Yantra' : report.driverNum === 3 ? 'Guru Yantra' : report.driverNum === 6 ? 'Shree Shukra Yantra' : 'Shree Yantra');
-          setCustomCrystals(report.luckySuggestions.gemstones.join(', '));
+          setCustomCrystals(report.luckySuggestions?.gemstones?.join(', ') || '');
           toast.success(`Automatically computed audit for ${decodeURIComponent(qName)}!`);
         } catch (e) {
           console.error('Auto-calculation error:', e);
@@ -169,25 +169,50 @@ export default function NumerologyCalculatorPage() {
       return;
     }
 
-    try {
-      const report = calculateNumerology(
-        name,
-        dob,
-        gender,
-        mobile,
-        email,
-        mobileToCheck || mobile, // Default check mobile to mobile if empty
-        vehicleNo,
-        houseNo
-      );
-      setResult(report);
-      setCustomRemedies(report.remedies.lifestyle.join('\n'));
-      setCustomYantra(report.driverNum === 1 ? 'Shree Surya Yantra' : report.driverNum === 3 ? 'Guru Yantra' : report.driverNum === 6 ? 'Shree Shukra Yantra' : 'Shree Yantra');
-      setCustomCrystals(report.luckySuggestions.gemstones.join(', '));
+    // Validate date format (should be YYYY-MM-DD from date input)
+    const dobParts = dob.split('-');
+    if (dobParts.length !== 3 || !dobParts[0] || !dobParts[1] || !dobParts[2]) {
+      toast.error('Invalid date format. Please select a valid date of birth.');
+      return;
+    }
 
-      // Partner compatibility calculation if partner details provided
-      if (partnerName.trim() && partnerDob) {
-        const pReport = calculateNumerology(partnerName, partnerDob, 'female', '', '');
+    let report: NumerologyReport;
+    try {
+      report = calculateNumerology(
+        name.trim(),
+        dob,
+        gender || 'male',
+        mobile || '',
+        email || '',
+        mobileToCheck || mobile || '', // Default check mobile to mobile if empty
+        vehicleNo || '',
+        houseNo || ''
+      );
+    } catch (err) {
+      console.error('Main numerology calculation error:', err);
+      const errMsg = err instanceof Error ? err.message : 'Unknown error';
+      toast.error(`Calculation failed: ${errMsg}. Please verify name and date of birth.`);
+      return;
+    }
+
+    try {
+      setResult(report);
+      setCustomRemedies(report.remedies?.lifestyle?.join('\n') || '');
+      setCustomYantra(
+        report.driverNum === 1 ? 'Shree Surya Yantra' 
+        : report.driverNum === 3 ? 'Guru Yantra' 
+        : report.driverNum === 6 ? 'Shree Shukra Yantra' 
+        : 'Shree Yantra'
+      );
+      setCustomCrystals(report.luckySuggestions?.gemstones?.join(', ') || '');
+    } catch (err) {
+      console.error('Error setting report state:', err);
+    }
+
+    // Partner compatibility calculation if partner details provided (isolated try/catch)
+    if (partnerName.trim() && partnerDob) {
+      try {
+        const pReport = calculateNumerology(partnerName.trim(), partnerDob, 'female', '', '', '', '', '');
         const comp = calculateCompatibility(
           report.driverNum,
           report.conductorNum,
@@ -195,20 +220,21 @@ export default function NumerologyCalculatorPage() {
           pReport.conductorNum
         );
         setCompatibility(comp);
-      } else {
+      } catch (err) {
+        console.error('Partner compatibility calculation error:', err);
+        toast.error('Partner compatibility could not be calculated. Main report is ready.');
         setCompatibility(null);
       }
+    } else {
+      setCompatibility(null);
+    }
 
-      toast.success('Numerology Audit calculated successfully!');
-      if (typeof window !== 'undefined' && window.innerWidth < 1024) {
-        setTimeout(() => {
-          const el = document.getElementById('results-dashboard');
-          if (el) el.scrollIntoView({ behavior: 'smooth' });
-        }, 150);
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error('Error during calculations. Please verify input data.');
+    toast.success('Numerology Audit calculated successfully!');
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      setTimeout(() => {
+        const el = document.getElementById('results-dashboard');
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }, 150);
     }
   };
 
@@ -243,21 +269,29 @@ export default function NumerologyCalculatorPage() {
     }
 
     // Run calculation first to ensure we save latest states
-    const reportToSave = {
-      ...calculateNumerology(
-        name,
-        dob,
-        gender,
-        mobile,
-        email,
-        mobileToCheck || mobile,
-        vehicleNo,
-        houseNo
-      ),
-      customRemedies,
-      customYantra,
-      customCrystals
-    };
+    let reportToSave;
+    try {
+      reportToSave = {
+        ...calculateNumerology(
+          name.trim(),
+          dob,
+          gender || 'male',
+          mobile || '',
+          email || '',
+          mobileToCheck || mobile || '',
+          vehicleNo || '',
+          houseNo || ''
+        ),
+        customRemedies,
+        customYantra,
+        customCrystals
+      };
+    } catch (err) {
+      console.error('Calculation error during save:', err);
+      const errMsg = err instanceof Error ? err.message : 'Unknown error';
+      toast.error(`Cannot save: ${errMsg}`);
+      return;
+    }
 
     try {
       const docId = await saveNumerologyReport(loadedReportId, reportToSave);

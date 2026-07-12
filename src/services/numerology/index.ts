@@ -56,7 +56,20 @@ export function calculateNumerology(
   const safeHouseNo = typeof houseNo === 'string' ? houseNo : '';
 
   const cleanName = safeName.toUpperCase().trim();
+  if (!cleanName) {
+    throw new Error('Name cannot be empty');
+  }
+
   const dob = parseDOB(safeDobStr);
+
+  // Validate parsed DOB values are valid numbers
+  if (isNaN(dob.day) || isNaN(dob.month) || isNaN(dob.year)) {
+    throw new Error('Invalid date of birth format');
+  }
+  if (dob.day < 1 || dob.day > 31 || dob.month < 1 || dob.month > 12 || dob.year < 1) {
+    throw new Error('Date of birth values out of range');
+  }
+
   const dobDigits = `${dob.day}${dob.month}${dob.year}`.replace(/\D/g, '');
 
   // 1. Core numbers
