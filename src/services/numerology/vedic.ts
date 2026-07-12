@@ -38,6 +38,10 @@ export function calculateVedicGrid(dobDigits: string, driverNum: number, conduct
     }
   });
 
+  if (driverNum >= 1 && driverNum <= 9) {
+    vedicFrequencies[driverNum]++;
+  }
+
   const vedicGrid = VEDIC_LAYOUT.map(row =>
     row.map(val => {
       const freq = vedicFrequencies[val];

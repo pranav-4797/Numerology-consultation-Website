@@ -1,4 +1,4 @@
-import { DOB, PLANET_INFO, FRIENDLY_PLANETS, ENEMY_PLANETS, PYTHAGOREAN_MAP, VOWELS, numerologyConfig } from './config';
+import { DOB, PLANET_INFO, FRIENDLY_PLANETS, ENEMY_PLANETS, VOWELS, numerologyConfig } from './config';
 import { calculateBirthNumber, calculateBirthdayNum, calculateAttitudeNum, reduceNumber, reduceToSingleDigit } from './birthNumber';
 import { calculateLifePath, calculateConductorNumber } from './destinyNumber';
 import { calculateExpression } from './expression';
@@ -153,7 +153,7 @@ export function calculateHiddenPassion(cleanName: string): number {
   const letters = cleanName.replace(/[^A-Z]/g, '').split('');
   const counts: Record<number, number> = {};
   letters.forEach(char => {
-    const val = PYTHAGOREAN_MAP[char] || 0;
+    const val = numerologyConfig.alphabetMap[char] || 0;
     if (val > 0) {
       counts[val] = (counts[val] || 0) + 1;
     }
@@ -175,7 +175,7 @@ export function calculateBalanceNum(cleanName: string): number {
   const parts = cleanName.split(/\s+/).filter(Boolean);
   const initialsSum = parts.reduce((s, part) => {
     const firstChar = part.charAt(0);
-    return s + (PYTHAGOREAN_MAP[firstChar] || 0);
+    return s + (numerologyConfig.alphabetMap[firstChar] || 0);
   }, 0);
   return reduceNumber(initialsSum, false);
 }
@@ -195,13 +195,13 @@ export function detectKarmicDebts(dob: DOB, cleanName: string): number[] {
   if (checkKarmicDebt(dobSum)) debts.add(dobSum);
   
   const letters = cleanName.replace(/[^A-Z]/g, '').split('');
-  const nameSum = letters.reduce((s, c) => s + (PYTHAGOREAN_MAP[c] || 0), 0);
+  const nameSum = letters.reduce((s, c) => s + (numerologyConfig.alphabetMap[c] || 0), 0);
   if (checkKarmicDebt(nameSum)) debts.add(nameSum);
   
-  const vowelSum = letters.filter(c => VOWELS.has(c)).reduce((s, c) => s + (PYTHAGOREAN_MAP[c] || 0), 0);
+  const vowelSum = letters.filter(c => VOWELS.has(c)).reduce((s, c) => s + (numerologyConfig.alphabetMap[c] || 0), 0);
   if (checkKarmicDebt(vowelSum)) debts.add(vowelSum);
   
-  const consonantSum = letters.filter(c => !VOWELS.has(c)).reduce((s, c) => s + (PYTHAGOREAN_MAP[c] || 0), 0);
+  const consonantSum = letters.filter(c => !VOWELS.has(c)).reduce((s, c) => s + (numerologyConfig.alphabetMap[c] || 0), 0);
   if (checkKarmicDebt(consonantSum)) debts.add(consonantSum);
 
   return Array.from(debts).sort((a, b) => a - b);
@@ -209,7 +209,7 @@ export function detectKarmicDebts(dob: DOB, cleanName: string): number[] {
 
 // Missing numbers in Name (Karmic Lessons)
 export function calculateKarmicLessons(cleanName: string): number[] {
-  const present = new Set(cleanName.replace(/[^A-Z]/g, '').split('').map(c => PYTHAGOREAN_MAP[c]));
+  const present = new Set(cleanName.replace(/[^A-Z]/g, '').split('').map(c => numerologyConfig.alphabetMap[c]));
   const missing: number[] = [];
   for (let i = 1; i <= 9; i++) {
     if (!present.has(i)) {
@@ -296,7 +296,7 @@ export function calculateNumerology(
   const bridgeNum = Math.abs(reduceToSingleDigit(lifePath) - reduceToSingleDigit(expression));
 
   const hiddenPassion = calculateHiddenPassion(cleanName);
-  const subconsciousSelf = new Set(cleanName.replace(/[^A-Z]/g, '').split('').map(c => PYTHAGOREAN_MAP[c])).size;
+  const subconsciousSelf = new Set(cleanName.replace(/[^A-Z]/g, '').split('').map(c => numerologyConfig.alphabetMap[c])).size;
   const karmicDebts = detectKarmicDebts(dob, cleanName);
   const karmicLessons = calculateKarmicLessons(cleanName);
 
@@ -325,9 +325,13 @@ export function calculateNumerology(
   const pin4 = reduceToSingleDigit(dob.month + dob.year);
   const pinnacles = [pin1, pin2, pin3, pin4];
 
+  // Exclude century digits (first 2 digits of 4-digit year) from Vedic grid DOB digits list
+  const yearPart = (dob.year % 100).toString();
+  const vedicDobDigits = `${dob.day}${dob.month}${yearPart}`.replace(/\D/g, '');
+
   // Grid Calculations
   const { loShuGrid, loShuFrequencies, loShuRepeated, loShuDominant, loShuArrows } = calculateLoShuGrid(dobDigits);
-  const { vedicGrid, vedicFrequencies, vedicStrongPlanets, vedicWeakPlanets, vedicPlanetStrengthPct, luckyNumbers, unluckyNumbers, planetsAnalysis } = calculateVedicGrid(dobDigits, driverNum, conductorNum);
+  const { vedicGrid, vedicFrequencies, vedicStrongPlanets, vedicWeakPlanets, vedicPlanetStrengthPct, luckyNumbers, unluckyNumbers, planetsAnalysis } = calculateVedicGrid(vedicDobDigits, driverNum, conductorNum);
   const { pythagoreanGrid, pythagoreanFrequencies, workingNumbers, pythagoreanPlanes } = calculatePythagoreanGrid(dob, dobDigits);
 
   // Name Analysis
@@ -336,10 +340,10 @@ export function calculateNumerology(
     soulUrge,
     personality,
     nameNumber: reduceToSingleDigit(expression),
-    compoundNumber: cleanName.replace(/[^A-Z]/g, '').split('').reduce((s, c) => s + (PYTHAGOREAN_MAP[c] || 0), 0),
+    compoundNumber: cleanName.replace(/[^A-Z]/g, '').split('').reduce((s, c) => s + (numerologyConfig.alphabetMap[c] || 0), 0),
     luckyAlphabets: ['A', 'E', 'I', 'O', 'U'].filter((_, idx) => (driverNum + idx) % 2 === 0),
     missingAlphabets: Array.from(karmicLessons).map(n => {
-      const entry = Object.entries(PYTHAGOREAN_MAP).find(([_, val]) => val === n);
+      const entry = Object.entries(numerologyConfig.alphabetMap).find(([_, val]) => val === n);
       return entry ? entry[0] : '';
     }).filter(Boolean),
     suggestedSpellings: [] as string[]
@@ -356,7 +360,7 @@ export function calculateNumerology(
     const v3 = firstName + 'E' + (lastName ? ' ' + lastName : '');
 
     [v1, v2, v3].forEach(candidate => {
-      const sum = candidate.replace(/[^A-Z]/g, '').split('').reduce((s, c) => s + (PYTHAGOREAN_MAP[c] || 0), 0);
+      const sum = candidate.replace(/[^A-Z]/g, '').split('').reduce((s, c) => s + (numerologyConfig.alphabetMap[c] || 0), 0);
       const red = reduceNumber(sum, true);
       if ([1, 3, 5, 6].includes(reduceToSingleDigit(red))) {
         nameAnalysis.suggestedSpellings.push(`${candidate} (Vibrates to ${red})`);
@@ -426,7 +430,7 @@ export function calculateNumerology(
       if (/[0-9]/.test(char)) {
         sum += parseInt(char, 10);
       } else {
-        sum += PYTHAGOREAN_MAP[char] || 0;
+        sum += numerologyConfig.alphabetMap[char] || 0;
       }
     });
     vehicleVal = reduceToSingleDigit(sum);
@@ -457,7 +461,7 @@ export function calculateNumerology(
       if (/[0-9]/.test(char)) {
         sum += parseInt(char, 10);
       } else {
-        sum += PYTHAGOREAN_MAP[char] || 0;
+        sum += numerologyConfig.alphabetMap[char] || 0;
       }
     });
     houseVal = reduceToSingleDigit(sum);

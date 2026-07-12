@@ -54,9 +54,9 @@ export const VEDIC_LAYOUT = [
 ];
 
 export const PYTHAGOREAN_LAYOUT = [
-  [1, 4, 7],
-  [2, 5, 8],
-  [3, 6, 9]
+  [1, 2, 3],
+  [4, 5, 6],
+  [7, 8, 9]
 ];
 
 export const FRIENDLY_PLANETS: Record<number, number[]> = {
@@ -243,7 +243,7 @@ export const PYTHAGOREAN_PLANES = [
 
 // Calculation Configurations
 export const numerologyConfig = {
-  alphabetMap: PYTHAGOREAN_MAP,
+  alphabetMap: CHALDEAN_MAP,
   vowels: VOWELS,
   masterNumbers: MASTER_NUMBERS,
   preserveMasterNumbers: true,
