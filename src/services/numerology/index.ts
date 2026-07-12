@@ -46,8 +46,17 @@ export function calculateNumerology(
   vehicleNo: string = '',
   houseNo: string = ''
 ): NumerologyReport {
-  const cleanName = name.toUpperCase().trim();
-  const dob = parseDOB(dobStr);
+  const safeName = typeof name === 'string' ? name : '';
+  const safeDobStr = typeof dobStr === 'string' ? dobStr : '';
+  const safeGender = typeof gender === 'string' ? gender : 'male';
+  const safeMobile = typeof mobile === 'string' ? mobile : '';
+  const safeEmail = typeof email === 'string' ? email : '';
+  const safeMobileToCheck = typeof mobileToCheck === 'string' ? mobileToCheck : '';
+  const safeVehicleNo = typeof vehicleNo === 'string' ? vehicleNo : '';
+  const safeHouseNo = typeof houseNo === 'string' ? houseNo : '';
+
+  const cleanName = safeName.toUpperCase().trim();
+  const dob = parseDOB(safeDobStr);
   const dobDigits = `${dob.day}${dob.month}${dob.year}`.replace(/\D/g, '');
 
   // 1. Core numbers
@@ -173,7 +182,7 @@ export function calculateNumerology(
   let positiveEnergyPct = 50;
   let negativeEnergyPct = 50;
 
-  const targetMobile = mobileToCheck || mobile;
+  const targetMobile = safeMobileToCheck || safeMobile;
   if (targetMobile) {
     const digits = targetMobile.replace(/\D/g, '').split('').map(Number);
     const sum = digits.reduce((s, v) => s + v, 0);
@@ -221,8 +230,8 @@ export function calculateNumerology(
   let vehicleLuckyScore = 65;
   let vehicleComp = 'Neutral Compatibility';
 
-  if (vehicleNo) {
-    const lettersAndDigits = vehicleNo.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (safeVehicleNo) {
+    const lettersAndDigits = safeVehicleNo.toUpperCase().replace(/[^A-Z0-9]/g, '');
     let sum = 0;
     lettersAndDigits.split('').forEach(char => {
       if (/[0-9]/.test(char)) {
@@ -252,8 +261,8 @@ export function calculateNumerology(
   let housePlanet = 'Mercury';
   let houseLuckyScore = 65;
 
-  if (houseNo) {
-    const cleaned = houseNo.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (safeHouseNo) {
+    const cleaned = safeHouseNo.toUpperCase().replace(/[^A-Z0-9]/g, '');
     let sum = 0;
     cleaned.split('').forEach(char => {
       if (/[0-9]/.test(char)) {
@@ -319,11 +328,11 @@ export function calculateNumerology(
   });
 
   return {
-    name,
-    dob: dobStr,
-    gender,
-    mobile,
-    email,
+    name: cleanName,
+    dob: safeDobStr,
+    gender: safeGender,
+    mobile: safeMobile,
+    email: safeEmail,
     lifePath,
     destiny,
     expression,

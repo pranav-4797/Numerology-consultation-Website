@@ -114,6 +114,9 @@ export default function NumerologyCalculatorPage() {
             ''
           );
           setResult(report);
+          setCustomRemedies(report.remedies.lifestyle.join('\n'));
+          setCustomYantra(report.driverNum === 1 ? 'Shree Surya Yantra' : report.driverNum === 3 ? 'Guru Yantra' : report.driverNum === 6 ? 'Shree Shukra Yantra' : 'Shree Yantra');
+          setCustomCrystals(report.luckySuggestions.gemstones.join(', '));
           toast.success(`Automatically computed audit for ${decodeURIComponent(qName)}!`);
         } catch (e) {
           console.error('Auto-calculation error:', e);
