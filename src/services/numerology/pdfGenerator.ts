@@ -299,18 +299,14 @@ export function generateReportHtml(
         font-size: 11px;
         color: #374151;
         line-height: 1.65;
-        padding: 14px;
-        background: #fafaf9;
-        border: 1px solid #e5e7eb;
-        border-radius: 6px;
-        margin-top: 10px;
+        margin-top: 6px;
       }
       .ai-h3 {
         font-size: 13px;
         font-weight: 700;
         color: #0F766E;
-        margin: 14px 0 6px 0;
-        padding-bottom: 3px;
+        margin: 16px 0 6px 0;
+        padding-bottom: 4px;
         border-bottom: 1px solid #e5e7eb;
       }
       .ai-h4 {
@@ -412,22 +408,14 @@ export function generateReportHtml(
         <tbody>${arrowsHtml}</tbody>
       </table>
 
-      <!-- 4. Name & Phone -->
-      <h2 class="sec-title">4. Name & Phone Vibration Audit</h2>
-      <table class="core-table">
-        <tr><td class="cl">Name Compound Sum</td><td class="cv">${result.nameAnalysis.compoundNumber}</td><td class="cl">Name Number</td><td class="cv">${result.nameAnalysis.nameNumber}</td></tr>
-        <tr><td class="cl">Suggested Spelling</td><td class="cv" colspan="3" style="text-align:left;font-size:11px;">${result.nameAnalysis.suggestedSpellings[0] || 'Current spelling is optimal'}</td></tr>
-        <tr><td class="cl">Mobile Vibration Number</td><td class="cv">${result.mobileAnalysis.value || 'N/A'}</td><td class="cl">Mobile Harmony Score</td><td class="cv">${result.mobileAnalysis.luckyPercentage ? result.mobileAnalysis.luckyPercentage + '%' : 'N/A'}</td></tr>
-      </table>
-
-      <!-- 5. Planets -->
-      <h2 class="sec-title">5. Planet Analysis</h2>
+      <!-- 4. Planets -->
+      <h2 class="sec-title">4. Planet Analysis</h2>
       ${planetsHtml}
 
       <div class="page-break"></div>
 
-      <!-- 6. Remedies -->
-      <h2 class="sec-title">6. Remedies & Suggestions</h2>
+      <!-- 5. Remedies -->
+      <h2 class="sec-title">5. Remedies & Suggestions</h2>
       <table class="core-table" style="margin-bottom:14px;">
         <tr><td class="cl">Suitable Colors</td><td colspan="3" style="padding:6px 10px;">${result.remedies.colors.join(', ')}</td></tr>
         <tr><td class="cl">Suitable Days</td><td colspan="3" style="padding:6px 10px;">${result.remedies.days.join(', ')}</td></tr>
@@ -448,8 +436,8 @@ export function generateReportHtml(
         <div class="remedy-content">${customCrystals}</div>
       </div>
 
-      <!-- 7. AI Report -->
-      <h2 class="sec-title">7. Spiritual Interpretation</h2>
+      <!-- 6. AI Report -->
+      <h2 class="sec-title">6. Spiritual Interpretation</h2>
       <div class="ai-report">${aiReportHtml}</div>
 
       <!-- Footer -->
