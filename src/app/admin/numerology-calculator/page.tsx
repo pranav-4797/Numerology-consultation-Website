@@ -302,6 +302,10 @@ export default function NumerologyCalculatorPage() {
       ? Object.keys(loShuFrequencies).map(Number).filter(k => loShuFrequencies[k] === maxFreq)
       : [];
 
+    const missingNumbers = Object.keys(loShuFrequencies)
+      .map(Number)
+      .filter(k => loShuFrequencies[k] === 0);
+
     setResult({
       ...result,
       loShuGrid: newGrid,
@@ -309,6 +313,7 @@ export default function NumerologyCalculatorPage() {
       loShuRepeated,
       loShuDominant,
       loShuArrows: newArrows,
+      missingNumbers,
     });
   };
 

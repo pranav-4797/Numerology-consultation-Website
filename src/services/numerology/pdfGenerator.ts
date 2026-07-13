@@ -1,20 +1,36 @@
 import { NumerologyReport } from './reportGenerator';
+import { toast } from 'sonner';
 
-export function printReport(
+function loadHtml2Pdf(): Promise<any> {
+  return new Promise((resolve, reject) => {
+    if (typeof window === 'undefined') {
+      reject(new Error('Window is not defined'));
+      return;
+    }
+    if ((window as any).html2pdf) {
+      resolve((window as any).html2pdf);
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+    script.async = true;
+    script.onload = () => {
+      resolve((window as any).html2pdf);
+    };
+    script.onerror = () => {
+      reject(new Error('Failed to load html2pdf library from CDN.'));
+    };
+    document.head.appendChild(script);
+  });
+}
+
+export function generateReportHtml(
   result: NumerologyReport,
   loadedReportId: string | undefined,
   customRemedies: string,
   customYantra: string,
   customCrystals: string
-): void {
-  if (typeof window === 'undefined') return;
-
-  const printWindow = window.open('', '_blank');
-  if (!printWindow) {
-    alert('Pop-up blocked. Please allow pop-ups for printing.');
-    return;
-  }
-
+): string {
   const dateStr = new Date().toLocaleDateString('en-IN', {
     day: 'numeric',
     month: 'long',
@@ -37,7 +53,6 @@ export function printReport(
     )
     .join('');
 
-
   const planetsHtml = result.planetsAnalysis
     .filter(p => p.strengthPct > 0)
     .map(p => `
@@ -58,7 +73,7 @@ export function printReport(
     `)
     .join('');
 
-  printWindow.document.write(`
+  return `
     <html>
       <head>
         <title>Numerology Audit - ${result.name}</title>
@@ -251,68 +266,53 @@ export function printReport(
         <div class="container">
           <div class="header">
             <div class="logo-area">
-              <h1>DIVYA URJA</h1>
-              <p>Ancient Sciences & Spiritual Guidance</p>
-              <p>Pune, Maharashtra, India</p>
-              <p>Phone: +91 98224 92488</p>
-              <p>Email: info@divyaurja.com</p>
+              <h1>Divya Urja</h1>
+              <p>Energy, Vibrations & Remedies Consultation</p>
+              <p>Email: contact@divyaurja.com | Web: www.divyaurja.com</p>
             </div>
             <div class="report-details">
-              <h2>NUMEROLOGY AUDIT</h2>
-              <p><strong>Report ID:</strong> #RP-${(loadedReportId || 'draft').substring(0, 8).toUpperCase()}</p>
-              <p><strong>Date:</strong> ${dateStr}</p>
-              <p><strong>Status:</strong> FINAL REPORT</p>
+              <h2>Numerology Audit Report</h2>
+              <p><strong>Report ID:</strong> ${loadedReportId || 'TEMP-AUDIT'}</p>
+              <p><strong>Date Compiled:</strong> ${dateStr}</p>
             </div>
           </div>
 
           <table class="client-info-table">
             <tr>
-              <td class="label">Full Name</td>
-              <td>${result.name}</td>
-              <td class="label">Report Date</td>
-              <td>${dateStr}</td>
+              <td class="label">Client Name</td>
+              <td><strong>${result.name}</strong></td>
+              <td class="label">Date of Birth</td>
+              <td><strong>${result.dob}</strong></td>
             </tr>
             <tr>
-              <td class="label">Date of Birth</td>
-              <td>${result.dob}</td>
               <td class="label">Gender</td>
               <td>${result.gender.toUpperCase()}</td>
+              <td class="label">Mobile Number</td>
+              <td>${result.mobile || 'N/A'}</td>
             </tr>
             <tr>
-              <td class="label">Mobile Number</td>
-              <td>${result.mobile}</td>
               <td class="label">Email Address</td>
               <td>${result.email || 'N/A'}</td>
+              <td class="label">Driver & Conductor</td>
+              <td>Driver: <strong>${result.driverNum}</strong> | Conductor: <strong>${result.conductorNum}</strong></td>
             </tr>
           </table>
 
-          <h2 class="section-title">1. Core Numerology Vibration</h2>
+          <h2 class="section-title">1. Core Numbers</h2>
           <div class="core-list">
+            <div class="core-item"><span class="lbl">Driver (Birth) Number</span><span class="val">${result.driverNum}</span></div>
+            <div class="core-item"><span class="lbl">Conductor (Destiny) Number</span><span class="val">${result.conductorNum}</span></div>
             <div class="core-item"><span class="lbl">Life Path Number</span><span class="val">${result.lifePath}</span></div>
-            <div class="core-item" style="font-weight: bold; background-color: #f0fdfa; border-radius: 6px; padding: 6px 12px; border: 1px solid #ccfbf1;"><span class="lbl" style="color: #0F766E;">Destiny Number *</span><span class="val" style="color: #0F766E; font-size: 16px;">${result.destiny}</span></div>
-            <div class="core-item"><span class="lbl">Soul Urge Number</span><span class="val">${result.soulUrge}</span></div>
-            <div class="core-item" style="font-weight: bold; background-color: #f0fdfa; border-radius: 6px; padding: 6px 12px; border: 1px solid #ccfbf1;"><span class="lbl" style="color: #0F766E;">Personality Number *</span><span class="val" style="color: #0F766E; font-size: 16px;">${result.personality}</span></div>
-            <div class="core-item"><span class="lbl">Driver (Moolank)</span><span class="val">${result.driverNum}</span></div>
-            <div class="core-item"><span class="lbl">Conductor (Bhagyank)</span><span class="val">${result.conductorNum}</span></div>
+            <div class="core-item"><span class="lbl">Expression (Name) Number</span><span class="val">${result.expression}</span></div>
+            <div class="core-item"><span class="lbl">Soul Urge (Heart) Number</span><span class="val">${result.soulUrge}</span></div>
+            <div class="core-item"><span class="lbl">Personality Number</span><span class="val">${result.personality}</span></div>
+            <div class="core-item"><span class="lbl">Birthday Number</span><span class="val">${result.birthdayNum}</span></div>
             <div class="core-item"><span class="lbl">Maturity Number</span><span class="val">${result.maturityNum}</span></div>
             <div class="core-item"><span class="lbl">Attitude Number</span><span class="val">${result.attitudeNum}</span></div>
             <div class="core-item"><span class="lbl">Balance Number</span><span class="val">${result.balanceNum}</span></div>
-            <div class="core-item"><span class="lbl">Bridge Number</span><span class="val">${result.bridgeNum}</span></div>
           </div>
 
-          <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; padding: 15px; border-radius: 8px; margin-top: 20px; font-size: 13px;">
-            <p style="color: #0F766E; margin: 0 0 6px 0; font-size: 14px; font-weight: bold; border-bottom: 1px solid #e5e7eb; padding-bottom: 6px;">🪐 Planetary Compatibility (Moolank & Bhagyank)</p>
-            <p style="margin: 4px 0;"><strong>Moolank (Personality Number):</strong> ${result.compatibilityAnalysis.driverNum} | <strong>Bhagyank (Destiny Number):</strong> ${result.compatibilityAnalysis.conductorNum}</p>
-            <p style="margin: 4px 0;"><strong>Vibrational Relationship:</strong> <span style="color: ${result.compatibilityAnalysis.status === 'Friendly' ? '#10b981' : result.compatibilityAnalysis.status === 'Enemy' ? '#ef4444' : '#b45309'}; font-weight: bold;">${result.compatibilityAnalysis.status}</span></p>
-            <p style="margin: 6px 0 0 0; color: #555; font-style: italic;">${result.compatibilityAnalysis.description}</p>
-            <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; font-size: 11px; text-align: center;">
-              <div style="background: #ecfdf5; padding: 6px; border-radius: 4px; border: 1px solid #d1fae5;"><strong>Friends:</strong> ${result.compatibilityAnalysis.friendlyList.join(', ') || 'None'}</div>
-              <div style="background: #fef2f2; padding: 6px; border-radius: 4px; border: 1px solid #fee2e2;"><strong>Enemies:</strong> ${result.compatibilityAnalysis.enemyList.join(', ') || 'Nil'}</div>
-              <div style="background: #fffbeb; padding: 6px; border-radius: 4px; border: 1px solid #fef3c7;"><strong>Neutrals:</strong> ${result.compatibilityAnalysis.neutralList.slice(0, 4).join(', ')}${result.compatibilityAnalysis.neutralList.length > 4 ? '...' : ''}</div>
-            </div>
-          </div>
-
-          <h2 class="section-title">2. Core Numerological Grids</h2>
+          <h2 class="section-title">2. Numerology Grids</h2>
           <div class="grid-container">
             <div class="grid-box">
               <h3>Lo Shu Grid</h3>
@@ -324,9 +324,7 @@ export function printReport(
             </div>
           </div>
 
-          <div class="page-break"></div>
-
-          <h2 class="section-title">3. Lo Shu Arrow Analysis</h2>
+          <h2 class="section-title">3. Lo Shu Arrows Analysis</h2>
           <div>${arrowsHtml}</div>
 
           <h2 class="section-title">4. Name & Phone Vibration Audit</h2>
@@ -371,14 +369,58 @@ export function printReport(
             <p>This is a computer generated calculations summary report compiled by Divya Urja Admin.</p>
           </div>
         </div>
-        <script>
-          window.onload = function() {
-            window.print();
-            window.close();
-          };
-        </script>
       </body>
     </html>
-  `);
-  printWindow.document.close();
+  `;
+}
+
+export async function printReport(
+  result: NumerologyReport,
+  loadedReportId: string | undefined,
+  customRemedies: string,
+  customYantra: string,
+  customCrystals: string
+): Promise<void> {
+  if (typeof window === 'undefined') return;
+
+  const toastId = toast.loading('Generating PDF report, please wait...');
+
+  try {
+    const html2pdf = await loadHtml2Pdf();
+    
+    // Create temporary wrapper
+    const wrapper = document.createElement('div');
+    wrapper.style.position = 'absolute';
+    wrapper.style.left = '-9999px';
+    wrapper.style.top = '-9999px';
+    wrapper.style.width = '800px';
+    wrapper.innerHTML = generateReportHtml(
+      result,
+      loadedReportId,
+      customRemedies,
+      customYantra,
+      customCrystals
+    );
+    document.body.appendChild(wrapper);
+
+    // Options for html2pdf
+    const opt = {
+      margin: [10, 10, 10, 10],
+      filename: `Numerology_Audit_${result.name.replace(/\s+/g, '_')}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, logging: false },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['avoid-all', 'css'] }
+    };
+
+    // Generate and save
+    await html2pdf().from(wrapper).set(opt).save();
+
+    // Clean up
+    document.body.removeChild(wrapper);
+    toast.success('PDF report downloaded successfully!', { id: toastId });
+  } catch (error) {
+    console.error('Failed to generate PDF:', error);
+    toast.error('Failed to generate PDF report. Please try again.', { id: toastId });
+  }
 }

@@ -297,8 +297,7 @@ export function calculateNumerology(
   const karmicDebts = detectKarmicDebts(dob, cleanName);
   const karmicLessons = calculateKarmicLessons(cleanName);
 
-  // Missing numbers in Date of birth
-  const missingNumbers = calculateMissingNumbers(dobDigits);
+  // Missing numbers will be calculated after Lo Shu Grid frequencies are ready
 
   // Personal Year, Month, Day
   const currentYear = new Date().getFullYear();
@@ -329,6 +328,11 @@ export function calculateNumerology(
   // Grid Calculations
   const { loShuGrid, loShuFrequencies, loShuRepeated, loShuDominant, loShuArrows } = calculateLoShuGrid(vedicDobDigits, driverNum, conductorNum);
   const { vedicGrid, vedicFrequencies, vedicStrongPlanets, vedicWeakPlanets, vedicPlanetStrengthPct, luckyNumbers, unluckyNumbers, planetsAnalysis } = calculateVedicGrid(vedicDobDigits, driverNum, conductorNum);
+
+  // Missing numbers in Lo Shu Grid (frequency is 0)
+  const missingNumbers = Object.keys(loShuFrequencies)
+    .map(Number)
+    .filter(k => loShuFrequencies[k] === 0);
 
   // Name Analysis
   const nameAnalysis = {
