@@ -382,22 +382,13 @@ export async function printReport(
   try {
     const html2pdf = await loadHtml2Pdf();
     
-    // Create temporary wrapper positioned underneath the application
-    const wrapper = document.createElement('div');
-    wrapper.style.position = 'absolute';
-    wrapper.style.left = '0';
-    wrapper.style.top = '0';
-    wrapper.style.zIndex = '-9999';
-    wrapper.style.width = '800px';
-    wrapper.style.backgroundColor = '#ffffff';
-    wrapper.innerHTML = generateReportHtml(
+    const htmlContent = generateReportHtml(
       result,
       loadedReportId,
       customRemedies,
       customYantra,
       customCrystals
     );
-    document.body.appendChild(wrapper);
 
     // Options for html2pdf
     const opt = {
@@ -414,11 +405,9 @@ export async function printReport(
       pagebreak: { mode: ['avoid-all', 'css'] }
     };
 
-    // Generate and save
-    await html2pdf().from(wrapper).set(opt).save();
+    // Generate and save directly from the HTML string
+    await html2pdf().from(htmlContent).set(opt).save();
 
-    // Clean up
-    document.body.removeChild(wrapper);
     toast.success('PDF report downloaded successfully!', { id: toastId });
   } catch (error) {
     console.error('Failed to generate PDF:', error);
