@@ -57,313 +57,408 @@ export function generateReportHtml(
     .filter(p => p.strengthPct > 0)
     .map(p => `
       <div class="planet-card">
-        <h4>${p.name} - Strength ${p.strengthPct}%</h4>
-        <p><strong>Influence:</strong> ${p.details.influence}</p>
-        <p><strong>Remedies:</strong> ${p.details.remedies}</p>
-        <p><strong>Lucky Day:</strong> ${p.details.day} | <strong>Lucky Color:</strong> ${p.details.color}</p>
+        <div class="planet-header">${p.name} — Strength ${p.strengthPct}%</div>
+        <table class="planet-table">
+          <tr><td class="pt-label">Influence</td><td>${p.details.influence}</td></tr>
+          <tr><td class="pt-label">Remedies</td><td>${p.details.remedies}</td></tr>
+          <tr><td class="pt-label">Lucky Day</td><td>${p.details.day}</td></tr>
+          <tr><td class="pt-label">Lucky Color</td><td>${p.details.color}</td></tr>
+        </table>
       </div>
     `)
     .join('');
 
   const arrowsHtml = result.loShuArrows
-    .map(a => `
-      <div class="arrow-item ${a.type === 'strength' ? 'arrow-strength' : a.type === 'weakness' ? 'arrow-weakness' : ''}">
-        <strong>${a.name} (${a.numbers.join('-')}):</strong> ${a.status} - <em>${a.meaning}</em>
-      </div>
-    `)
+    .map(a => {
+      const cls = a.type === 'strength' ? 'arrow-strength' : a.type === 'weakness' ? 'arrow-weakness' : 'arrow-neutral';
+      const badge = a.type === 'strength' ? '<span class="badge badge-green">Strength</span>' : a.type === 'weakness' ? '<span class="badge badge-red">Missing</span>' : '<span class="badge badge-gray">Inactive</span>';
+      return `
+        <tr class="${cls}">
+          <td class="arrow-name">${a.name} <span class="arrow-nums">(${a.numbers.join('-')})</span></td>
+          <td class="arrow-meaning">${a.meaning}</td>
+          <td class="arrow-badge">${badge}</td>
+        </tr>
+      `;
+    })
     .join('');
+
+  // Convert markdown-style AI report to basic HTML
+  const formatAiReport = (text: string): string => {
+    return text
+      .replace(/####\s*(.+)/g, '<h4 class="ai-h4">$1</h4>')
+      .replace(/###\s*(.+)/g, '<h3 class="ai-h3">$1</h3>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n/g, '<br>');
+  };
+
+  const aiReportHtml = formatAiReport(result.aiReport || '');
 
   return `
     <style>
-      .report-pdf-root {
-        font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      .pdf-root {
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         color: #1f2937;
-        margin: 0;
-        padding: 40px;
-        background-color: #fff;
-        line-height: 1.6;
-        width: 800px;
-        box-sizing: border-box;
+        padding: 28px 32px;
+        background: #fff;
+        line-height: 1.55;
+        width: 700px;
+        font-size: 11px;
       }
-      .no-print { display: none; }
-      .page-break { page-break-before: always; }
-      .card { page-break-inside: avoid; }
-      .container {
-        max-width: 800px;
-        margin: 0 auto;
+
+      /* ── Header ── */
+      .pdf-header {
+        border-bottom: 3px solid #0F766E;
+        padding-bottom: 16px;
+        margin-bottom: 20px;
       }
-      .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        border-bottom: 2px solid #f3f4f6;
-        padding-bottom: 20px;
-        margin-bottom: 30px;
-      }
-      .logo-area h1 {
-        font-family: 'Playfair Display', Georgia, serif;
-        font-size: 28px;
+      .pdf-header table { width: 100%; border-collapse: collapse; }
+      .pdf-header td { vertical-align: top; padding: 0; border: none; }
+      .brand-name {
+        font-family: Georgia, 'Times New Roman', serif;
+        font-size: 26px;
+        font-weight: bold;
         color: #0F766E;
-        margin: 0 0 5px 0;
+        margin: 0 0 2px 0;
+      }
+      .brand-tagline { font-size: 10px; color: #666; margin: 1px 0; }
+      .report-title {
+        font-family: Georgia, 'Times New Roman', serif;
+        font-size: 16px;
         font-weight: bold;
-      }
-      .logo-area p {
-        margin: 2px 0;
-        font-size: 12px;
-        color: #666;
-      }
-      .report-details {
-        text-align: right;
-      }
-      .report-details h2 {
-        font-family: 'Playfair Display', Georgia, serif;
-        font-size: 22px;
-        margin: 0 0 10px 0;
         color: #111;
-        letter-spacing: 0.5px;
-        font-weight: bold;
+        text-align: right;
+        margin: 0 0 6px 0;
       }
-      .report-details p {
-        margin: 3px 0;
-        font-size: 12px;
-        color: #555;
-      }
-      .client-info-table {
+      .report-meta { text-align: right; font-size: 10px; color: #555; margin: 2px 0; }
+
+      /* ── Client Info ── */
+      .info-table {
         width: 100%;
         border-collapse: collapse;
-        margin-bottom: 30px;
-        background: #f9fafb;
+        margin-bottom: 22px;
+        font-size: 11px;
       }
-      .client-info-table td {
-        padding: 10px 15px;
-        border: 1px solid #e5e7eb;
-        font-size: 13px;
+      .info-table td {
+        padding: 7px 10px;
+        border: 1px solid #d1d5db;
+        vertical-align: top;
       }
-      .client-info-table td.label {
-        font-weight: bold;
+      .info-table .il {
+        font-weight: 600;
         color: #0F766E;
-        width: 25%;
+        background: #f0fdfa;
+        width: 130px;
+        white-space: nowrap;
       }
-      .section-title {
-        font-family: 'Playfair Display', Georgia, serif;
-        color: #0F766E;
-        border-bottom: 2px solid #e5e7eb;
-        padding-bottom: 8px;
-        margin-top: 40px;
-        margin-bottom: 20px;
-        font-size: 20px;
-        font-weight: bold;
-      }
-      .grid-container {
-        display: flex;
-        justify-content: space-between;
-        gap: 20px;
-        margin-bottom: 30px;
-      }
-      .grid-box {
-        flex: 1;
-        text-align: center;
-        background: #fafaf9;
-        padding: 15px;
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-      }
-      .grid-box h3 {
-        margin: 0 0 12px 0;
-        color: #0F766E;
+      .info-table .iv { color: #111; }
+
+      /* ── Section Titles ── */
+      .sec-title {
+        font-family: Georgia, 'Times New Roman', serif;
         font-size: 15px;
-        border-bottom: 1px solid #e5e7eb;
-        padding-bottom: 6px;
+        font-weight: bold;
+        color: #0F766E;
+        border-bottom: 2px solid #d1d5db;
+        padding-bottom: 5px;
+        margin: 26px 0 14px 0;
       }
-      .calc-grid {
-        margin: 0 auto;
+
+      /* ── Core Numbers Table ── */
+      .core-table {
+        width: 100%;
         border-collapse: collapse;
+        margin-bottom: 6px;
+        font-size: 11px;
       }
+      .core-table td {
+        padding: 6px 10px;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      .core-table .cl { color: #374151; font-weight: 500; width: 45%; }
+      .core-table .cv {
+        color: #0F766E;
+        font-weight: 700;
+        font-size: 13px;
+        width: 5%;
+        text-align: center;
+      }
+
+      /* ── Grids ── */
+      .grids-row { margin-bottom: 20px; }
+      .grids-row table.outer { width: 100%; border-collapse: collapse; }
+      .grids-row td.grid-wrap {
+        width: 50%;
+        vertical-align: top;
+        padding: 0 8px;
+        text-align: center;
+      }
+      .grid-label {
+        font-weight: 600;
+        color: #0F766E;
+        font-size: 12px;
+        margin-bottom: 8px;
+        padding-bottom: 4px;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      .calc-grid { margin: 0 auto; border-collapse: collapse; }
       .grid-cell {
-        width: 50px;
-        height: 50px;
+        width: 52px;
+        height: 42px;
         border: 2px solid #0F766E;
         text-align: center;
-        font-weight: bold;
-        font-size: 18px;
-        color: #1f2937;
+        font-weight: 700;
+        font-size: 15px;
+        color: #111;
         background: #fff;
       }
-      .core-list {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 15px;
+
+      /* ── Arrows Table ── */
+      .arrows-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+        font-size: 11px;
       }
-      .core-item {
-        border-bottom: 1px dashed #e5e7eb;
-        padding-bottom: 8px;
-        font-size: 13px;
-      }
-      .core-item span.lbl {
-        font-weight: bold;
-        color: #4b5563;
-      }
-      .core-item span.val {
-        float: right;
-        font-weight: bold;
+      .arrows-table th {
+        background: #f0fdfa;
         color: #0F766E;
+        font-weight: 600;
+        padding: 6px 8px;
+        text-align: left;
+        border-bottom: 2px solid #0F766E;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
       }
-      .ai-text {
-        white-space: pre-line;
-        font-size: 13px;
-        color: #374151;
-        background: #fdfdfd;
-        border-left: 4px solid #D4AF37;
-        padding: 15px;
-        margin-top: 15px;
+      .arrows-table td { padding: 5px 8px; border-bottom: 1px solid #e5e7eb; }
+      .arrow-name { font-weight: 600; color: #111; white-space: nowrap; }
+      .arrow-nums { font-weight: 400; color: #888; font-size: 10px; }
+      .arrow-meaning { color: #555; font-style: italic; }
+      .arrow-badge { text-align: center; }
+      .badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 9px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
       }
+      .badge-green { background: #dcfce7; color: #166534; }
+      .badge-red { background: #fee2e2; color: #991b1b; }
+      .badge-gray { background: #f3f4f6; color: #6b7280; }
+      .arrow-strength td { background: #f0fdf4; }
+      .arrow-weakness td { background: #fef2f2; }
+
+      /* ── Planet Cards ── */
       .planet-card {
-        border: 1px solid #f3f4f6;
-        padding: 12px;
-        margin-bottom: 15px;
+        border: 1px solid #e5e7eb;
         border-radius: 6px;
-        background: #fafaf9;
+        margin-bottom: 12px;
+        page-break-inside: avoid;
+        overflow: hidden;
+      }
+      .planet-header {
+        background: #f0fdfa;
+        padding: 7px 10px;
+        font-weight: 700;
+        font-size: 12px;
+        color: #0F766E;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      .planet-table { width: 100%; border-collapse: collapse; font-size: 10px; }
+      .planet-table td { padding: 4px 10px; border-bottom: 1px solid #f3f4f6; color: #374151; }
+      .planet-table .pt-label { font-weight: 600; color: #555; width: 90px; }
+
+      /* ── Remedy Boxes ── */
+      .remedy-box {
+        padding: 12px 14px;
+        border-radius: 6px;
+        margin-bottom: 12px;
+        font-size: 11px;
         page-break-inside: avoid;
       }
-      .planet-card h4 {
-        margin: 0 0 8px 0;
-        color: #0F766E;
-        font-size: 14px;
-      }
-      .planet-card p {
-        margin: 4px 0;
+      .remedy-box-title {
+        font-weight: 700;
         font-size: 12px;
+        margin: 0 0 6px 0;
+        padding-bottom: 5px;
+        border-bottom: 1px solid rgba(0,0,0,0.08);
       }
-      .arrow-item {
-        padding: 6px 10px;
-        font-size: 12px;
-        border-left: 3px solid #e5e7eb;
-        margin-bottom: 6px;
-      }
-      .arrow-strength {
-        border-left-color: #10b981;
-        background-color: #ecfdf5;
-      }
-      .arrow-weakness {
-        border-left-color: #ef4444;
-        background-color: #fef2f2;
-      }
-      .footer-note {
-        margin-top: 60px;
-        text-align: center;
+      .remedy-content { white-space: pre-line; line-height: 1.6; }
+      .rb-teal { background: #f0fdfa; border: 1px solid #99f6e4; }
+      .rb-teal .remedy-box-title { color: #0F766E; }
+      .rb-amber { background: #fffbeb; border: 1px solid #fde68a; }
+      .rb-amber .remedy-box-title { color: #b45309; }
+      .rb-blue { background: #eff6ff; border: 1px solid #bfdbfe; }
+      .rb-blue .remedy-box-title { color: #1d4ed8; }
+
+      /* ── AI Report ── */
+      .ai-report {
         font-size: 11px;
-        color: #9ca3af;
-        border-top: 1px dashed #e5e7eb;
-        padding-top: 20px;
+        color: #374151;
+        line-height: 1.65;
+        padding: 14px;
+        background: #fafaf9;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        margin-top: 10px;
       }
+      .ai-h3 {
+        font-size: 13px;
+        font-weight: 700;
+        color: #0F766E;
+        margin: 14px 0 6px 0;
+        padding-bottom: 3px;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      .ai-h4 {
+        font-size: 12px;
+        font-weight: 700;
+        color: #374151;
+        margin: 10px 0 4px 0;
+      }
+
+      /* ── Footer ── */
+      .pdf-footer {
+        margin-top: 40px;
+        text-align: center;
+        font-size: 9px;
+        color: #9ca3af;
+        border-top: 1px dashed #d1d5db;
+        padding-top: 14px;
+      }
+      .pdf-footer p { margin: 2px 0; }
+
+      /* ── Utility ── */
+      .page-break { page-break-before: always; }
+      p { margin: 0 0 6px 0; font-size: 11px; }
     </style>
-    <div class="report-pdf-root">
-      <div class="container">
-        <div class="header">
-          <div class="logo-area">
-            <h1>Divya Urja</h1>
-            <p>Energy, Vibrations & Remedies Consultation</p>
-            <p>Email: contact@divyaurja.com | Web: www.divyaurja.com</p>
-          </div>
-          <div class="report-details">
-            <h2>Numerology Audit Report</h2>
-            <p><strong>Report ID:</strong> ${loadedReportId || 'TEMP-AUDIT'}</p>
-            <p><strong>Date Compiled:</strong> ${dateStr}</p>
-          </div>
-        </div>
 
-        <table class="client-info-table">
-          <tr>
-            <td class="label">Client Name</td>
-            <td><strong>${result.name}</strong></td>
-            <td class="label">Date of Birth</td>
-            <td><strong>${result.dob}</strong></td>
-          </tr>
-          <tr>
-            <td class="label">Gender</td>
-            <td>${result.gender.toUpperCase()}</td>
-            <td class="label">Mobile Number</td>
-            <td>${result.mobile || 'N/A'}</td>
-          </tr>
-          <tr>
-            <td class="label">Email Address</td>
-            <td>${result.email || 'N/A'}</td>
-            <td class="label">Driver & Conductor</td>
-            <td>Driver: <strong>${result.driverNum}</strong> | Conductor: <strong>${result.conductorNum}</strong></td>
-          </tr>
-        </table>
+    <div class="pdf-root">
 
-        <h2 class="section-title">1. Core Numbers</h2>
-        <div class="core-list">
-          <div class="core-item"><span class="lbl">Driver (Birth) Number</span><span class="val">${result.driverNum}</span></div>
-          <div class="core-item"><span class="lbl">Conductor (Destiny) Number</span><span class="val">${result.conductorNum}</span></div>
-          <div class="core-item"><span class="lbl">Life Path Number</span><span class="val">${result.lifePath}</span></div>
-          <div class="core-item"><span class="lbl">Expression (Name) Number</span><span class="val">${result.expression}</span></div>
-          <div class="core-item"><span class="lbl">Soul Urge (Heart) Number</span><span class="val">${result.soulUrge}</span></div>
-          <div class="core-item"><span class="lbl">Personality Number</span><span class="val">${result.personality}</span></div>
-          <div class="core-item"><span class="lbl">Birthday Number</span><span class="val">${result.birthdayNum}</span></div>
-          <div class="core-item"><span class="lbl">Maturity Number</span><span class="val">${result.maturityNum}</span></div>
-          <div class="core-item"><span class="lbl">Attitude Number</span><span class="val">${result.attitudeNum}</span></div>
-          <div class="core-item"><span class="lbl">Balance Number</span><span class="val">${result.balanceNum}</span></div>
-        </div>
-
-        <h2 class="section-title">2. Numerology Grids</h2>
-        <div class="grid-container">
-          <div class="grid-box">
-            <h3>Lo Shu Grid</h3>
-            <table class="calc-grid">${loShuGridHtml}</table>
-          </div>
-          <div class="grid-box">
-            <h3>Vedic Grid</h3>
-            <table class="calc-grid">${vedicGridHtml}</table>
-          </div>
-        </div>
-
-        <h2 class="section-title">3. Lo Shu Arrows Analysis</h2>
-        <div>${arrowsHtml}</div>
-
-        <h2 class="section-title">4. Name & Phone Vibration Audit</h2>
-        <div class="core-list" style="margin-bottom: 20px;">
-          <div class="core-item"><span class="lbl">Name Compound Sum</span><span class="val">${result.nameAnalysis.compoundNumber}</span></div>
-          <div class="core-item"><span class="lbl">Suggested Spelling</span><span class="val">${result.nameAnalysis.suggestedSpellings[0] || 'Spelling is Optimal'}</span></div>
-          <div class="core-item"><span class="lbl">Mobile Vibration Number</span><span class="val">${result.mobileAnalysis.value || 'N/A'}</span></div>
-          <div class="core-item"><span class="lbl">Mobile Harmony Score</span><span class="val">${result.mobileAnalysis.luckyPercentage ? result.mobileAnalysis.luckyPercentage + '%' : 'N/A'}</span></div>
-        </div>
-
-        <h2 class="section-title">5. Planet Analysis</h2>
-        <div>${planetsHtml}</div>
-
-        <div class="page-break"></div>
-
-        <h2 class="section-title">6. Remedies & Suggestions</h2>
-        <p><strong>Suitable Colors:</strong> ${result.remedies.colors.join(', ')}</p>
-        <p><strong>Suitable Days:</strong> ${result.remedies.days.join(', ')}</p>
-        <p><strong>Chant Mantra Daily:</strong> ${result.remedies.mantras.join(' or ')}</p>
-        <p><strong>Suggested Donations:</strong> ${result.remedies.donations.join(', ')}</p>
-
-        <div style="background-color: #f0fdfa; border: 1px solid #ccfbf1; padding: 15px; border-radius: 8px; margin-top: 15px; margin-bottom: 15px; font-size: 13px; color: #111;">
-          <p style="color: #0F766E; margin: 0 0 6px 0; font-size: 14px; border-bottom: 1px solid #ccfbf1; padding-bottom: 6px; font-weight: bold;">🔮 Core Remedies & Daily Habits (Customized)</p>
-          <div style="white-space: pre-line; line-height: 1.6; font-weight: bold;">${customRemedies}</div>
-        </div>
-
-        <div style="background-color: #fef3c7; border: 1px solid #fde68a; padding: 15px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; color: #111;">
-          <p style="color: #b45309; margin: 0 0 6px 0; font-size: 14px; border-bottom: 1px solid #fde68a; padding-bottom: 6px; font-weight: bold;">🔱 Extra Suggested Yantras (Customized)</p>
-          <div style="white-space: pre-line; line-height: 1.6; font-weight: bold;">${customYantra}</div>
-        </div>
-
-        <div style="background-color: #eff6ff; border: 1px solid #dbeafe; padding: 15px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; color: #111;">
-          <p style="color: #1d4ed8; margin: 0 0 6px 0; font-size: 14px; border-bottom: 1px solid #dbeafe; padding-bottom: 6px; font-weight: bold;">💎 Crystals & Gemstones (Customized)</p>
-          <div style="white-space: pre-line; line-height: 1.6; font-weight: bold;">${customCrystals}</div>
-        </div>
-
-        <h2 class="section-title">7. AI Spiritual Interpretation</h2>
-        <div class="ai-text">${result.aiReport}</div>
-
-        <div class="footer-note">
-          <p>Thank you for consulting Divya Urja!</p>
-          <p>This is a computer generated calculations summary report compiled by Divya Urja Admin.</p>
-        </div>
+      <!-- Header -->
+      <div class="pdf-header">
+        <table><tr>
+          <td style="width:55%;">
+            <div class="brand-name">Divya Urja</div>
+            <div class="brand-tagline">Energy, Vibrations & Remedies Consultation</div>
+            <div class="brand-tagline">contact@divyaurja.com | www.divyaurja.com</div>
+          </td>
+          <td style="width:45%;">
+            <div class="report-title">Numerology Audit Report</div>
+            <div class="report-meta"><strong>Report ID:</strong> ${loadedReportId || 'TEMP-AUDIT'}</div>
+            <div class="report-meta"><strong>Date:</strong> ${dateStr}</div>
+          </td>
+        </tr></table>
       </div>
+
+      <!-- Client Info -->
+      <table class="info-table">
+        <tr>
+          <td class="il">Client Name</td>
+          <td class="iv"><strong>${result.name}</strong></td>
+          <td class="il">Date of Birth</td>
+          <td class="iv"><strong>${result.dob}</strong></td>
+        </tr>
+        <tr>
+          <td class="il">Gender</td>
+          <td class="iv">${result.gender.toUpperCase()}</td>
+          <td class="il">Mobile</td>
+          <td class="iv">${result.mobile || 'N/A'}</td>
+        </tr>
+        <tr>
+          <td class="il">Email</td>
+          <td class="iv" colspan="3">${result.email || 'N/A'}</td>
+        </tr>
+        <tr>
+          <td class="il">Driver Number</td>
+          <td class="iv"><strong>${result.driverNum}</strong></td>
+          <td class="il">Conductor Number</td>
+          <td class="iv"><strong>${result.conductorNum}</strong></td>
+        </tr>
+      </table>
+
+      <!-- 1. Core Numbers -->
+      <h2 class="sec-title">1. Core Numbers</h2>
+      <table class="core-table">
+        <tr><td class="cl">Driver (Birth) Number</td><td class="cv">${result.driverNum}</td><td class="cl">Conductor (Destiny) Number</td><td class="cv">${result.conductorNum}</td></tr>
+        <tr><td class="cl">Life Path Number</td><td class="cv">${result.lifePath}</td><td class="cl">Expression (Name) Number</td><td class="cv">${result.expression}</td></tr>
+        <tr><td class="cl">Soul Urge (Heart) Number</td><td class="cv">${result.soulUrge}</td><td class="cl">Personality Number</td><td class="cv">${result.personality}</td></tr>
+        <tr><td class="cl">Birthday Number</td><td class="cv">${result.birthdayNum}</td><td class="cl">Maturity Number</td><td class="cv">${result.maturityNum}</td></tr>
+        <tr><td class="cl">Attitude Number</td><td class="cv">${result.attitudeNum}</td><td class="cl">Balance Number</td><td class="cv">${result.balanceNum}</td></tr>
+      </table>
+
+      <!-- 2. Grids -->
+      <h2 class="sec-title">2. Numerology Grids</h2>
+      <div class="grids-row">
+        <table class="outer"><tr>
+          <td class="grid-wrap">
+            <div class="grid-label">Lo Shu Grid</div>
+            <table class="calc-grid">${loShuGridHtml}</table>
+          </td>
+          <td class="grid-wrap">
+            <div class="grid-label">Vedic Grid</div>
+            <table class="calc-grid">${vedicGridHtml}</table>
+          </td>
+        </tr></table>
+      </div>
+
+      <!-- 3. Arrows -->
+      <h2 class="sec-title">3. Lo Shu Arrows Analysis</h2>
+      <table class="arrows-table">
+        <thead><tr><th>Arrow</th><th>Meaning</th><th>Status</th></tr></thead>
+        <tbody>${arrowsHtml}</tbody>
+      </table>
+
+      <!-- 4. Name & Phone -->
+      <h2 class="sec-title">4. Name & Phone Vibration Audit</h2>
+      <table class="core-table">
+        <tr><td class="cl">Name Compound Sum</td><td class="cv">${result.nameAnalysis.compoundNumber}</td><td class="cl">Name Number</td><td class="cv">${result.nameAnalysis.nameNumber}</td></tr>
+        <tr><td class="cl">Suggested Spelling</td><td class="cv" colspan="3" style="text-align:left;font-size:11px;">${result.nameAnalysis.suggestedSpellings[0] || 'Current spelling is optimal'}</td></tr>
+        <tr><td class="cl">Mobile Vibration Number</td><td class="cv">${result.mobileAnalysis.value || 'N/A'}</td><td class="cl">Mobile Harmony Score</td><td class="cv">${result.mobileAnalysis.luckyPercentage ? result.mobileAnalysis.luckyPercentage + '%' : 'N/A'}</td></tr>
+      </table>
+
+      <!-- 5. Planets -->
+      <h2 class="sec-title">5. Planet Analysis</h2>
+      ${planetsHtml}
+
+      <div class="page-break"></div>
+
+      <!-- 6. Remedies -->
+      <h2 class="sec-title">6. Remedies & Suggestions</h2>
+      <table class="core-table" style="margin-bottom:14px;">
+        <tr><td class="cl">Suitable Colors</td><td colspan="3" style="padding:6px 10px;">${result.remedies.colors.join(', ')}</td></tr>
+        <tr><td class="cl">Suitable Days</td><td colspan="3" style="padding:6px 10px;">${result.remedies.days.join(', ')}</td></tr>
+        <tr><td class="cl">Chant Mantra Daily</td><td colspan="3" style="padding:6px 10px;">${result.remedies.mantras.join(' or ')}</td></tr>
+        <tr><td class="cl">Suggested Donations</td><td colspan="3" style="padding:6px 10px;">${result.remedies.donations.join(', ')}</td></tr>
+      </table>
+
+      <div class="remedy-box rb-teal">
+        <div class="remedy-box-title">🔮 Core Remedies & Daily Habits</div>
+        <div class="remedy-content">${customRemedies}</div>
+      </div>
+      <div class="remedy-box rb-amber">
+        <div class="remedy-box-title">🔱 Suggested Yantras</div>
+        <div class="remedy-content">${customYantra}</div>
+      </div>
+      <div class="remedy-box rb-blue">
+        <div class="remedy-box-title">💎 Crystals & Gemstones</div>
+        <div class="remedy-content">${customCrystals}</div>
+      </div>
+
+      <!-- 7. AI Report -->
+      <h2 class="sec-title">7. Spiritual Interpretation</h2>
+      <div class="ai-report">${aiReportHtml}</div>
+
+      <!-- Footer -->
+      <div class="pdf-footer">
+        <p><strong>Thank you for consulting Divya Urja!</strong></p>
+        <p>This is a computer-generated numerology audit report compiled by Divya Urja Admin.</p>
+        <p>© ${new Date().getFullYear()} Divya Urja — Energy, Vibrations & Remedies</p>
+      </div>
+
     </div>
   `;
 }
