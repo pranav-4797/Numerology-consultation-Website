@@ -833,13 +833,17 @@ export default function NumerologyCalculatorPage() {
                           <div>
                             <span className="block text-[10px] font-bold text-text/40 uppercase mb-1">Strengths</span>
                             <p className="text-xs text-text/80 leading-relaxed">
-                              Possesses strong grid lines indicating active execution of goals, structural planning, and determination. Good planetary balance is evident.
+                              {result.loShuArrows.filter(a => a.type === 'strength').length > 0
+                                ? `Possesses strong grid lines: ${result.loShuArrows.filter(a => a.type === 'strength').map(a => a.name).join(', ')}. These indicate active execution of goals, structural planning, and determination.`
+                                : 'No complete arrow lines detected. Focus on strengthening energy through remedies and lifestyle adjustments.'}
                             </p>
                           </div>
                           <div>
                             <span className="block text-[10px] font-bold text-text/40 uppercase mb-1">Weaknesses</span>
                             <p className="text-xs text-text/80 leading-relaxed">
-                              Missing numbers {result.missingNumbers.join(', ') || 'none'} indicate potential gaps in practical focus, emotional grounding, or organizational foresight.
+                              {result.missingNumbers.length > 0
+                                ? `Missing numbers ${result.missingNumbers.join(', ')} indicate potential gaps in practical focus, emotional grounding, or organizational foresight.${result.loShuArrows.filter(a => a.type === 'weakness').length > 0 ? ` Weak arrows: ${result.loShuArrows.filter(a => a.type === 'weakness').map(a => a.name).join(', ')}.` : ''}`
+                                : 'No missing numbers detected. The grid shows a balanced energy profile.'}
                             </p>
                           </div>
                           <div>

@@ -93,6 +93,23 @@ export function generateReportHtml(
 
   const aiReportHtml = formatAiReport(result.aiReport || '');
 
+  // Generate dynamic Grid Readings text
+  const strengthArrows = result.loShuArrows.filter(a => a.type === 'strength').map(a => a.name);
+  const weakArrows = result.loShuArrows.filter(a => a.type === 'weakness').map(a => a.name);
+  const missingStr = result.missingNumbers.length > 0 ? result.missingNumbers.join(', ') : 'none';
+
+  const strengthsText = strengthArrows.length > 0
+    ? `Possesses strong grid lines: ${strengthArrows.join(', ')}. These indicate active execution of goals, structural planning, and determination.`
+    : 'No complete arrow lines detected. Focus on strengthening energy through remedies and lifestyle adjustments.';
+
+  const weaknessText = result.missingNumbers.length > 0
+    ? `Missing numbers ${missingStr} indicate potential gaps in practical focus, emotional grounding, or organizational foresight.${weakArrows.length > 0 ? ' Weak arrows: ' + weakArrows.join(', ') + '.' : ''}`
+    : 'No missing numbers detected. The grid shows a balanced energy profile.';
+
+  const directionText = result.luckySuggestions.directions.join(' or ');
+  const colorsText = result.luckySuggestions.colors.join(', ');
+  const careersText = result.luckySuggestions.careers.join(', ');
+
   return `
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -294,6 +311,42 @@ export function generateReportHtml(
       .rb-blue { background: #eff6ff; border: 1px solid #bfdbfe; }
       .rb-blue .remedy-box-title { color: #1d4ed8; }
 
+      /* ── Readings Row ── */
+      .readings-row { margin-bottom: 20px; }
+      .readings-row table.outer { width: 100%; border-collapse: collapse; }
+      .readings-row td.readings-col {
+        width: 50%;
+        vertical-align: top;
+        padding: 10px 12px;
+        border: 1px solid #e5e7eb;
+        background: #fafaf9;
+      }
+      .readings-row td.readings-col:first-child { border-right: none; }
+      .readings-col-title {
+        font-size: 10px;
+        font-weight: 700;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-bottom: 10px;
+        padding-bottom: 5px;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      .reading-block { margin-bottom: 8px; }
+      .reading-label {
+        font-size: 9px;
+        font-weight: 700;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        margin-bottom: 2px;
+      }
+      .reading-text {
+        font-size: 10px;
+        color: #374151;
+        line-height: 1.5;
+      }
+
       /* ── AI Report ── */
       .ai-report {
         font-size: 11px;
@@ -408,14 +461,51 @@ export function generateReportHtml(
         <tbody>${arrowsHtml}</tbody>
       </table>
 
-      <!-- 4. Planets -->
-      <h2 class="sec-title">4. Planet Analysis</h2>
+      <!-- 4. Grid Readings & Life Path Guidance -->
+      <h2 class="sec-title">4. Grid Readings & Life Path Guidance</h2>
+      <div class="readings-row">
+        <table class="outer"><tr>
+          <td class="readings-col">
+            <div class="readings-col-title">Grid Readings</div>
+            <div class="reading-block">
+              <div class="reading-label">Strengths</div>
+              <div class="reading-text">${strengthsText}</div>
+            </div>
+            <div class="reading-block">
+              <div class="reading-label">Weaknesses</div>
+              <div class="reading-text">${weaknessText}</div>
+            </div>
+            <div class="reading-block">
+              <div class="reading-label">Lucky Direction & Colors</div>
+              <div class="reading-text"><strong>Direction:</strong> ${directionText} | <strong>Colors:</strong> ${colorsText}</div>
+            </div>
+          </td>
+          <td class="readings-col">
+            <div class="readings-col-title">Life Path Guidance</div>
+            <div class="reading-block">
+              <div class="reading-label">Career Suggestions</div>
+              <div class="reading-text">Well suited for: ${careersText}. Excellent organizational skills support administration or freelance paths.</div>
+            </div>
+            <div class="reading-block">
+              <div class="reading-label">Health Analysis</div>
+              <div class="reading-text">Pay attention to general energy levels. Refrain from over-exhaustion, practice morning meditation daily to balance internal pranic forces.</div>
+            </div>
+            <div class="reading-block">
+              <div class="reading-label">Relationship Insights</div>
+              <div class="reading-text">Vibrates to number ${result.conductorNum} Conductor, indicating high emotional capacity. Respect the opinions of your close ones and avoid rigid arguments.</div>
+            </div>
+          </td>
+        </tr></table>
+      </div>
+
+      <!-- 5. Planets -->
+      <h2 class="sec-title">5. Planet Analysis</h2>
       ${planetsHtml}
 
       <div class="page-break"></div>
 
-      <!-- 5. Remedies -->
-      <h2 class="sec-title">5. Remedies & Suggestions</h2>
+      <!-- 6. Remedies -->
+      <h2 class="sec-title">6. Remedies & Suggestions</h2>
       <table class="core-table" style="margin-bottom:14px;">
         <tr><td class="cl">Suitable Colors</td><td colspan="3" style="padding:6px 10px;">${result.remedies.colors.join(', ')}</td></tr>
         <tr><td class="cl">Suitable Days</td><td colspan="3" style="padding:6px 10px;">${result.remedies.days.join(', ')}</td></tr>
@@ -436,8 +526,8 @@ export function generateReportHtml(
         <div class="remedy-content">${customCrystals}</div>
       </div>
 
-      <!-- 6. AI Report -->
-      <h2 class="sec-title">6. Spiritual Interpretation</h2>
+      <!-- 7. AI Report -->
+      <h2 class="sec-title">7. Spiritual Interpretation</h2>
       <div class="ai-report">${aiReportHtml}</div>
 
       <!-- Footer -->
