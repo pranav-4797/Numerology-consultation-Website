@@ -18,33 +18,65 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://divyaurja.com'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://divyaurja.in'),
   title: {
-    default: 'Divya Urja Numerology & Vastu Consultancy',
+    default: 'Divya Urja | Best Numerology Consultation & Vastu Shastra Expert',
     template: '%s | Divya Urja',
   },
   description:
-    'Transform your life with ancient wisdom. Expert Numerology, Vastu Shastra, Crystal Therapy, Name Correction, and holistic consultancy services in Pune, India.',
+    'Transform your life with authentic Numerology Consultation, Vastu Shastra Audit, Name Correction, Loshu Grid Analysis, Mobile Numerology, and Crystal Therapy in Pune & Online across India.',
   keywords: [
-    'numerology',
-    'vastu shastra',
-    'vastu consultancy',
-    'crystal therapy',
-    'name correction',
-    'switch words',
+    'numerology consultation',
+    'online numerology consultation',
+    'best numerologist in india',
+    'best numerologist in pune',
+    'vastu shastra consultation',
+    'vastu expert online',
+    'name numerology correction',
+    'loshu grid analysis',
+    'vedic numerology consultation',
+    'mobile numerology reading',
+    'occult science guidance',
+    'business name numerology',
+    'baby name numerology',
+    'marriage numerology compatibility',
+    'signature numerology analysis',
+    'car number numerology',
+    'house number numerology',
+    'crystal therapy remedies',
+    'switch words consultation',
     'yantra numerology',
-    'vedic numerology',
-    'pune',
-    'india',
+    'rudraksha consultation',
+    'divya urja',
+    'divya urja numerology',
+    'divya urja vastu',
+    'driver conductor number numerology',
+    'psychic destiny number report',
+    'loshu grid missing number remedies',
+    'vastu shastra for home',
+    'vastu for office and factory',
+    'energy science consultant',
+    'gemstone recommendation numerology',
+    'lucky numbers and colors consultation',
+    'personal year predictions',
+    'pythagorean numerology consultation',
+    'chaldean numerology expert',
+    'astrology and numerology guidance',
+    'top numerologist in maharashtra',
+    'numerology consultation fees',
+    'book numerology consultation online',
   ],
+  alternates: {
+    canonical: './',
+  },
   openGraph: {
     type: 'website',
     locale: 'en_IN',
-    url: '/',
+    url: 'https://divyaurja.in',
     siteName: 'Divya Urja Numerology & Vastu Consultancy',
-    title: 'Divya Urja Numerology & Vastu Consultancy',
+    title: 'Divya Urja | Premier Numerology & Vastu Shastra Consultancy',
     description:
-      'Transform your life with ancient wisdom. Expert Numerology, Vastu Shastra, and holistic consultancy services.',
+      'Transform your life with ancient wisdom. Expert Numerology, Vastu Shastra, Name Correction, and holistic energy consultancy services.',
     images: [
       {
         url: '/og-image.png',
@@ -56,14 +88,104 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Divya Urja Numerology & Vastu Consultancy',
+    title: 'Divya Urja | Best Numerology & Vastu Shastra Guidance',
     description:
-      'Transform your life with ancient wisdom. Expert Numerology, Vastu, and holistic consultancy.',
+      'Transform your life with ancient wisdom. Expert Numerology, Vastu, Name Correction, and holistic energy science.',
+    images: ['/og-image.png'],
   },
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
+};
+
+const businessJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': ['LocalBusiness', 'ProfessionalService'],
+  name: 'Divya Urja Numerology & Vastu Consultancy',
+  url: 'https://divyaurja.in',
+  logo: 'https://divyaurja.in/logo.jpg',
+  image: 'https://divyaurja.in/logo.jpg',
+  description:
+    'Premier Numerology, Vastu Shastra, Crystal Therapy, Name Correction, and Occult Science Consultancy in Pune, Maharashtra, India. Online & In-person consultations available worldwide.',
+  telephone: '+919876543210',
+  priceRange: '₹₹',
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Pune',
+    addressRegion: 'Maharashtra',
+    addressCountry: 'IN',
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: '18.5204',
+    longitude: '73.8567',
+  },
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+      opens: '09:00',
+      closes: '20:00',
+    },
+  ],
+  areaServed: ['Pune', 'Maharashtra', 'India', 'Worldwide'],
+  knowsAbout: [
+    'Numerology',
+    'Vastu Shastra',
+    'Loshu Grid',
+    'Name Numerology Correction',
+    'Occult Science',
+    'Crystal Remedies',
+    'Mobile Numerology',
+    'Energy Science',
+  ],
+};
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'What is Numerology Consultation and how can it help me?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Numerology consultation is the study of numbers derived from your birthdate and name to reveal your personality traits, life purpose, career opportunities, and destiny. Divya Urja offers personalized Numerology consultations including Loshu Grid analysis, Driver-Conductor number compatibility, Name Correction, and tailored remedies.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How does Vastu Shastra Consultation improve home and office energy?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: "Vastu Shastra balances five natural elements (Earth, Water, Fire, Air, Space) within a living or working space. Divya Urja's Vastu expert provides non-demolition remedies, directional alignment, and energy science guidance for maximum peace, health, and prosperity.",
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Can Name Correction in Numerology bring success?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Yes, aligning your name spelling with your birth number and friendly planetary frequencies helps remove obstacles, enhances career growth, improves health, and attracts positive energy. We provide customized Name Numerology correction for individuals, babies, and business brand names.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Do you offer online Numerology and Vastu consultations?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Yes! Divya Urja provides both online (via phone/video call/PDF reports) and in-person consultations in Pune and across the globe.',
+      },
+    },
+  ],
 };
 
 export default function RootLayout({
@@ -78,6 +200,14 @@ export default function RootLayout({
         <meta name="theme-color" content="#0F766E" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(businessJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        />
       </head>
       <body className="font-poppins antialiased bg-background text-text">
         <AuthProvider>
