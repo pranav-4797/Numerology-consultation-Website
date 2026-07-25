@@ -1,21 +1,23 @@
 import { NumerologyReport } from './reportGenerator';
 import { toast } from 'sonner';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function loadHtml2Pdf(): Promise<any> {
   return new Promise((resolve, reject) => {
     if (typeof window === 'undefined') {
       reject(new Error('Window is not defined'));
       return;
     }
-    if ((window as any).html2pdf) {
-      resolve((window as any).html2pdf);
+    const win = window as unknown as Record<string, unknown>;
+    if (win.html2pdf) {
+      resolve(win.html2pdf);
       return;
     }
     const script = document.createElement('script');
     script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
     script.async = true;
     script.onload = () => {
-      resolve((window as any).html2pdf);
+      resolve((window as unknown as Record<string, unknown>).html2pdf);
     };
     script.onerror = () => {
       reject(new Error('Failed to load html2pdf library from CDN.'));

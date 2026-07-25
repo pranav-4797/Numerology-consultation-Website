@@ -1,4 +1,4 @@
-import { DOB, PLANET_INFO, FRIENDLY_PLANETS, ENEMY_PLANETS, NEUTRAL_PLANETS, VOWELS, numerologyConfig } from './config';
+import { DOB, PLANET_INFO, FRIENDLY_PLANETS, ENEMY_PLANETS, NEUTRAL_PLANETS, VOWELS, numerologyConfig, PlanetDetail } from './config';
 import { calculateBirthNumber, calculateBirthdayNum, calculateAttitudeNum, reduceNumber, reduceToSingleDigit } from './birthNumber';
 import { calculateLifePath, calculateConductorNumber } from './destinyNumber';
 import { calculateExpression } from './expression';
@@ -66,7 +66,7 @@ export interface NumerologyReport {
   // Analysis
   planetsAnalysis: {
     name: string;
-    details: any;
+    details: PlanetDetail;
     strengthPct: number;
   }[];
 

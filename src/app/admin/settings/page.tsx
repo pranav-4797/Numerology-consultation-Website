@@ -6,13 +6,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import { Save, Phone, Share2, Home, Award, Plus, Trash2, Edit, X, Eye, Upload } from 'lucide-react';
 import { siteSettingsSchema, certificateSchema, type SiteSettingsFormData, type CertificateFormData } from '@/schemas';
-import { getSiteSettings, updateSiteSettings, getCertificates, createCertificate, updateCertificate, deleteCertificate } from '@/services/firestore';
+import { getSiteSettings, updateSiteSettings, createCertificate, updateCertificate, deleteCertificate } from '@/services/firestore';
 import { useFirestoreCollection } from '@/hooks/useFirestore';
 import { invalidateSiteSettingsCache } from '@/hooks/useSiteSettings';
 import { compressAndConvertToBase64 } from '@/utils/imageUtils';
 import DeleteConfirmModal from '@/components/admin/DeleteConfirmModal';
 import Loader from '@/components/ui/Loader';
-import EmptyState from '@/components/ui/EmptyState';
 import type { Certificate } from '@/types';
 
 const inputClass =
@@ -321,7 +320,7 @@ export default function AdminSettingsPage() {
                       {cert.regNo !== 'N/A' ? 'Certificate' : 'Trophy Award'}
                     </span>
                     <h3 className="font-playfair text-sm font-bold text-text truncate">{cert.title}</h3>
-                    <p className="text-xs text-text/50 truncate italic mb-2">"{cert.caption}"</p>
+                    <p className="text-xs text-text/50 truncate italic mb-2">&quot;{cert.caption}&quot;</p>
                     <p className="text-[10px] text-text/40 font-medium">
                       Date: {cert.date} | Reg: {cert.regNo}
                     </p>

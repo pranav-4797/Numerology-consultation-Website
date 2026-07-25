@@ -36,8 +36,17 @@ export default function NumerologyCalculatorPage() {
   // Search reports state
   const [searchQuery, setSearchQuery] = useState('');
   const [savedReports, setSavedReports] = useState<SavedNumerologyReport[]>([]);
-  const [filteredReports, setFilteredReports] = useState<SavedNumerologyReport[]>([]);
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+
+  // Derived filtered reports
+  const filteredReports = searchQuery.trim()
+    ? savedReports.filter(
+        r =>
+          r.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          r.mobile?.includes(searchQuery.toLowerCase()) ||
+          r.dob?.includes(searchQuery.toLowerCase())
+      )
+    : [];
 
   // Calculation results
   const [result, setResult] = useState<NumerologyReport | null>(null);
@@ -64,6 +73,7 @@ export default function NumerologyCalculatorPage() {
     }
   };
 
+  // Load saved reports & handle query params
   useEffect(() => {
     fetchReports();
 
@@ -74,50 +84,41 @@ export default function NumerologyCalculatorPage() {
       const qPhone = params.get('phone');
       const qEmail = params.get('email');
 
-      if (qName) setName(decodeURIComponent(qName));
-      if (qDob) setDob(qDob);
-      if (qPhone) setMobile(decodeURIComponent(qPhone));
-      if (qEmail) setEmail(decodeURIComponent(qEmail));
+      if (qName || qDob || qPhone || qEmail) {
+        setTimeout(() => {
+          const nameVal = qName ? decodeURIComponent(qName) : '';
+          const phoneVal = qPhone ? decodeURIComponent(qPhone) : '';
+          const emailVal = qEmail ? decodeURIComponent(qEmail) : '';
+          if (qName) setName(nameVal);
+          if (qDob) setDob(qDob);
+          if (qPhone) setMobile(phoneVal);
+          if (qEmail) setEmail(emailVal);
 
-      if (qName && qDob) {
-        try {
-          const report = calculateNumerology(
-            decodeURIComponent(qName),
-            qDob,
-            'male',
-            qPhone ? decodeURIComponent(qPhone) : '',
-            qEmail ? decodeURIComponent(qEmail) : '',
-            '',
-            '',
-            ''
-          );
-          setResult(report);
-          setCustomRemedies(report.remedies?.lifestyle?.join('\n') || '');
-          setCustomYantra(report.driverNum === 1 ? 'Shree Surya Yantra' : report.driverNum === 3 ? 'Guru Yantra' : report.driverNum === 6 ? 'Shree Shukra Yantra' : 'Shree Yantra');
-          setCustomCrystals(report.luckySuggestions?.gemstones?.join(', ') || '');
-          toast.success(`Computed report for ${decodeURIComponent(qName)}!`);
-        } catch (e) {
-          console.error('Auto-calculation error:', e);
-        }
+          if (qName && qDob) {
+            try {
+              const report = calculateNumerology(
+                nameVal,
+                qDob,
+                'male',
+                phoneVal,
+                emailVal,
+                '',
+                '',
+                ''
+              );
+              setResult(report);
+              setCustomRemedies(report.remedies?.lifestyle?.join('\n') || '');
+              setCustomYantra(report.driverNum === 1 ? 'Shree Surya Yantra' : report.driverNum === 3 ? 'Guru Yantra' : report.driverNum === 6 ? 'Shree Shukra Yantra' : 'Shree Yantra');
+              setCustomCrystals(report.luckySuggestions?.gemstones?.join(', ') || '');
+              toast.success(`Computed report for ${nameVal}!`);
+            } catch (e) {
+              console.error('Auto-calculation error:', e);
+            }
+          }
+        }, 0);
       }
     }
   }, []);
-
-  // Filter reports
-  useEffect(() => {
-    if (!searchQuery.trim()) {
-      setFilteredReports([]);
-      return;
-    }
-    const lower = searchQuery.toLowerCase();
-    const filtered = savedReports.filter(
-      r =>
-        r.name?.toLowerCase().includes(lower) ||
-        r.mobile?.includes(lower) ||
-        r.dob?.includes(lower)
-    );
-    setFilteredReports(filtered);
-  }, [searchQuery, savedReports]);
 
 
   // Calculation handler
@@ -603,7 +604,7 @@ export default function NumerologyCalculatorPage() {
             ].map(tab => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id as 'overview' | 'loshu' | 'vedic' | 'summary')}
                 className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
                   activeTab === tab.id
                     ? 'bg-primary text-white shadow-sm'
