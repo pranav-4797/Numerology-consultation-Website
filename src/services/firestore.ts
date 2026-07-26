@@ -308,7 +308,7 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
   facebook: '',
   instagram: '',
   youtube: 'https://www.youtube.com/@divyaurja',
-  heroTitle: 'Unlock Your Destiny Through Numbers',
+  heroTitle: 'Unlock Your Destiny Through Numerology & Vastu Shastra',
   heroSubtitle:
     'Discover the hidden power of Numerology, Vastu Shastra, and ancient energy sciences. Transform your life, career, and relationships with personalized expert guidance.',
 };

@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     template: '%s | Divya Urja',
   },
   description:
-    'Transform your life with authentic Numerology Consultation, Vastu Shastra Audit, Name Correction, Loshu Grid Analysis, Mobile Numerology, and Crystal Therapy in Pune & Online across India.',
+    'Transform your life with authentic Numerology Consultation, Vastu Shastra Audit, Name Correction & Loshu Grid Analysis in Pune and Online across India.',
   keywords: [
     'numerology consultation',
     'online numerology consultation',
@@ -67,7 +67,7 @@ export const metadata: Metadata = {
     'book numerology consultation online',
   ],
   alternates: {
-    canonical: './',
+    canonical: 'https://divyaurja.in',
   },
   openGraph: {
     type: 'website',
@@ -79,7 +79,7 @@ export const metadata: Metadata = {
       'Transform your life with ancient wisdom. Expert Numerology, Vastu Shastra, Name Correction, and holistic energy consultancy services.',
     images: [
       {
-        url: '/og-image.png',
+        url: 'https://divyaurja.in/og-image.png',
         width: 1200,
         height: 630,
         alt: 'Divya Urja Numerology & Vastu Consultancy',
@@ -91,7 +91,7 @@ export const metadata: Metadata = {
     title: 'Divya Urja | Best Numerology & Vastu Shastra Guidance',
     description:
       'Transform your life with ancient wisdom. Expert Numerology, Vastu, Name Correction, and holistic energy science.',
-    images: ['/og-image.png'],
+    images: ['https://divyaurja.in/og-image.png'],
   },
   robots: {
     index: true,
@@ -112,10 +112,10 @@ const businessJsonLd = {
   name: 'Divya Urja Numerology & Vastu Consultancy',
   url: 'https://divyaurja.in',
   logo: 'https://divyaurja.in/logo.jpg',
-  image: 'https://divyaurja.in/logo.jpg',
+  image: 'https://divyaurja.in/og-image.png',
   description:
     'Premier Numerology, Vastu Shastra, Crystal Therapy, Name Correction, and Occult Science Consultancy in Pune, Maharashtra, India. Online & In-person consultations available worldwide.',
-  telephone: '+919876543210',
+  telephone: '+919822492488',
   priceRange: '₹₹',
   address: {
     '@type': 'PostalAddress',
@@ -137,6 +137,11 @@ const businessJsonLd = {
     },
   ],
   areaServed: ['Pune', 'Maharashtra', 'India', 'Worldwide'],
+  founder: {
+    '@type': 'Person',
+    name: 'Divya Urja Lead Consultant',
+    jobTitle: 'Senior Numerologist & Vastu Expert',
+  },
   knowsAbout: [
     'Numerology',
     'Vastu Shastra',

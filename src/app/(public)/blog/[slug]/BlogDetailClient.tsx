@@ -10,19 +10,24 @@ import { renderMarkdown, isHtmlContent } from '@/utils/markdown';
 import Loader from '@/components/ui/Loader';
 import type { Blog } from '@/types';
 
-export default function BlogDetailClient() {
-  const [blog, setBlog] = useState<Blog | null>(null);
-  const [loading, setLoading] = useState(true);
+interface BlogDetailClientProps {
+  initialBlog?: Blog | null;
+}
+
+export default function BlogDetailClient({ initialBlog }: BlogDetailClientProps) {
+  const [blog, setBlog] = useState<Blog | null>(initialBlog ?? null);
+  const [loading, setLoading] = useState<boolean>(initialBlog === undefined);
 
   useEffect(() => {
-    // Extract slug from the actual browser URL (not useParams, which returns 'placeholder' due to Firebase rewrites)
+    if (initialBlog !== undefined) return;
+
+    // Extract slug from browser URL as fallback
     const pathParts = window.location.pathname.split('/').filter(Boolean);
     const slug = pathParts[pathParts.length - 1];
 
     async function fetchBlog() {
       try {
         const data = await getBlogBySlug(slug);
-        // Drafts are not publicly visible
         setBlog(data && data.status !== 'draft' ? data : null);
       } catch (error) {
         console.error('Error fetching blog:', error);
@@ -30,14 +35,13 @@ export default function BlogDetailClient() {
         setLoading(false);
       }
     }
+
     if (slug && slug !== 'placeholder') {
       fetchBlog();
     } else {
-      setTimeout(() => {
-        setLoading(false);
-      }, 0);
+      setLoading(false);
     }
-  }, []);
+  }, [initialBlog]);
 
   if (loading) return <Loader text="Loading article..." />;
 
@@ -137,4 +141,3 @@ export default function BlogDetailClient() {
     </>
   );
 }
-

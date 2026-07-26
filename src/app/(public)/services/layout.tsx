@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Numerology & Vastu Consultation Services | Divya Urja',
+  title: 'Numerology & Vastu Consultation Services',
   description:
-    'Explore comprehensive consultation services: Name Numerology Correction, Vastu Shastra Audit, Loshu Grid Report, Mobile Numerology, Crystal Therapy, and Switch Words remedies.',
+    'Explore expert Numerology, Vastu Shastra Audit, Name Correction, Loshu Grid Analysis & Crystal Therapy remedies in Pune & Online.',
   keywords: [
     'numerology consultation services',
     'vastu shastra audit pune',

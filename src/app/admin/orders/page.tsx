@@ -10,7 +10,7 @@ import EmptyState from '@/components/ui/EmptyState';
 import { toast } from 'sonner';
 import { 
   Eye, Trash2, X, CheckCircle, XCircle, Clock, 
-  MapPin, Phone, Mail, User, Printer, ShoppingBag, Receipt
+  MapPin, Phone, Mail, User, Printer, ShoppingBag, Receipt, Download
 } from 'lucide-react';
 
 const STATUS_OPTIONS: { value: OrderStatus; label: string; bg: string; text: string }[] = [
@@ -296,6 +296,43 @@ export default function AdminOrdersPage() {
     }
   };
 
+  const loadHtml2Pdf = async () => {
+    const win = window as unknown as Record<string, unknown>;
+    if (win.html2pdf) return win.html2pdf;
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+      script.onload = () => resolve((window as unknown as Record<string, unknown>).html2pdf);
+      script.onerror = () => reject(new Error('Failed to load html2pdf library.'));
+      document.head.appendChild(script);
+    });
+  };
+
+  const handleDownloadPDF = async () => {
+    if (!selectedOrder) return;
+    const toastId = toast.loading('Generating Invoice PDF...');
+    try {
+      const element = document.getElementById('printable-invoice');
+      if (!element) throw new Error('Invoice element not found');
+
+      const html2pdf = await loadHtml2Pdf();
+      const invoiceId = selectedOrder.id?.substring(0, 8).toUpperCase() || 'ORDER';
+      const opt = {
+        margin: [8, 8, 8, 8],
+        filename: `DivyaUrja_Invoice_${invoiceId}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      };
+
+      await (html2pdf as any)().set(opt).from(element).save();
+      toast.success('Invoice PDF downloaded successfully!', { id: toastId });
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      toast.error('Failed to generate PDF invoice.', { id: toastId });
+    }
+  };
+
   if (loading) return <Loader text="Loading orders list..." />;
 
   return (
@@ -525,7 +562,7 @@ export default function AdminOrdersPage() {
             </div>
 
             {/* Actions Footer */}
-            <div className="flex items-center justify-between border-t border-gray-100 pt-5">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between border-t border-gray-100 pt-5 gap-3">
               <div className="flex items-center gap-2">
                 <span className="text-xs font-semibold text-text/50">Order Status:</span>
                 <select
@@ -540,18 +577,18 @@ export default function AdminOrdersPage() {
                 </select>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
                 <button
                   onClick={() => {
                     setShowInvoiceModal(true);
                   }}
-                  className="px-4 py-2 border border-gray-200 hover:bg-gray-50 text-text/75 text-sm font-semibold rounded-xl flex items-center gap-1.5 transition-colors"
+                  className="flex-1 sm:flex-initial px-4 py-2 border border-gray-200 hover:bg-gray-50 text-text/75 text-sm font-semibold rounded-xl flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                 >
                   <Receipt className="w-4 h-4" /> View Invoice
                 </button>
                 <button
                   onClick={() => setDeleteModal({ open: true, id: selectedOrder.id! })}
-                  className="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-500 text-sm font-semibold rounded-xl flex items-center gap-1.5 transition-colors"
+                  className="flex-1 sm:flex-initial px-4 py-2 bg-red-50 hover:bg-red-100 text-red-500 text-sm font-semibold rounded-xl flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                 >
                   <Trash2 className="w-4 h-4" /> Delete Order
                 </button>
@@ -563,13 +600,13 @@ export default function AdminOrdersPage() {
 
       {/* Invoice Modal */}
       {showInvoiceModal && selectedOrder && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center pt-10 p-4 bg-black/50 overflow-y-auto">
-          <div className="bg-white rounded-2xl p-6 sm:p-8 max-w-2xl w-full shadow-2xl mb-8 relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/50 overflow-y-auto">
+          <div className="bg-white rounded-2xl p-4 sm:p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative my-auto">
             <button
               onClick={() => {
                 setShowInvoiceModal(false);
               }}
-              className="absolute top-4 right-4 p-1.5 hover:bg-gray-100 rounded-lg no-print"
+              className="absolute top-4 right-4 p-1.5 hover:bg-gray-100 rounded-lg no-print cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -580,9 +617,9 @@ export default function AdminOrdersPage() {
                 <div>
                   <h1 className="font-playfair text-xl font-bold text-red-800">DIVYA URJA</h1>
                   <p className="text-xs text-text/50">Ancient Sciences & Spiritual Store</p>
-                  <p className="text-[11px] text-text/40">Akola, Maharashtra, India</p>
-                  <p className="text-[11px] text-text/40">Phone: +91 7218733125</p>
-                  <p className="text-[11px] text-text/40">Email: divyaurja37@gmail.com</p>
+                  <p className="text-[11px] text-text/40">Pune, Maharashtra, India</p>
+                  <p className="text-[11px] text-text/40">Phone: +91 98224 92488</p>
+                  <p className="text-[11px] text-text/40">Email: info@divyaurja.in</p>
                 </div>
                 <div className="text-right">
                   <h2 className="text-lg font-bold text-text uppercase tracking-wider mb-1">INVOICE</h2>
@@ -593,7 +630,7 @@ export default function AdminOrdersPage() {
               </div>
 
               {/* Billing Info */}
-              <div className="grid grid-cols-2 gap-8 mb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                 <div className="details-box">
                   <h3 className="text-xs font-bold text-text/40 uppercase mb-2">Billed To:</h3>
                   <p className="text-sm font-bold text-text">{selectedOrder.name}</p>
@@ -613,29 +650,31 @@ export default function AdminOrdersPage() {
               </div>
 
               {/* Billing Items Table */}
-              <table className="w-full text-left mb-6 border-collapse">
-                <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="py-2 text-xs font-bold text-text/50 uppercase">Description</th>
-                    <th className="py-2 text-xs font-bold text-text/50 uppercase text-right">Unit Price</th>
-                    <th className="py-2 text-xs font-bold text-text/50 uppercase text-center">Qty</th>
-                    <th className="py-2 text-xs font-bold text-text/50 uppercase text-right">Amount</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {selectedOrder.items.map((item, idx) => (
-                    <tr key={idx} className="border-b border-gray-100">
-                      <td className="py-3 text-sm font-semibold text-text">{item.productName}</td>
-                      <td className="py-3 text-sm text-text/70 text-right">₹{item.price.toLocaleString('en-IN')}</td>
-                      <td className="py-3 text-sm text-text/70 text-center">{item.quantity}</td>
-                      <td className="py-3 text-sm font-semibold text-text text-right">₹{(item.price * item.quantity).toLocaleString('en-IN')}</td>
+              <div className="overflow-x-auto mb-6">
+                <table className="w-full text-left border-collapse min-w-[400px]">
+                  <thead>
+                    <tr className="border-b border-gray-200">
+                      <th className="py-2 text-xs font-bold text-text/50 uppercase">Description</th>
+                      <th className="py-2 text-xs font-bold text-text/50 uppercase text-right">Unit Price</th>
+                      <th className="py-2 text-xs font-bold text-text/50 uppercase text-center">Qty</th>
+                      <th className="py-2 text-xs font-bold text-text/50 uppercase text-right">Amount</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {selectedOrder.items.map((item, idx) => (
+                      <tr key={idx} className="border-b border-gray-100">
+                        <td className="py-3 text-sm font-semibold text-text">{item.productName}</td>
+                        <td className="py-3 text-sm text-text/70 text-right">₹{item.price.toLocaleString('en-IN')}</td>
+                        <td className="py-3 text-sm text-text/70 text-center">{item.quantity}</td>
+                        <td className="py-3 text-sm font-semibold text-text text-right">₹{(item.price * item.quantity).toLocaleString('en-IN')}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
 
               {/* Totals */}
-              <div className="w-72 ml-auto border-t border-gray-100 pt-2">
+              <div className="w-full sm:w-72 ml-auto border-t border-gray-100 pt-2">
                 <div className="flex justify-between py-1 text-xs text-text/60">
                   <span>Subtotal:</span>
                   <span>₹{selectedOrder.subtotal.toLocaleString('en-IN')}</span>
@@ -651,19 +690,25 @@ export default function AdminOrdersPage() {
               </div>
             </div>
 
-            {/* Print and Close buttons */}
-            <div className="flex justify-end gap-3 mt-6 border-t border-gray-100 pt-4 no-print">
+            {/* Print, Download PDF, and Close buttons */}
+            <div className="flex flex-wrap items-center justify-end gap-3 mt-6 border-t border-gray-100 pt-4 no-print">
+              <button
+                onClick={handleDownloadPDF}
+                className="px-4 py-2.5 bg-primary text-white text-sm font-semibold rounded-xl flex items-center gap-1.5 hover:bg-primary/95 transition-colors shadow-sm cursor-pointer"
+              >
+                <Download className="w-4 h-4" /> Download PDF
+              </button>
               <button
                 onClick={handlePrint}
-                className="px-5 py-2.5 bg-primary text-white text-sm font-semibold rounded-xl flex items-center gap-1.5 hover:bg-primary/95 transition-colors shadow-sm"
+                className="px-4 py-2.5 border border-gray-200 text-text/75 text-sm font-semibold rounded-xl flex items-center gap-1.5 hover:bg-gray-50 transition-colors cursor-pointer"
               >
-                <Printer className="w-4 h-4" /> Print Invoice
+                <Printer className="w-4 h-4" /> Print
               </button>
               <button
                 onClick={() => {
                   setShowInvoiceModal(false);
                 }}
-                className="px-5 py-2.5 border border-gray-200 text-text/75 text-sm font-semibold rounded-xl hover:bg-gray-50 transition-colors"
+                className="px-4 py-2.5 border border-gray-200 text-text/75 text-sm font-semibold rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
               >
                 Close
               </button>

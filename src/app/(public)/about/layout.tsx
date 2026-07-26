@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'About Divya Urja | Leading Numerologist & Vastu Practitioner',
+  title: 'About Us | Leading Numerologist & Vastu Practitioner',
   description:
     'Learn about Divya Urja, dedicated to empowering lives through Vedic Numerology, Vastu Shastra, Loshu Grid analysis, and Energy Science guidance.',
   keywords: [

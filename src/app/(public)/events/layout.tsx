@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Spiritual Events & Occult Webinars | Divya Urja',
+  title: 'Spiritual Events & Occult Webinars',
   description:
     'Discover upcoming spiritual events, interactive Q&A sessions, webinars, and community gatherings hosted by Divya Urja.',
   keywords: [

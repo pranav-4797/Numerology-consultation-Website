@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Occult Science & Numerology Insights Blog | Divya Urja',
+  title: 'Occult Science & Numerology Insights Blog',
   description:
     'Read insightful blogs on Numerology, Loshu Grid calculations, Vastu Shastra remedies, Name Correction guides, Switch Words, and spiritual wellbeing.',
   keywords: [

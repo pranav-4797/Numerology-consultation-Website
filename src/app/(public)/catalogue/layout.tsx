@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Spiritual Catalogue | Certified Crystals, Yantras & Rudraksha | Divya Urja',
+  title: 'Spiritual Catalogue | Certified Crystals, Yantras & Rudraksha',
   description:
     'Shop authentic energized spiritual items: natural gemstone bracelets, Shree Yantra, Rudraksha beads, directional Vastu remedies, and healing crystals.',
   keywords: [

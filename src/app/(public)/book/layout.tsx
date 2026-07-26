@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Book Numerology & Vastu Consultation Online | Divya Urja',
+  title: 'Book Numerology & Vastu Consultation Online',
   description:
     'Schedule your 1-on-1 expert Numerology or Vastu Shastra consultation with Divya Urja. Select your preferred date, time slot, and service online.',
   keywords: [

@@ -29,12 +29,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Dynamic Blog routes
   try {
     const blogs = await getBlogs();
-    const blogRoutes = blogs.map((blog) => ({
-      url: `${baseUrl}/blog/${blog.slug}`,
-      lastModified: blog.publishedAt,
-      changeFrequency: 'monthly' as const,
-      priority: 0.7,
-    }));
+    const published = blogs.filter((b) => b.status !== 'draft');
+    const blogRoutes = published.map((blog) => {
+      let lastModifiedDate = new Date();
+      if (blog.publishedAt) {
+        const parsed = new Date(blog.publishedAt);
+        if (!isNaN(parsed.getTime())) {
+          lastModifiedDate = parsed;
+        }
+      }
+      return {
+        url: `${baseUrl}/blog/${blog.slug}`,
+        lastModified: lastModifiedDate.toISOString(),
+        changeFrequency: 'monthly' as const,
+        priority: 0.7,
+      };
+    });
 
     return [...routes, ...blogRoutes];
   } catch (error) {

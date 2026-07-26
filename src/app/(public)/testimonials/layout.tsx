@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Client Reviews & Testimonials | Divya Urja Consultation',
+  title: 'Client Reviews & Testimonials',
   description:
     'Read real client reviews, ratings, and transformation stories after Numerology consultation, Name Correction, and Vastu remedies by Divya Urja.',
   keywords: [

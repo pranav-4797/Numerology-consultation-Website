@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Photo Gallery & Media | Divya Urja Events & Awards',
+  title: 'Photo Gallery & Media | Events & Awards',
   description:
     'Browse photos of Divya Urja consultations, awards, certificates, seminars, workshops, and client interactions.',
   keywords: [

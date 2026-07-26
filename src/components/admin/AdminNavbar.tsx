@@ -69,8 +69,8 @@ export default function AdminNavbar() {
       {mobileOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-black/50" onClick={() => setMobileOpen(false)} />
-          <div className="absolute left-0 top-0 bottom-0 w-64 bg-white shadow-2xl">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <div className="absolute left-0 top-0 bottom-0 w-64 bg-white shadow-2xl flex flex-col">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center relative">
                   <NextImage
@@ -88,7 +88,7 @@ export default function AdminNavbar() {
                 <X className="w-5 h-5 text-text" />
               </button>
             </div>
-            <nav className="px-3 py-4 space-y-1">
+            <nav className="px-3 py-4 space-y-1 overflow-y-auto flex-1 max-h-[calc(100vh-65px)]">
               {menuItems.map((item) => {
                 const isActive = pathname === item.href;
                 return (
