@@ -300,41 +300,39 @@ export default function AdminOrdersPage() {
     const invoiceId = order.id?.substring(0, 8).toUpperCase() || 'ORDER';
     const orderDate = order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-IN') : 'N/A';
     const isCompleted = order.status === 'completed';
-    const statusBg = isCompleted ? '#def7ec' : '#fde8e8';
-    const statusColor = isCompleted ? '#03543f' : '#9b1c1c';
     const statusText = order.status ? order.status.toUpperCase() : 'PENDING';
 
     const itemsRows = order.items
       .map(
         (item, index) => `
-        <tr style="background-color: ${index % 2 === 0 ? '#ffffff' : '#f8fafc'}; border-bottom: 1px solid #e2e8f0;">
-          <td style="padding: 14px 16px; font-size: 14px; font-weight: 600; color: #0f172a;">${item.productName}</td>
-          <td style="padding: 14px 16px; font-size: 14px; color: #334155; text-align: right; font-family: Arial, sans-serif;">₹${item.price.toLocaleString('en-IN')}</td>
-          <td style="padding: 14px 16px; font-size: 14px; color: #334155; text-align: center; font-weight: 600;">${item.quantity}</td>
-          <td style="padding: 14px 16px; font-size: 14px; font-weight: 700; color: #0f172a; text-align: right; font-family: Arial, sans-serif;">₹${(item.price * item.quantity).toLocaleString('en-IN')}</td>
+        <tr style="background-color: ${index % 2 === 0 ? '#ffffff' : '#f8fafc'}; border-bottom: 1px solid #cbd5e1;">
+          <td style="padding: 14px 16px; font-size: 14px; font-weight: 600; color: #000000;">${item.productName}</td>
+          <td style="padding: 14px 16px; font-size: 14px; color: #1e293b; text-align: right; font-family: Arial, sans-serif;">Rs. ${item.price.toLocaleString('en-IN')}</td>
+          <td style="padding: 14px 16px; font-size: 14px; color: #1e293b; text-align: center; font-weight: 600;">${item.quantity}</td>
+          <td style="padding: 14px 16px; font-size: 14px; font-weight: 700; color: #000000; text-align: right; font-family: Arial, sans-serif;">Rs. ${(item.price * item.quantity).toLocaleString('en-IN')}</td>
         </tr>
       `
       )
       .join('');
 
     return `
-      <div style="width: 730px; box-sizing: border-box; background: #ffffff; font-family: Arial, Helvetica, sans-serif; color: #1e293b; padding: 24px 12px;">
+      <div style="width: 730px; box-sizing: border-box; background: #ffffff; font-family: Arial, Helvetica, sans-serif; color: #000000; padding: 24px 12px;">
         <!-- Header Table -->
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
           <tr>
             <td style="vertical-align: top; width: 55%;">
-              <h1 style="font-size: 28px; font-weight: 800; color: #0f766e; margin: 0 0 4px 0; letter-spacing: 0.5px;">DIVYA URJA</h1>
-              <p style="font-size: 13px; font-weight: 700; color: #d97706; margin: 0 0 10px 0; text-transform: uppercase; letter-spacing: 0.5px;">Ancient Sciences & Spiritual Store</p>
+              <h1 style="font-size: 28px; font-weight: 900; color: #000000; margin: 0 0 4px 0; letter-spacing: 0.5px;">DIVYA URJA</h1>
+              <p style="font-size: 13px; font-weight: 700; color: #1e293b; margin: 0 0 10px 0; text-transform: uppercase; letter-spacing: 0.5px;">Ancient Sciences & Spiritual Store</p>
               <p style="font-size: 12px; color: #475569; margin: 0 0 4px 0;">Pune, Maharashtra, India</p>
               <p style="font-size: 12px; color: #475569; margin: 0 0 4px 0;">Phone: +91 98224 92488 | Email: info@divyaurja.in</p>
               <p style="font-size: 12px; color: #475569; margin: 0;">Website: https://divyaurja.in</p>
             </td>
             <td style="vertical-align: top; width: 45%; text-align: right;">
-              <div style="display: inline-block; background-color: #0f766e; color: #ffffff; padding: 8px 20px; border-radius: 6px; font-size: 18px; font-weight: 800; letter-spacing: 1.5px; margin-bottom: 12px;">TAX INVOICE</div>
-              <p style="font-size: 13px; color: #334155; margin: 0 0 5px 0;"><strong>Invoice No:</strong> <span style="font-family: monospace; font-size: 14px; font-weight: bold;">#${invoiceId}</span></p>
-              <p style="font-size: 13px; color: #334155; margin: 0 0 10px 0;"><strong>Date:</strong> ${orderDate}</p>
+              <div style="display: inline-block; background-color: #000000; color: #ffffff; padding: 8px 20px; border-radius: 4px; font-size: 18px; font-weight: 800; letter-spacing: 1.5px; margin-bottom: 12px;">TAX INVOICE</div>
+              <p style="font-size: 13px; color: #000000; margin: 0 0 5px 0;"><strong>Invoice No:</strong> <span style="font-family: monospace; font-size: 14px; font-weight: bold;">#${invoiceId}</span></p>
+              <p style="font-size: 13px; color: #000000; margin: 0 0 10px 0;"><strong>Date:</strong> ${orderDate}</p>
               <div>
-                <span style="background-color: ${statusBg}; color: ${statusColor}; padding: 5px 14px; border-radius: 12px; font-size: 12px; font-weight: 800; display: inline-block; border: 1px solid ${isCompleted ? '#a7f3d0' : '#fecaca'};">
+                <span style="background-color: ${isCompleted ? '#f1f5f9' : '#ffffff'}; color: #000000; padding: 5px 14px; border-radius: 4px; font-size: 12px; font-weight: 800; display: inline-block; border: 1.5px solid #000000;">
                   STATUS: ${statusText}
                 </span>
               </div>
@@ -342,31 +340,31 @@ export default function AdminOrdersPage() {
           </tr>
         </table>
 
-        <!-- Gradient Accent Bar -->
-        <div style="height: 4px; background: linear-gradient(to right, #0f766e, #d97706); margin-bottom: 24px; border-radius: 2px;"></div>
+        <!-- Solid Black Divider Line -->
+        <div style="height: 3px; background-color: #000000; margin-bottom: 24px; border-radius: 1px;"></div>
 
         <!-- Customer & Shipping Section -->
         <table style="width: 100%; border-collapse: separate; border-spacing: 16px 0; margin-left: -16px; margin-right: -16px; margin-bottom: 28px;">
           <tr>
-            <td style="width: 50%; vertical-align: top; background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 16px;">
-              <p style="font-size: 11px; font-weight: 800; color: #0f766e; text-transform: uppercase; letter-spacing: 0.8px; margin: 0 0 8px 0;">BILLED TO (CUSTOMER)</p>
-              <p style="font-size: 16px; font-weight: 800; color: #0f172a; margin: 0 0 6px 0;">${order.name}</p>
-              <p style="font-size: 13px; color: #334155; margin: 0 0 4px 0;">Phone: <strong>${order.phone}</strong></p>
-              ${order.email ? `<p style="font-size: 13px; color: #334155; margin: 0;">Email: ${order.email}</p>` : ''}
+            <td style="width: 50%; vertical-align: top; background-color: #f8fafc; border: 1px solid #94a3b8; border-radius: 6px; padding: 16px;">
+              <p style="font-size: 11px; font-weight: 800; color: #000000; text-transform: uppercase; letter-spacing: 0.8px; margin: 0 0 8px 0;">BILLED TO (CUSTOMER)</p>
+              <p style="font-size: 16px; font-weight: 800; color: #000000; margin: 0 0 6px 0;">${order.name}</p>
+              <p style="font-size: 13px; color: #1e293b; margin: 0 0 4px 0;">Phone: <strong>${order.phone}</strong></p>
+              ${order.email ? `<p style="font-size: 13px; color: #1e293b; margin: 0;">Email: ${order.email}</p>` : ''}
             </td>
-            <td style="width: 50%; vertical-align: top; background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 16px;">
-              <p style="font-size: 11px; font-weight: 800; color: #0f766e; text-transform: uppercase; letter-spacing: 0.8px; margin: 0 0 8px 0;">SHIPPING DESTINATION</p>
-              <p style="font-size: 13px; font-weight: 700; color: #0f172a; margin: 0 0 4px 0; line-height: 1.4;">${order.address}</p>
-              ${(order.district || order.state) ? `<p style="font-size: 13px; color: #334155; margin: 0 0 4px 0;">${[order.district, order.state].filter(Boolean).join(', ')}</p>` : ''}
-              ${order.pincode ? `<p style="font-size: 13px; font-weight: 700; color: #0f172a; margin: 0;">PIN Code: ${order.pincode}</p>` : ''}
+            <td style="width: 50%; vertical-align: top; background-color: #f8fafc; border: 1px solid #94a3b8; border-radius: 6px; padding: 16px;">
+              <p style="font-size: 11px; font-weight: 800; color: #000000; text-transform: uppercase; letter-spacing: 0.8px; margin: 0 0 8px 0;">SHIPPING DESTINATION</p>
+              <p style="font-size: 13px; font-weight: 700; color: #000000; margin: 0 0 4px 0; line-height: 1.4;">${order.address}</p>
+              ${(order.district || order.state) ? `<p style="font-size: 13px; color: #1e293b; margin: 0 0 4px 0;">${[order.district, order.state].filter(Boolean).join(', ')}</p>` : ''}
+              ${order.pincode ? `<p style="font-size: 13px; font-weight: 700; color: #000000; margin: 0;">PIN Code: ${order.pincode}</p>` : ''}
             </td>
           </tr>
         </table>
 
         <!-- Products Table -->
-        <table style="width: 100%; border-collapse: collapse; margin-bottom: 28px; border: 1px solid #cbd5e1; border-radius: 10px; overflow: hidden;">
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 28px; border: 1.5px solid #000000; border-radius: 4px; overflow: hidden;">
           <thead>
-            <tr style="background-color: #0f766e; color: #ffffff;">
+            <tr style="background-color: #000000; color: #ffffff;">
               <th style="padding: 14px 16px; text-align: left; width: 45%; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px;">Product Description</th>
               <th style="padding: 14px 16px; text-align: right; width: 20%; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px;">Unit Price</th>
               <th style="padding: 14px 16px; text-align: center; width: 15%; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px;">Qty</th>
@@ -382,24 +380,24 @@ export default function AdminOrdersPage() {
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 36px;">
           <tr>
             <td style="width: 50%; vertical-align: top;">
-              <div style="background-color: #f0fdf4; border: 1px solid #86efac; border-radius: 10px; padding: 14px 16px;">
-                <p style="font-size: 12px; font-weight: 800; color: #166534; margin: 0 0 4px 0; text-transform: uppercase; letter-spacing: 0.5px;">Authenticity & Guarantee</p>
-                <p style="font-size: 12px; color: #15803d; margin: 0; line-height: 1.4;">All spiritual items are 100% natural, lab-certified, and spiritually energized prior to dispatch.</p>
+              <div style="background-color: #f8fafc; border: 1px solid #94a3b8; border-radius: 6px; padding: 14px 16px;">
+                <p style="font-size: 12px; font-weight: 800; color: #000000; margin: 0 0 4px 0; text-transform: uppercase; letter-spacing: 0.5px;">Authenticity & Guarantee</p>
+                <p style="font-size: 12px; color: #334155; margin: 0; line-height: 1.4;">All spiritual items are 100% natural, lab-certified, and spiritually energized prior to dispatch.</p>
               </div>
             </td>
             <td style="width: 50%; vertical-align: top;">
               <table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif;">
                 <tr>
                   <td style="padding: 8px 14px; font-size: 13px; color: #475569; text-align: left;">Subtotal:</td>
-                  <td style="padding: 8px 14px; font-size: 14px; font-weight: 700; color: #0f172a; text-align: right;">₹${order.subtotal.toLocaleString('en-IN')}</td>
+                  <td style="padding: 8px 14px; font-size: 14px; font-weight: 700; color: #000000; text-align: right;">Rs. ${order.subtotal.toLocaleString('en-IN')}</td>
                 </tr>
                 <tr>
                   <td style="padding: 8px 14px; font-size: 13px; color: #475569; text-align: left;">Shipping & Handling:</td>
-                  <td style="padding: 8px 14px; font-size: 14px; font-weight: 700; color: #0f172a; text-align: right;">₹${order.shippingCharges.toLocaleString('en-IN')}</td>
+                  <td style="padding: 8px 14px; font-size: 14px; font-weight: 700; color: #000000; text-align: right;">Rs. ${order.shippingCharges.toLocaleString('en-IN')}</td>
                 </tr>
-                <tr style="border-top: 2px solid #0f766e; background-color: #f0fdf4;">
-                  <td style="padding: 12px 14px; font-size: 16px; font-weight: 800; color: #0f766e; text-align: left;">Grand Total:</td>
-                  <td style="padding: 12px 14px; font-size: 18px; font-weight: 800; color: #0f766e; text-align: right;">₹${order.total.toLocaleString('en-IN')}</td>
+                <tr style="border-top: 2px solid #000000; background-color: #f1f5f9;">
+                  <td style="padding: 12px 14px; font-size: 16px; font-weight: 900; color: #000000; text-align: left;">Grand Total:</td>
+                  <td style="padding: 12px 14px; font-size: 18px; font-weight: 900; color: #000000; text-align: right;">Rs. ${order.total.toLocaleString('en-IN')}</td>
                 </tr>
               </table>
             </td>
@@ -407,10 +405,10 @@ export default function AdminOrdersPage() {
         </table>
 
         <!-- Footer Section -->
-        <div style="border-top: 1px solid #cbd5e1; padding-top: 20px; text-align: center;">
-          <p style="font-size: 14px; font-weight: 800; color: #0f766e; margin: 0 0 6px 0;">Thank you for choosing Divya Urja!</p>
-          <p style="font-size: 12px; color: #475569; margin: 0 0 8px 0;">For queries regarding your order, please contact +91 98224 92488 or info@divyaurja.in</p>
-          <p style="font-size: 11px; color: #94a3b8; margin: 0; font-style: italic;">* This is an official computer-generated tax invoice. No physical signature is required.</p>
+        <div style="border-top: 1.5px solid #000000; padding-top: 20px; text-align: center;">
+          <p style="font-size: 14px; font-weight: 900; color: #000000; margin: 0 0 6px 0;">Thank you for choosing Divya Urja!</p>
+          <p style="font-size: 12px; color: #334155; margin: 0 0 8px 0;">For queries regarding your order, please contact +91 98224 92488 or info@divyaurja.in</p>
+          <p style="font-size: 11px; color: #64748b; margin: 0; font-style: italic;">* This is an official computer-generated tax invoice. No physical signature required.</p>
         </div>
       </div>
     `;
@@ -457,11 +455,12 @@ export default function AdminOrdersPage() {
       const orderDate = target.createdAt ? new Date(target.createdAt).toLocaleDateString('en-IN') : 'N/A';
       const isCompleted = target.status === 'completed';
 
-      // Brand Colors
-      const primaryColor: [number, number, number] = [15, 118, 110]; // #0F766E Deep Teal
-      const goldColor: [number, number, number] = [217, 119, 6];    // #D97706 Gold Accent
-      const darkText: [number, number, number] = [15, 23, 42];      // #0F172A Dark Slate
-      const grayText: [number, number, number] = [71, 85, 105];     // #475569
+      // High-Contrast Monochrome Corporate Palette for B&W Printing
+      const primaryColor: [number, number, number] = [0, 0, 0];        // Solid Black
+      const darkText: [number, number, number] = [15, 23, 42];         // Dark Slate
+      const grayText: [number, number, number] = [71, 85, 105];        // Dark Gray
+      const lightBg: [number, number, number] = [248, 250, 252];       // Light Gray Fill
+      const borderColor: [number, number, number] = [148, 163, 184];   // Medium Dark Gray Outline
 
       // 1. Header Left: Brand Info
       doc.setFont('helvetica', 'bold');
@@ -471,7 +470,7 @@ export default function AdminOrdersPage() {
 
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(9.5);
-      doc.setTextColor(...goldColor);
+      doc.setTextColor(...darkText);
       doc.text('ANCIENT SCIENCES & SPIRITUAL STORE', 14, 26);
 
       doc.setFont('helvetica', 'normal');
@@ -483,7 +482,7 @@ export default function AdminOrdersPage() {
 
       // 2. Header Right: Invoice Badge & Details
       doc.setFillColor(...primaryColor);
-      doc.roundedRect(145, 14, 51, 10, 2, 2, 'F');
+      doc.roundedRect(145, 14, 51, 10, 1.5, 1.5, 'F');
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(11);
       doc.setTextColor(255, 255, 255);
@@ -495,34 +494,37 @@ export default function AdminOrdersPage() {
       doc.text(`Invoice No: #${invoiceId}`, 196, 29, { align: 'right' });
       doc.text(`Date: ${orderDate}`, 196, 35, { align: 'right' });
 
-      // Status Badge Right
+      // Status Badge Right (High-Contrast Black Outlined Box)
       const statusText = `STATUS: ${(target.status || 'PENDING').toUpperCase()}`;
       if (isCompleted) {
-        doc.setFillColor(222, 247, 236); // Light green
-        doc.setTextColor(3, 84, 63);      // Dark green
+        doc.setFillColor(241, 245, 249); // Light Gray Fill
+        doc.setDrawColor(0, 0, 0);       // Solid Black Outline
+        doc.setTextColor(0, 0, 0);       // Solid Black Bold Text
       } else {
-        doc.setFillColor(253, 232, 232); // Light red
-        doc.setTextColor(155, 28, 28);   // Dark red
+        doc.setFillColor(255, 255, 255); // Pure White Fill
+        doc.setDrawColor(0, 0, 0);       // Solid Black Outline
+        doc.setTextColor(0, 0, 0);       // Solid Black Bold Text
       }
-      doc.roundedRect(145, 38, 51, 6, 1.5, 1.5, 'F');
+      doc.setLineWidth(0.4);
+      doc.roundedRect(145, 38, 51, 6, 1.5, 1.5, 'FD');
       doc.setFontSize(8);
       doc.setFont('helvetica', 'bold');
       doc.text(statusText, 170.5, 42.2, { align: 'center' });
 
-      // Gradient Accent Line
-      doc.setDrawColor(...primaryColor);
+      // Solid Black Divider Line
+      doc.setDrawColor(0, 0, 0);
       doc.setLineWidth(0.8);
       doc.line(14, 46, 196, 46);
 
       // 3. Customer & Shipping Info Card Containers
       // Billed To Box (Left)
-      doc.setFillColor(248, 250, 252);
-      doc.setDrawColor(203, 213, 225);
+      doc.setFillColor(...lightBg);
+      doc.setDrawColor(...borderColor);
       doc.setLineWidth(0.3);
-      doc.roundedRect(14, 50, 88, 30, 3, 3, 'FD');
+      doc.roundedRect(14, 50, 88, 30, 2, 2, 'FD');
 
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(8);
+      doc.setFontSize(8.5);
       doc.setTextColor(...primaryColor);
       doc.text('BILLED TO (CUSTOMER)', 18, 55);
 
@@ -540,12 +542,12 @@ export default function AdminOrdersPage() {
       }
 
       // Shipping Destination Box (Right)
-      doc.setFillColor(248, 250, 252);
-      doc.setDrawColor(203, 213, 225);
-      doc.roundedRect(108, 50, 88, 30, 3, 3, 'FD');
+      doc.setFillColor(...lightBg);
+      doc.setDrawColor(...borderColor);
+      doc.roundedRect(108, 50, 88, 30, 2, 2, 'FD');
 
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(8);
+      doc.setFontSize(8.5);
       doc.setTextColor(...primaryColor);
       doc.text('SHIPPING DESTINATION', 112, 55);
 
@@ -565,7 +567,7 @@ export default function AdminOrdersPage() {
         doc.text(`PIN Code: ${target.pincode}`, 112, 75);
       }
 
-      // 4. Products Table (jsPDF AutoTable)
+      // 4. Products Table (jsPDF AutoTable Monochrome Header & Grid)
       const tableHead = [['Product Description', 'Unit Price', 'Qty', 'Amount']];
       const tableBody = target.items.map((item) => [
         item.productName,
@@ -580,7 +582,7 @@ export default function AdminOrdersPage() {
         body: tableBody,
         theme: 'grid',
         headStyles: {
-          fillColor: primaryColor,
+          fillColor: [0, 0, 0], // Solid Black header bar
           textColor: [255, 255, 255],
           fontSize: 9,
           fontStyle: 'bold',
@@ -595,7 +597,9 @@ export default function AdminOrdersPage() {
         styles: {
           fontSize: 9,
           cellPadding: 4,
-          textColor: [15, 23, 42],
+          textColor: [0, 0, 0],
+          lineColor: [180, 180, 180],
+          lineWidth: 0.2,
         },
         alternateRowStyles: {
           fillColor: [248, 250, 252],
@@ -606,18 +610,18 @@ export default function AdminOrdersPage() {
 
       // 5. Authenticity Guarantee Box & Totals Summary Table
       // Authenticity box (Left)
-      doc.setFillColor(240, 253, 244);
-      doc.setDrawColor(134, 239, 172);
+      doc.setFillColor(...lightBg);
+      doc.setDrawColor(...borderColor);
       doc.roundedRect(14, finalY, 90, 24, 2, 2, 'FD');
 
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(8);
-      doc.setTextColor(22, 101, 52);
+      doc.setFontSize(8.5);
+      doc.setTextColor(0, 0, 0);
       doc.text('AUTHENTICITY & GUARANTEE', 18, finalY + 6);
 
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(8);
-      doc.setTextColor(21, 128, 61);
+      doc.setTextColor(51, 65, 85);
       const authText = 'All spiritual items are 100% natural, lab-certified, and spiritually energized prior to dispatch.';
       doc.text(doc.splitTextToSize(authText, 82), 18, finalY + 12);
 
@@ -640,25 +644,26 @@ export default function AdminOrdersPage() {
       doc.setFont('helvetica', 'bold');
       doc.text(`Rs. ${target.shippingCharges.toLocaleString('en-IN')}`, totalXVal, finalY + 12, { align: 'right' });
 
-      // Grand Total Highlight Bar
-      doc.setFillColor(240, 253, 244);
-      doc.setDrawColor(134, 239, 172);
+      // Grand Total Highlight Bar (High Contrast Dark Box)
+      doc.setFillColor(241, 245, 249);
+      doc.setDrawColor(0, 0, 0);
+      doc.setLineWidth(0.6);
       doc.roundedRect(138, finalY + 16, 58, 9, 1.5, 1.5, 'FD');
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(11);
-      doc.setTextColor(...primaryColor);
+      doc.setTextColor(0, 0, 0);
       doc.text('Grand Total:', 140, finalY + 22);
       doc.text(`Rs. ${target.total.toLocaleString('en-IN')}`, totalXVal, finalY + 22, { align: 'right' });
 
       // 6. Footer Section
       const footerY = Math.max(finalY + 36, 268);
-      doc.setDrawColor(226, 232, 240);
-      doc.setLineWidth(0.3);
+      doc.setDrawColor(0, 0, 0);
+      doc.setLineWidth(0.6);
       doc.line(14, footerY, 196, footerY);
 
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(10);
-      doc.setTextColor(...primaryColor);
+      doc.setTextColor(0, 0, 0);
       doc.text('Thank you for choosing Divya Urja!', 105, footerY + 6, { align: 'center' });
 
       doc.setFont('helvetica', 'normal');
