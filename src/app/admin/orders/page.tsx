@@ -296,6 +296,190 @@ export default function AdminOrdersPage() {
     }
   };
 
+  const generateInvoiceHtml = (order: Order): string => {
+    const invoiceId = order.id?.substring(0, 8).toUpperCase() || 'ORDER';
+    const orderDate = order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-IN') : 'N/A';
+    const itemsRows = order.items
+      .map(
+        (item) => `
+        <tr style="border-bottom: 1px solid #f3f4f6;">
+          <td style="padding: 10px 0; font-size: 13px; font-weight: 600; color: #111827;">${item.productName}</td>
+          <td style="padding: 10px 0; font-size: 13px; color: #4b5563; text-align: right;">₹${item.price.toLocaleString('en-IN')}</td>
+          <td style="padding: 10px 0; font-size: 13px; color: #4b5563; text-align: center;">${item.quantity}</td>
+          <td style="padding: 10px 0; font-size: 13px; font-weight: 600; color: #111827; text-align: right;">₹${(item.price * item.quantity).toLocaleString('en-IN')}</td>
+        </tr>
+      `
+      )
+      .join('');
+
+    return `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8" />
+          <title>Invoice #${invoiceId}</title>
+          <style>
+            body {
+              font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+              color: #1f2937;
+              margin: 0;
+              padding: 20px;
+              background: #ffffff;
+            }
+            .invoice-box {
+              max-width: 800px;
+              margin: auto;
+              padding: 10px;
+            }
+            .brand-title {
+              font-size: 22px;
+              font-weight: bold;
+              color: #991b1b;
+              margin: 0 0 4px 0;
+            }
+            .brand-sub {
+              font-size: 11px;
+              color: #6b7280;
+              margin: 0;
+            }
+            .invoice-title {
+              font-size: 20px;
+              font-weight: bold;
+              text-align: right;
+              margin: 0 0 4px 0;
+              color: #111827;
+            }
+            .meta-text {
+              font-size: 12px;
+              color: #6b7280;
+              text-align: right;
+              margin: 2px 0;
+            }
+            .section-title {
+              font-size: 10px;
+              font-weight: bold;
+              color: #9ca3af;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              margin-bottom: 6px;
+            }
+            .client-name {
+              font-size: 14px;
+              font-weight: bold;
+              color: #111827;
+              margin: 0 0 4px 0;
+            }
+            .client-text {
+              font-size: 12px;
+              color: #4b5563;
+              margin: 2px 0;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-bottom: 20px;
+            }
+            th {
+              border-bottom: 1px solid #e5e7eb;
+              padding: 8px 0;
+              font-size: 11px;
+              font-weight: bold;
+              color: #6b7280;
+              text-transform: uppercase;
+            }
+            .totals-box {
+              width: 250px;
+              margin-left: auto;
+              border-top: 1px solid #f3f4f6;
+              padding-top: 8px;
+            }
+            .total-row {
+              display: flex;
+              justify-content: space-between;
+              font-size: 12px;
+              color: #4b5563;
+              padding: 4px 0;
+            }
+            .grand-total {
+              border-top: 2px solid #e5e7eb;
+              margin-top: 6px;
+              padding-top: 8px;
+              font-size: 15px;
+              font-weight: bold;
+              color: #991b1b;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="invoice-box">
+            <table style="width: 100%; border: none; margin-bottom: 20px;">
+              <tr>
+                <td style="vertical-align: top;">
+                  <h1 class="brand-title">DIVYA URJA</h1>
+                  <p class="brand-sub">Ancient Sciences & Spiritual Store</p>
+                  <p class="brand-sub">Pune, Maharashtra, India</p>
+                  <p class="brand-sub">Phone: +91 98224 92488 | Email: info@divyaurja.in</p>
+                </td>
+                <td style="vertical-align: top; text-align: right;">
+                  <h2 class="invoice-title">INVOICE</h2>
+                  <p class="meta-text"><strong>Invoice #:</strong> ${invoiceId}</p>
+                  <p class="meta-text"><strong>Date:</strong> ${orderDate}</p>
+                  <p class="meta-text"><strong>Status:</strong> ${order.status.toUpperCase()}</p>
+                </td>
+              </tr>
+            </table>
+
+            <table style="width: 100%; border: none; margin-bottom: 25px;">
+              <tr>
+                <td style="width: 50%; vertical-align: top;">
+                  <div class="section-title">Billed To</div>
+                  <p class="client-name">${order.name}</p>
+                  <p class="client-text">Phone: ${order.phone}</p>
+                  ${order.email ? `<p class="client-text">Email: ${order.email}</p>` : ''}
+                </td>
+                <td style="width: 50%; vertical-align: top;">
+                  <div class="section-title">Shipping Destination</div>
+                  <p class="client-text" style="font-weight: 600;">${order.address}</p>
+                  ${(order.district || order.state) ? `<p class="client-text">${[order.district, order.state].filter(Boolean).join(', ')}</p>` : ''}
+                  ${order.pincode ? `<p class="client-text">PIN: ${order.pincode}</p>` : ''}
+                </td>
+              </tr>
+            </table>
+
+            <table>
+              <thead>
+                <tr>
+                  <th style="text-align: left;">Description</th>
+                  <th style="text-align: right;">Unit Price</th>
+                  <th style="text-align: center;">Qty</th>
+                  <th style="text-align: right;">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${itemsRows}
+              </tbody>
+            </table>
+
+            <div class="totals-box">
+              <div class="total-row">
+                <span>Subtotal:</span>
+                <span>₹${order.subtotal.toLocaleString('en-IN')}</span>
+              </div>
+              <div class="total-row">
+                <span>Shipping Fee:</span>
+                <span>₹${order.shippingCharges.toLocaleString('en-IN')}</span>
+              </div>
+              <div class="total-row grand-total">
+                <span>Grand Total:</span>
+                <span>₹${order.total.toLocaleString('en-IN')}</span>
+              </div>
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
+  };
+
   const loadHtml2Pdf = async () => {
     const win = window as unknown as Record<string, unknown>;
     if (win.html2pdf) return win.html2pdf;
@@ -308,24 +492,24 @@ export default function AdminOrdersPage() {
     });
   };
 
-  const handleDownloadPDF = async () => {
-    if (!selectedOrder) return;
+  const handleDownloadPDF = async (orderTarget?: Order) => {
+    const target = orderTarget || selectedOrder;
+    if (!target) return;
     const toastId = toast.loading('Generating Invoice PDF...');
     try {
-      const element = document.getElementById('printable-invoice');
-      if (!element) throw new Error('Invoice element not found');
-
       const html2pdf = await loadHtml2Pdf();
-      const invoiceId = selectedOrder.id?.substring(0, 8).toUpperCase() || 'ORDER';
+      const invoiceId = target.id?.substring(0, 8).toUpperCase() || 'ORDER';
+      const htmlContent = generateInvoiceHtml(target);
+
       const opt = {
-        margin: [8, 8, 8, 8],
+        margin: [10, 10, 10, 10],
         filename: `DivyaUrja_Invoice_${invoiceId}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
+        html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff' },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
       };
 
-      await (html2pdf as any)().set(opt).from(element).save();
+      await (html2pdf as any)().from(htmlContent).set(opt).save();
       toast.success('Invoice PDF downloaded successfully!', { id: toastId });
     } catch (error) {
       console.error('PDF generation error:', error);
@@ -579,6 +763,12 @@ export default function AdminOrdersPage() {
 
               <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
                 <button
+                  onClick={() => handleDownloadPDF(selectedOrder)}
+                  className="flex-1 sm:flex-initial px-4 py-2 bg-primary text-white hover:bg-primary/95 text-sm font-semibold rounded-xl flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-sm"
+                >
+                  <Download className="w-4 h-4" /> Download PDF
+                </button>
+                <button
                   onClick={() => {
                     setShowInvoiceModal(true);
                   }}
@@ -693,7 +883,7 @@ export default function AdminOrdersPage() {
             {/* Print, Download PDF, and Close buttons */}
             <div className="flex flex-wrap items-center justify-end gap-3 mt-6 border-t border-gray-100 pt-4 no-print">
               <button
-                onClick={handleDownloadPDF}
+                onClick={() => handleDownloadPDF(selectedOrder)}
                 className="px-4 py-2.5 bg-primary text-white text-sm font-semibold rounded-xl flex items-center gap-1.5 hover:bg-primary/95 transition-colors shadow-sm cursor-pointer"
               >
                 <Download className="w-4 h-4" /> Download PDF
