@@ -432,15 +432,17 @@ export default function AdminOrdersPage() {
     const target = orderTarget || selectedOrder;
     if (!target) return;
     const toastId = toast.loading('Generating Invoice PDF...');
+    let container: HTMLDivElement | null = null;
     try {
       const html2pdf = await loadHtml2Pdf();
       const invoiceId = target.id?.substring(0, 8).toUpperCase() || 'ORDER';
 
-      // Create a temporary off-screen container with exact A4 proportions
-      const container = document.createElement('div');
-      container.style.position = 'absolute';
-      container.style.left = '-9999px';
+      // Create a temporary off-screen container positioned at (0,0) behind page UI
+      container = document.createElement('div');
+      container.style.position = 'fixed';
       container.style.top = '0';
+      container.style.left = '0';
+      container.style.zIndex = '-9999';
       container.style.width = '750px';
       container.style.backgroundColor = '#ffffff';
       container.innerHTML = generateInvoiceHtml(target);
@@ -456,16 +458,21 @@ export default function AdminOrdersPage() {
           logging: false,
           backgroundColor: '#ffffff',
           windowWidth: 750,
+          scrollY: 0,
+          scrollX: 0,
         },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
       };
 
       await (html2pdf as any)().from(container).set(opt).save();
-      document.body.removeChild(container);
       toast.success('Invoice PDF downloaded successfully!', { id: toastId });
     } catch (error) {
       console.error('PDF generation error:', error);
       toast.error('Failed to generate PDF invoice.', { id: toastId });
+    } finally {
+      if (container && document.body.contains(container)) {
+        document.body.removeChild(container);
+      }
     }
   };
 
