@@ -416,63 +416,263 @@ export default function AdminOrdersPage() {
     `;
   };
 
-  const loadHtml2Pdf = async () => {
-    const win = window as unknown as Record<string, unknown>;
-    if (win.html2pdf) return win.html2pdf;
-    return new Promise((resolve, reject) => {
+  const loadJsPDF = async () => {
+    const win = window as unknown as Record<string, any>;
+    if (win.jspdf && win.jspdf.jsPDF) {
+      return win.jspdf;
+    }
+
+    // Load jsPDF core
+    await new Promise((resolve, reject) => {
       const script = document.createElement('script');
-      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
-      script.onload = () => resolve((window as unknown as Record<string, unknown>).html2pdf);
-      script.onerror = () => reject(new Error('Failed to load html2pdf library.'));
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+      script.onload = resolve;
+      script.onerror = () => reject(new Error('Failed to load jsPDF core library.'));
       document.head.appendChild(script);
     });
+
+    // Load jsPDF-AutoTable plugin
+    await new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js';
+      script.onload = resolve;
+      script.onerror = () => reject(new Error('Failed to load jsPDF AutoTable plugin.'));
+      document.head.appendChild(script);
+    });
+
+    return (window as unknown as Record<string, any>).jspdf;
   };
 
   const handleDownloadPDF = async (orderTarget?: Order) => {
     const target = orderTarget || selectedOrder;
     if (!target) return;
     const toastId = toast.loading('Generating Invoice PDF...');
-    let container: HTMLDivElement | null = null;
+
     try {
-      const html2pdf = await loadHtml2Pdf();
+      const jspdfModule = await loadJsPDF();
+      const { jsPDF } = jspdfModule;
+      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
       const invoiceId = target.id?.substring(0, 8).toUpperCase() || 'ORDER';
+      const orderDate = target.createdAt ? new Date(target.createdAt).toLocaleDateString('en-IN') : 'N/A';
+      const isCompleted = target.status === 'completed';
 
-      // Create a temporary off-screen container positioned at (0,0) behind page UI
-      container = document.createElement('div');
-      container.style.position = 'fixed';
-      container.style.top = '0';
-      container.style.left = '0';
-      container.style.zIndex = '-9999';
-      container.style.width = '750px';
-      container.style.backgroundColor = '#ffffff';
-      container.innerHTML = generateInvoiceHtml(target);
-      document.body.appendChild(container);
+      // Brand Colors
+      const primaryColor: [number, number, number] = [15, 118, 110]; // #0F766E Deep Teal
+      const goldColor: [number, number, number] = [217, 119, 6];    // #D97706 Gold Accent
+      const darkText: [number, number, number] = [15, 23, 42];      // #0F172A Dark Slate
+      const grayText: [number, number, number] = [71, 85, 105];     // #475569
 
-      const opt = {
-        margin: [5, 5, 5, 5],
-        filename: `DivyaUrja_Invoice_${invoiceId}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: {
-          scale: 2,
-          useCORS: true,
-          logging: false,
-          backgroundColor: '#ffffff',
-          windowWidth: 750,
-          scrollY: 0,
-          scrollX: 0,
+      // 1. Header Left: Brand Info
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(22);
+      doc.setTextColor(...primaryColor);
+      doc.text('DIVYA URJA', 14, 20);
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9.5);
+      doc.setTextColor(...goldColor);
+      doc.text('ANCIENT SCIENCES & SPIRITUAL STORE', 14, 26);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(...grayText);
+      doc.text('Pune, Maharashtra, India', 14, 31);
+      doc.text('Phone: +91 98224 92488 | Email: info@divyaurja.in', 14, 36);
+      doc.text('Website: https://divyaurja.in', 14, 41);
+
+      // 2. Header Right: Invoice Badge & Details
+      doc.setFillColor(...primaryColor);
+      doc.roundedRect(145, 14, 51, 10, 2, 2, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(255, 255, 255);
+      doc.text('TAX INVOICE', 170.5, 20.5, { align: 'center' });
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9.5);
+      doc.setTextColor(...darkText);
+      doc.text(`Invoice No: #${invoiceId}`, 196, 29, { align: 'right' });
+      doc.text(`Date: ${orderDate}`, 196, 35, { align: 'right' });
+
+      // Status Badge Right
+      const statusText = `STATUS: ${(target.status || 'PENDING').toUpperCase()}`;
+      if (isCompleted) {
+        doc.setFillColor(222, 247, 236); // Light green
+        doc.setTextColor(3, 84, 63);      // Dark green
+      } else {
+        doc.setFillColor(253, 232, 232); // Light red
+        doc.setTextColor(155, 28, 28);   // Dark red
+      }
+      doc.roundedRect(145, 38, 51, 6, 1.5, 1.5, 'F');
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'bold');
+      doc.text(statusText, 170.5, 42.2, { align: 'center' });
+
+      // Gradient Accent Line
+      doc.setDrawColor(...primaryColor);
+      doc.setLineWidth(0.8);
+      doc.line(14, 46, 196, 46);
+
+      // 3. Customer & Shipping Info Card Containers
+      // Billed To Box (Left)
+      doc.setFillColor(248, 250, 252);
+      doc.setDrawColor(203, 213, 225);
+      doc.setLineWidth(0.3);
+      doc.roundedRect(14, 50, 88, 30, 3, 3, 'FD');
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.setTextColor(...primaryColor);
+      doc.text('BILLED TO (CUSTOMER)', 18, 55);
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(...darkText);
+      doc.text(target.name || 'N/A', 18, 62);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(...grayText);
+      doc.text(`Phone: ${target.phone}`, 18, 68);
+      if (target.email) {
+        doc.text(`Email: ${target.email}`, 18, 74);
+      }
+
+      // Shipping Destination Box (Right)
+      doc.setFillColor(248, 250, 252);
+      doc.setDrawColor(203, 213, 225);
+      doc.roundedRect(108, 50, 88, 30, 3, 3, 'FD');
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.setTextColor(...primaryColor);
+      doc.text('SHIPPING DESTINATION', 112, 55);
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9);
+      doc.setTextColor(...darkText);
+      const splitAddress = doc.splitTextToSize(target.address || '', 80);
+      doc.text(splitAddress, 112, 62);
+
+      const cityState = [target.district, target.state].filter(Boolean).join(', ');
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8.5);
+      if (cityState) {
+        doc.text(cityState, 112, 69);
+      }
+      if (target.pincode) {
+        doc.text(`PIN Code: ${target.pincode}`, 112, 75);
+      }
+
+      // 4. Products Table (jsPDF AutoTable)
+      const tableHead = [['Product Description', 'Unit Price', 'Qty', 'Amount']];
+      const tableBody = target.items.map((item) => [
+        item.productName,
+        `Rs. ${item.price.toLocaleString('en-IN')}`,
+        item.quantity.toString(),
+        `Rs. ${(item.price * item.quantity).toLocaleString('en-IN')}`,
+      ]);
+
+      (doc as any).autoTable({
+        startY: 85,
+        head: tableHead,
+        body: tableBody,
+        theme: 'grid',
+        headStyles: {
+          fillColor: primaryColor,
+          textColor: [255, 255, 255],
+          fontSize: 9,
+          fontStyle: 'bold',
+          halign: 'left',
         },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      };
+        columnStyles: {
+          0: { cellWidth: 90, halign: 'left' },
+          1: { cellWidth: 32, halign: 'right' },
+          2: { cellWidth: 20, halign: 'center' },
+          3: { cellWidth: 40, halign: 'right' },
+        },
+        styles: {
+          fontSize: 9,
+          cellPadding: 4,
+          textColor: [15, 23, 42],
+        },
+        alternateRowStyles: {
+          fillColor: [248, 250, 252],
+        },
+      });
 
-      await (html2pdf as any)().from(container).set(opt).save();
+      const finalY = (doc as any).lastAutoTable.finalY + 8;
+
+      // 5. Authenticity Guarantee Box & Totals Summary Table
+      // Authenticity box (Left)
+      doc.setFillColor(240, 253, 244);
+      doc.setDrawColor(134, 239, 172);
+      doc.roundedRect(14, finalY, 90, 24, 2, 2, 'FD');
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.setTextColor(22, 101, 52);
+      doc.text('AUTHENTICITY & GUARANTEE', 18, finalY + 6);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(21, 128, 61);
+      const authText = 'All spiritual items are 100% natural, lab-certified, and spiritually energized prior to dispatch.';
+      doc.text(doc.splitTextToSize(authText, 82), 18, finalY + 12);
+
+      // Totals Table (Right)
+      const totalXLabel = 145;
+      const totalXVal = 196;
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9.5);
+      doc.setTextColor(...grayText);
+      doc.text('Subtotal:', totalXLabel, finalY + 6);
+      doc.setTextColor(...darkText);
+      doc.setFont('helvetica', 'bold');
+      doc.text(`Rs. ${target.subtotal.toLocaleString('en-IN')}`, totalXVal, finalY + 6, { align: 'right' });
+
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(...grayText);
+      doc.text('Shipping Fee:', totalXLabel, finalY + 12);
+      doc.setTextColor(...darkText);
+      doc.setFont('helvetica', 'bold');
+      doc.text(`Rs. ${target.shippingCharges.toLocaleString('en-IN')}`, totalXVal, finalY + 12, { align: 'right' });
+
+      // Grand Total Highlight Bar
+      doc.setFillColor(240, 253, 244);
+      doc.setDrawColor(134, 239, 172);
+      doc.roundedRect(138, finalY + 16, 58, 9, 1.5, 1.5, 'FD');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(...primaryColor);
+      doc.text('Grand Total:', 140, finalY + 22);
+      doc.text(`Rs. ${target.total.toLocaleString('en-IN')}`, totalXVal, finalY + 22, { align: 'right' });
+
+      // 6. Footer Section
+      const footerY = Math.max(finalY + 36, 268);
+      doc.setDrawColor(226, 232, 240);
+      doc.setLineWidth(0.3);
+      doc.line(14, footerY, 196, footerY);
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(...primaryColor);
+      doc.text('Thank you for choosing Divya Urja!', 105, footerY + 6, { align: 'center' });
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8.5);
+      doc.setTextColor(...grayText);
+      doc.text('For queries regarding your order, please contact +91 98224 92488 or info@divyaurja.in', 105, footerY + 11, { align: 'center' });
+      doc.text('* This is an official computer-generated tax invoice. No signature required.', 105, footerY + 16, { align: 'center' });
+
+      // Save PDF document directly
+      doc.save(`DivyaUrja_Invoice_${invoiceId}.pdf`);
       toast.success('Invoice PDF downloaded successfully!', { id: toastId });
     } catch (error) {
       console.error('PDF generation error:', error);
       toast.error('Failed to generate PDF invoice.', { id: toastId });
-    } finally {
-      if (container && document.body.contains(container)) {
-        document.body.removeChild(container);
-      }
     }
   };
 
