@@ -302,7 +302,7 @@ export async function updateSectionVisibility(data: Partial<SectionVisibility>):
 export const DEFAULT_SITE_SETTINGS: SiteSettings = {
   phone: '+91 98224 92488',
   whatsapp: '919822492488',
-  email: 'info@divyaurja.com',
+  email: 'info@divyaurja.in',
   address: 'Pune, Maharashtra, India',
   workingHours: 'Mon - Sat: 10AM - 7PM',
   facebook: '',

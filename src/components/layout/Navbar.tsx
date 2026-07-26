@@ -152,7 +152,7 @@ export default function Navbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden overflow-hidden bg-white border-t border-primary/10"
+            className="lg:hidden max-h-[calc(100vh-80px)] overflow-y-auto bg-white border-t border-primary/10"
           >
             <div className="px-4 py-4 space-y-1">
               <div className="px-2 pb-2 md:hidden">

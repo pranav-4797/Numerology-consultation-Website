@@ -1085,9 +1085,9 @@ export default function NumerologyCalculatorPage() {
 
       {/* Edit Print details Modal */}
       {showEditRemediesModal && result && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
           <div className="absolute inset-0 bg-black/45 backdrop-blur-xs" onClick={() => setShowEditRemediesModal(false)} />
-          <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-2xl relative w-full max-w-lg z-10">
+          <div className="bg-white border border-gray-100 rounded-2xl p-4 sm:p-6 shadow-2xl relative w-full max-w-lg max-h-[90vh] overflow-y-auto z-10 my-auto">
             <h3 className="text-sm font-bold uppercase tracking-wider text-text mb-4 border-b border-gray-100 pb-2">Customise printable PDF details</h3>
             
             <div className="flex flex-col gap-4">

@@ -105,8 +105,8 @@ export default function AdminWorkshopsPage() {
       </div>
 
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center pt-10 p-4 bg-black/50 overflow-y-auto">
-          <div className="bg-white rounded-2xl p-6 sm:p-8 max-w-lg w-full shadow-2xl mb-8">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/50 overflow-y-auto">
+          <div className="bg-white rounded-2xl p-4 sm:p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl my-auto">
             <div className="flex items-center justify-between mb-6">
               <h2 className="font-playfair text-xl font-bold">{editingId ? 'Edit' : 'Create'} Workshop</h2>
               <button onClick={() => setShowForm(false)} className="p-1.5 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5" /></button>

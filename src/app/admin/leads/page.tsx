@@ -328,8 +328,8 @@ export default function AdminLeadsPage() {
       <DeleteConfirmModal isOpen={deleteModal.open} onClose={() => setDeleteModal({ open: false, id: '' })} onConfirm={handleDelete} loading={deleting} title="Delete Lead" message="Are you sure you want to delete this lead? This action cannot be undone." />
 
       {editModal.open && editModal.item && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-md shadow-xl border border-gray-100 relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl p-4 sm:p-8 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-xl border border-gray-100 relative my-auto">
             <button
               onClick={() => setEditModal({ open: false, item: null })}
               className="absolute top-4 right-4 p-1.5 hover:bg-gray-100 rounded-full transition-colors text-text/40"
