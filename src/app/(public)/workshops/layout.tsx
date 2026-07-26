@@ -10,6 +10,10 @@ export const metadata: Metadata = {
     'loshu grid training masterclass',
     'occult science classes online',
     'name numerology learning course',
+    'basic to advance numerology course pune',
+    'professional vastu consultant training',
+    'mobile numerology live workshop',
+    'certified numerologist certification course',
   ],
   alternates: {
     canonical: 'https://divyaurja.in/workshops',

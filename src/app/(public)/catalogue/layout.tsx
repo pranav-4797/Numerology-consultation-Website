@@ -11,6 +11,13 @@ export const metadata: Metadata = {
     'energized gemstone remedies',
     'vastu pyramid online shop',
     'healing crystals for positivity',
+    'pyrite bracelet for wealth',
+    '7 chakra lava stone bracelet',
+    'green aventurine money magnet',
+    'original mukhi rudraksha beads',
+    'copper shree yantra 3d model',
+    'vastu helix for north east toilets',
+    'brass vastu remedies pune',
   ],
   alternates: {
     canonical: 'https://divyaurja.in/catalogue',

@@ -10,6 +10,10 @@ export const metadata: Metadata = {
     'vastu consultant contact pune',
     'numerologist contact information',
     'book consultation inquiry',
+    'divya urja whatsapp number 9822492488',
+    'best numerologist in kothrud pune',
+    'vastu consultant in baner wakad',
+    'pimpri chinchwad numerology clinic',
   ],
   alternates: {
     canonical: 'https://divyaurja.in/contact',

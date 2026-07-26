@@ -65,6 +65,34 @@ export const metadata: Metadata = {
     'top numerologist in maharashtra',
     'numerology consultation fees',
     'book numerology consultation online',
+    'commercial vastu consultant pune',
+    'industrial vastu audit maharashtra',
+    'non demolition vastu remedies',
+    'directional energy balancing',
+    'vastu pyramid placement',
+    'main door vastu guidelines',
+    'lucky mobile number selection',
+    'flat number numerology check',
+    'natural gemstone recommendation',
+    'shree yantra placement guide',
+    'energized crystal bracelets pune',
+    'aura cleansing remedies',
+    'chakra balancing consultation',
+    'numerologist near me',
+    'vastu consultant near me',
+    'best occult science expert pune',
+    'kothrud numerology consultant',
+    'baner vastu expert',
+    'wakad numerology consultation',
+    'pimpri chinchwad vastu shastra',
+    'soul urge number calculation',
+    'karmic debt number analysis',
+    'master number reading',
+    'brand name spelling correction',
+    'company name vibration analysis',
+    'lucky name calculator online',
+    'relationship compatibility by birthdate',
+    'online numerology pdf report',
   ],
   alternates: {
     canonical: 'https://divyaurja.in',
@@ -145,13 +173,49 @@ const businessJsonLd = {
   knowsAbout: [
     'Numerology',
     'Vastu Shastra',
-    'Loshu Grid',
+    'Loshu Grid Analysis',
     'Name Numerology Correction',
     'Occult Science',
     'Crystal Remedies',
     'Mobile Numerology',
     'Energy Science',
+    'Switch Words Remedies',
+    'Yantra Numerology',
   ],
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Consultancy Services',
+    itemListElement: [
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'Service',
+          name: 'Numerology Consultation',
+          description: 'Comprehensive Driver-Conductor, Loshu Grid & Name Correction audit.',
+        },
+      },
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'Service',
+          name: 'Vastu Shastra Audit',
+          description: 'Non-demolition elemental energy balancing for residential and commercial spaces.',
+        },
+      },
+    ],
+  },
+};
+
+const websiteJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Divya Urja',
+  url: 'https://divyaurja.in',
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: 'https://divyaurja.in/catalogue?search={search_term_string}',
+    'query-input': 'required name=search_term_string',
+  },
 };
 
 const faqJsonLd = {
@@ -190,6 +254,14 @@ const faqJsonLd = {
         text: 'Yes! Divya Urja provides both online (via phone/video call/PDF reports) and in-person consultations in Pune and across the globe.',
       },
     },
+    {
+      '@type': 'Question',
+      name: 'What is Mobile Numerology and why is it important?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Mobile Numerology analyzes the total vibration and number combinations in your mobile phone number. Choosing a lucky mobile number aligned with your birth date attracts career success, business leads, and positive communication energy.',
+      },
+    },
   ],
 };
 
@@ -208,6 +280,10 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(businessJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
         />
         <script
           type="application/ld+json"
