@@ -299,14 +299,19 @@ export default function AdminOrdersPage() {
   const generateInvoiceHtml = (order: Order): string => {
     const invoiceId = order.id?.substring(0, 8).toUpperCase() || 'ORDER';
     const orderDate = order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-IN') : 'N/A';
+    const isCompleted = order.status === 'completed';
+    const statusBg = isCompleted ? '#def7ec' : '#fde8e8';
+    const statusColor = isCompleted ? '#03543f' : '#9b1c1c';
+    const statusText = order.status ? order.status.toUpperCase() : 'PENDING';
+
     const itemsRows = order.items
       .map(
-        (item) => `
-        <tr style="border-bottom: 1px solid #f3f4f6;">
-          <td style="padding: 10px 0; font-size: 13px; font-weight: 600; color: #111827;">${item.productName}</td>
-          <td style="padding: 10px 0; font-size: 13px; color: #4b5563; text-align: right;">₹${item.price.toLocaleString('en-IN')}</td>
-          <td style="padding: 10px 0; font-size: 13px; color: #4b5563; text-align: center;">${item.quantity}</td>
-          <td style="padding: 10px 0; font-size: 13px; font-weight: 600; color: #111827; text-align: right;">₹${(item.price * item.quantity).toLocaleString('en-IN')}</td>
+        (item, index) => `
+        <tr style="background-color: ${index % 2 === 0 ? '#ffffff' : '#f9fafb'}; border-bottom: 1px solid #e5e7eb;">
+          <td style="padding: 12px 14px; font-size: 13px; font-weight: 600; color: #111827;">${item.productName}</td>
+          <td style="padding: 12px 14px; font-size: 13px; color: #4b5563; text-align: right;">₹${item.price.toLocaleString('en-IN')}</td>
+          <td style="padding: 12px 14px; font-size: 13px; color: #4b5563; text-align: center;">${item.quantity}</td>
+          <td style="padding: 12px 14px; font-size: 13px; font-weight: 700; color: #111827; text-align: right;">₹${(item.price * item.quantity).toLocaleString('en-IN')}</td>
         </tr>
       `
       )
@@ -317,142 +322,79 @@ export default function AdminOrdersPage() {
       <html>
         <head>
           <meta charset="utf-8" />
-          <title>Invoice #${invoiceId}</title>
+          <title>Divya Urja Invoice #${invoiceId}</title>
           <style>
+            * { box-sizing: border-box; }
             body {
-              font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
               color: #1f2937;
               margin: 0;
-              padding: 20px;
+              padding: 0;
+              background-color: #ffffff;
+              -webkit-print-color-adjust: exact;
+            }
+            .invoice-wrapper {
+              width: 700px;
+              margin: 0 auto;
+              padding: 24px;
               background: #ffffff;
-            }
-            .invoice-box {
-              max-width: 800px;
-              margin: auto;
-              padding: 10px;
-            }
-            .brand-title {
-              font-size: 22px;
-              font-weight: bold;
-              color: #991b1b;
-              margin: 0 0 4px 0;
-            }
-            .brand-sub {
-              font-size: 11px;
-              color: #6b7280;
-              margin: 0;
-            }
-            .invoice-title {
-              font-size: 20px;
-              font-weight: bold;
-              text-align: right;
-              margin: 0 0 4px 0;
-              color: #111827;
-            }
-            .meta-text {
-              font-size: 12px;
-              color: #6b7280;
-              text-align: right;
-              margin: 2px 0;
-            }
-            .section-title {
-              font-size: 10px;
-              font-weight: bold;
-              color: #9ca3af;
-              text-transform: uppercase;
-              letter-spacing: 0.5px;
-              margin-bottom: 6px;
-            }
-            .client-name {
-              font-size: 14px;
-              font-weight: bold;
-              color: #111827;
-              margin: 0 0 4px 0;
-            }
-            .client-text {
-              font-size: 12px;
-              color: #4b5563;
-              margin: 2px 0;
-            }
-            table {
-              width: 100%;
-              border-collapse: collapse;
-              margin-bottom: 20px;
-            }
-            th {
-              border-bottom: 1px solid #e5e7eb;
-              padding: 8px 0;
-              font-size: 11px;
-              font-weight: bold;
-              color: #6b7280;
-              text-transform: uppercase;
-            }
-            .totals-box {
-              width: 250px;
-              margin-left: auto;
-              border-top: 1px solid #f3f4f6;
-              padding-top: 8px;
-            }
-            .total-row {
-              display: flex;
-              justify-content: space-between;
-              font-size: 12px;
-              color: #4b5563;
-              padding: 4px 0;
-            }
-            .grand-total {
-              border-top: 2px solid #e5e7eb;
-              margin-top: 6px;
-              padding-top: 8px;
-              font-size: 15px;
-              font-weight: bold;
-              color: #991b1b;
             }
           </style>
         </head>
         <body>
-          <div class="invoice-box">
-            <table style="width: 100%; border: none; margin-bottom: 20px;">
+          <div class="invoice-wrapper">
+            <!-- Header Table -->
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
               <tr>
-                <td style="vertical-align: top;">
-                  <h1 class="brand-title">DIVYA URJA</h1>
-                  <p class="brand-sub">Ancient Sciences & Spiritual Store</p>
-                  <p class="brand-sub">Pune, Maharashtra, India</p>
-                  <p class="brand-sub">Phone: +91 98224 92488 | Email: info@divyaurja.in</p>
+                <td style="vertical-align: top; width: 60%;">
+                  <h1 style="font-size: 24px; font-weight: 800; color: #0f766e; margin: 0 0 4px 0; letter-spacing: 0.5px;">DIVYA URJA</h1>
+                  <p style="font-size: 12px; font-weight: 600; color: #d97706; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px;">Ancient Sciences & Spiritual Store</p>
+                  <p style="font-size: 11px; color: #6b7280; margin: 0 0 3px 0;">Pune, Maharashtra, India</p>
+                  <p style="font-size: 11px; color: #6b7280; margin: 0 0 3px 0;">Phone: +91 98224 92488 | Email: info@divyaurja.in</p>
+                  <p style="font-size: 11px; color: #6b7280; margin: 0;">Website: https://divyaurja.in</p>
                 </td>
-                <td style="vertical-align: top; text-align: right;">
-                  <h2 class="invoice-title">INVOICE</h2>
-                  <p class="meta-text"><strong>Invoice #:</strong> ${invoiceId}</p>
-                  <p class="meta-text"><strong>Date:</strong> ${orderDate}</p>
-                  <p class="meta-text"><strong>Status:</strong> ${order.status.toUpperCase()}</p>
+                <td style="vertical-align: top; width: 40%; text-align: right;">
+                  <div style="display: inline-block; background-color: #0f766e; color: #ffffff; padding: 6px 16px; border-radius: 6px; font-size: 16px; font-weight: 800; letter-spacing: 1px; margin-bottom: 10px;">INVOICE</div>
+                  <p style="font-size: 12px; color: #374151; margin: 0 0 4px 0;"><strong>Invoice #:</strong> <span style="font-family: monospace; font-size: 13px;">#${invoiceId}</span></p>
+                  <p style="font-size: 12px; color: #374151; margin: 0 0 8px 0;"><strong>Date:</strong> ${orderDate}</p>
+                  <div>
+                    <span style="background-color: ${statusBg}; color: ${statusColor}; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 700; display: inline-block;">
+                      STATUS: ${statusText}
+                    </span>
+                  </div>
                 </td>
               </tr>
             </table>
 
-            <table style="width: 100%; border: none; margin-bottom: 25px;">
+            <!-- Gradient Accent Line -->
+            <div style="height: 3px; background: linear-gradient(to right, #0f766e, #d97706); margin-bottom: 20px; border-radius: 2px;"></div>
+
+            <!-- Customer & Shipping Section -->
+            <table style="width: 100%; border-collapse: separate; border-spacing: 12px 0; margin-left: -12px; margin-right: -12px; margin-bottom: 20px;">
               <tr>
-                <td style="width: 50%; vertical-align: top;">
-                  <div class="section-title">Billed To</div>
-                  <p class="client-name">${order.name}</p>
-                  <p class="client-text">Phone: ${order.phone}</p>
-                  ${order.email ? `<p class="client-text">Email: ${order.email}</p>` : ''}
+                <td style="width: 50%; vertical-align: top; background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px;">
+                  <p style="font-size: 10px; font-weight: 700; color: #0f766e; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 8px 0;">BILLED TO (CUSTOMER)</p>
+                  <p style="font-size: 14px; font-weight: 700; color: #111827; margin: 0 0 4px 0;">${order.name}</p>
+                  <p style="font-size: 12px; color: #4b5563; margin: 0 0 3px 0;">Phone: <strong>${order.phone}</strong></p>
+                  ${order.email ? `<p style="font-size: 12px; color: #4b5563; margin: 0;">Email: ${order.email}</p>` : ''}
                 </td>
-                <td style="width: 50%; vertical-align: top;">
-                  <div class="section-title">Shipping Destination</div>
-                  <p class="client-text" style="font-weight: 600;">${order.address}</p>
-                  ${(order.district || order.state) ? `<p class="client-text">${[order.district, order.state].filter(Boolean).join(', ')}</p>` : ''}
-                  ${order.pincode ? `<p class="client-text">PIN: ${order.pincode}</p>` : ''}
+                <td style="width: 50%; vertical-align: top; background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px;">
+                  <p style="font-size: 10px; font-weight: 700; color: #0f766e; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 8px 0;">SHIPPING DESTINATION</p>
+                  <p style="font-size: 12px; font-weight: 600; color: #111827; margin: 0 0 4px 0; line-height: 1.4;">${order.address}</p>
+                  ${(order.district || order.state) ? `<p style="font-size: 12px; color: #4b5563; margin: 0 0 3px 0;">${[order.district, order.state].filter(Boolean).join(', ')}</p>` : ''}
+                  ${order.pincode ? `<p style="font-size: 12px; font-weight: 600; color: #111827; margin: 0;">PIN Code: ${order.pincode}</p>` : ''}
                 </td>
               </tr>
             </table>
 
-            <table>
+            <!-- Products Table -->
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
               <thead>
-                <tr>
-                  <th style="text-align: left;">Description</th>
-                  <th style="text-align: right;">Unit Price</th>
-                  <th style="text-align: center;">Qty</th>
-                  <th style="text-align: right;">Amount</th>
+                <tr style="background-color: #0f766e; color: #ffffff;">
+                  <th style="padding: 12px 14px; text-align: left; width: 45%; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Product Description</th>
+                  <th style="padding: 12px 14px; text-align: right; width: 20%; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Unit Price</th>
+                  <th style="padding: 12px 14px; text-align: center; width: 15%; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Qty</th>
+                  <th style="padding: 12px 14px; text-align: right; width: 20%; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Amount</th>
                 </tr>
               </thead>
               <tbody>
@@ -460,19 +402,39 @@ export default function AdminOrdersPage() {
               </tbody>
             </table>
 
-            <div class="totals-box">
-              <div class="total-row">
-                <span>Subtotal:</span>
-                <span>₹${order.subtotal.toLocaleString('en-IN')}</span>
-              </div>
-              <div class="total-row">
-                <span>Shipping Fee:</span>
-                <span>₹${order.shippingCharges.toLocaleString('en-IN')}</span>
-              </div>
-              <div class="total-row grand-total">
-                <span>Grand Total:</span>
-                <span>₹${order.total.toLocaleString('en-IN')}</span>
-              </div>
+            <!-- Totals Section Table -->
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
+              <tr>
+                <td style="width: 55%; vertical-align: top;">
+                  <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 12px 16px;">
+                    <p style="font-size: 11px; font-weight: 700; color: #166534; margin: 0 0 4px 0; text-transform: uppercase;">Authenticity & Guarantee</p>
+                    <p style="font-size: 11px; color: #15803d; margin: 0; line-height: 1.4;">All items are 100% natural, lab-certified, and spiritually energized for maximum positivity.</p>
+                  </div>
+                </td>
+                <td style="width: 45%; vertical-align: top;">
+                  <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                      <td style="padding: 6px 12px; font-size: 12px; color: #6b7280; text-align: left;">Subtotal:</td>
+                      <td style="padding: 6px 12px; font-size: 12px; font-weight: 600; color: #111827; text-align: right;">₹${order.subtotal.toLocaleString('en-IN')}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 6px 12px; font-size: 12px; color: #6b7280; text-align: left;">Shipping Fee:</td>
+                      <td style="padding: 6px 12px; font-size: 12px; font-weight: 600; color: #111827; text-align: right;">₹${order.shippingCharges.toLocaleString('en-IN')}</td>
+                    </tr>
+                    <tr style="border-top: 2px solid #0f766e; background-color: #f0fdf4;">
+                      <td style="padding: 10px 12px; font-size: 14px; font-weight: 800; color: #0f766e; text-align: left;">Grand Total:</td>
+                      <td style="padding: 10px 12px; font-size: 16px; font-weight: 800; color: #0f766e; text-align: right;">₹${order.total.toLocaleString('en-IN')}</td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Footer Section -->
+            <div style="border-top: 1px solid #e5e7eb; padding-top: 16px; text-align: center;">
+              <p style="font-size: 12px; font-weight: 600; color: #0f766e; margin: 0 0 4px 0;">Thank you for choosing Divya Urja!</p>
+              <p style="font-size: 11px; color: #6b7280; margin: 0 0 8px 0;">For queries regarding your order, please contact +91 98224 92488 or info@divyaurja.in</p>
+              <p style="font-size: 10px; color: #9ca3af; margin: 0; font-style: italic;">* This is a computer-generated tax invoice. No signature is required.</p>
             </div>
           </div>
         </body>
@@ -803,60 +765,68 @@ export default function AdminOrdersPage() {
 
             {/* Printable Invoice Container */}
             <div id="printable-invoice" className="bg-white p-2">
-              <div className="invoice-header flex justify-between border-b-2 border-gray-100 pb-4 mb-6">
+              <div className="invoice-header flex justify-between border-b-2 border-primary/20 pb-4 mb-6">
                 <div>
-                  <h1 className="font-playfair text-xl font-bold text-red-800">DIVYA URJA</h1>
-                  <p className="text-xs text-text/50">Ancient Sciences & Spiritual Store</p>
-                  <p className="text-[11px] text-text/40">Pune, Maharashtra, India</p>
-                  <p className="text-[11px] text-text/40">Phone: +91 98224 92488</p>
-                  <p className="text-[11px] text-text/40">Email: info@divyaurja.in</p>
+                  <h1 className="font-playfair text-2xl font-extrabold text-primary tracking-wide">DIVYA URJA</h1>
+                  <p className="text-xs font-semibold text-secondary uppercase tracking-wider">Ancient Sciences & Spiritual Store</p>
+                  <p className="text-xs text-text/60 mt-1">Pune, Maharashtra, India</p>
+                  <p className="text-xs text-text/60">Phone: +91 98224 92488 | Email: info@divyaurja.in</p>
                 </div>
                 <div className="text-right">
-                  <h2 className="text-lg font-bold text-text uppercase tracking-wider mb-1">INVOICE</h2>
-                  <p className="text-xs font-semibold text-text/60">Invoice: <span className="font-mono uppercase">#{selectedOrder.id?.substring(0, 8)}</span></p>
-                  <p className="text-xs text-text/40">Date: {selectedOrder.createdAt ? new Date(selectedOrder.createdAt).toLocaleDateString('en-IN') : 'N/A'}</p>
-                  <p className="text-xs text-text/40">Status: <span className="font-semibold capitalize text-primary">{selectedOrder.status}</span></p>
+                  <div className="inline-block bg-primary text-white text-xs font-extrabold px-3 py-1 rounded mb-2 tracking-widest uppercase">
+                    INVOICE
+                  </div>
+                  <p className="text-xs font-semibold text-text/70">Invoice #: <span className="font-mono text-sm">#{selectedOrder.id?.substring(0, 8).toUpperCase()}</span></p>
+                  <p className="text-xs text-text/50">Date: {selectedOrder.createdAt ? new Date(selectedOrder.createdAt).toLocaleDateString('en-IN') : 'N/A'}</p>
+                  <p className="text-xs text-text/50 mt-1">
+                    Status:{' '}
+                    <span className={`font-bold px-2 py-0.5 rounded-full text-[11px] ${
+                      selectedOrder.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                    }`}>
+                      {selectedOrder.status ? selectedOrder.status.toUpperCase() : 'PENDING'}
+                    </span>
+                  </p>
                 </div>
               </div>
 
               {/* Billing Info */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
-                <div className="details-box">
-                  <h3 className="text-xs font-bold text-text/40 uppercase mb-2">Billed To:</h3>
-                  <p className="text-sm font-bold text-text">{selectedOrder.name}</p>
-                  <p className="text-xs text-text/60">Phone: {selectedOrder.phone}</p>
-                  {selectedOrder.email && <p className="text-xs text-text/60">Email: {selectedOrder.email}</p>}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+                  <h3 className="text-[11px] font-bold text-primary uppercase tracking-wider mb-2">BILLED TO (CUSTOMER)</h3>
+                  <p className="text-sm font-bold text-text mb-1">{selectedOrder.name}</p>
+                  <p className="text-xs text-text/70">Phone: <span className="font-medium text-text">{selectedOrder.phone}</span></p>
+                  {selectedOrder.email && <p className="text-xs text-text/70 mt-0.5">Email: {selectedOrder.email}</p>}
                 </div>
-                <div className="details-box">
-                  <h3 className="text-xs font-bold text-text/40 uppercase mb-2">Shipping Destination:</h3>
-                  <div className="text-xs text-text/70 leading-relaxed whitespace-pre-wrap">
-                    <p className="font-semibold">{selectedOrder.address}</p>
+                <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+                  <h3 className="text-[11px] font-bold text-primary uppercase tracking-wider mb-2">SHIPPING DESTINATION</h3>
+                  <div className="text-xs text-text/80 leading-relaxed whitespace-pre-wrap">
+                    <p className="font-semibold text-text">{selectedOrder.address}</p>
                     {(selectedOrder.district || selectedOrder.state) && (
-                      <p>{[selectedOrder.district, selectedOrder.state].filter(Boolean).join(', ')}</p>
+                      <p className="text-text/70">{[selectedOrder.district, selectedOrder.state].filter(Boolean).join(', ')}</p>
                     )}
-                    {selectedOrder.pincode && <p className="font-medium">PIN: {selectedOrder.pincode}</p>}
+                    {selectedOrder.pincode && <p className="font-semibold text-text mt-0.5">PIN Code: {selectedOrder.pincode}</p>}
                   </div>
                 </div>
               </div>
 
               {/* Billing Items Table */}
-              <div className="overflow-x-auto mb-6">
-                <table className="w-full text-left border-collapse min-w-[400px]">
+              <div className="overflow-x-auto mb-6 border border-gray-200 rounded-xl">
+                <table className="w-full text-left border-collapse min-w-[500px]">
                   <thead>
-                    <tr className="border-b border-gray-200">
-                      <th className="py-2 text-xs font-bold text-text/50 uppercase">Description</th>
-                      <th className="py-2 text-xs font-bold text-text/50 uppercase text-right">Unit Price</th>
-                      <th className="py-2 text-xs font-bold text-text/50 uppercase text-center">Qty</th>
-                      <th className="py-2 text-xs font-bold text-text/50 uppercase text-right">Amount</th>
+                    <tr className="bg-primary text-white text-[11px] uppercase font-bold tracking-wider">
+                      <th className="py-3 px-4 w-[45%]">Product Description</th>
+                      <th className="py-3 px-4 w-[20%] text-right">Unit Price</th>
+                      <th className="py-3 px-4 w-[15%] text-center">Qty</th>
+                      <th className="py-3 px-4 w-[20%] text-right">Amount</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="divide-y divide-gray-100 text-xs">
                     {selectedOrder.items.map((item, idx) => (
-                      <tr key={idx} className="border-b border-gray-100">
-                        <td className="py-3 text-sm font-semibold text-text">{item.productName}</td>
-                        <td className="py-3 text-sm text-text/70 text-right">₹{item.price.toLocaleString('en-IN')}</td>
-                        <td className="py-3 text-sm text-text/70 text-center">{item.quantity}</td>
-                        <td className="py-3 text-sm font-semibold text-text text-right">₹{(item.price * item.quantity).toLocaleString('en-IN')}</td>
+                      <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}>
+                        <td className="py-3 px-4 font-semibold text-text">{item.productName}</td>
+                        <td className="py-3 px-4 text-text/70 text-right">₹{item.price.toLocaleString('en-IN')}</td>
+                        <td className="py-3 px-4 text-text/70 text-center font-medium">{item.quantity}</td>
+                        <td className="py-3 px-4 font-bold text-text text-right">₹{(item.price * item.quantity).toLocaleString('en-IN')}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -864,18 +834,24 @@ export default function AdminOrdersPage() {
               </div>
 
               {/* Totals */}
-              <div className="w-full sm:w-72 ml-auto border-t border-gray-100 pt-2">
-                <div className="flex justify-between py-1 text-xs text-text/60">
-                  <span>Subtotal:</span>
-                  <span>₹{selectedOrder.subtotal.toLocaleString('en-IN')}</span>
+              <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-2">
+                <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-xs max-w-xs">
+                  <p className="font-bold text-green-800 uppercase text-[10px] mb-1">Authenticity & Guarantee</p>
+                  <p className="text-green-700 text-[11px] leading-snug">All products are 100% natural, lab-certified, and spiritually energized.</p>
                 </div>
-                <div className="flex justify-between py-1 text-xs text-text/60">
-                  <span>Shipping Fee:</span>
-                  <span>₹{selectedOrder.shippingCharges.toLocaleString('en-IN')}</span>
-                </div>
-                <div className="flex justify-between py-2 border-t-2 border-gray-100 font-bold text-red-800 text-sm mt-1">
-                  <span>Grand Total:</span>
-                  <span>₹{selectedOrder.total.toLocaleString('en-IN')}</span>
+                <div className="w-full sm:w-72 border-t border-gray-200 pt-2 space-y-1">
+                  <div className="flex justify-between text-xs text-text/60">
+                    <span>Subtotal:</span>
+                    <span className="font-semibold text-text">₹{selectedOrder.subtotal.toLocaleString('en-IN')}</span>
+                  </div>
+                  <div className="flex justify-between text-xs text-text/60">
+                    <span>Shipping Fee:</span>
+                    <span className="font-semibold text-text">₹{selectedOrder.shippingCharges.toLocaleString('en-IN')}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-t-2 border-primary bg-green-50/60 px-2 rounded-lg font-bold text-primary text-sm mt-2">
+                    <span>Grand Total:</span>
+                    <span>₹{selectedOrder.total.toLocaleString('en-IN')}</span>
+                  </div>
                 </div>
               </div>
             </div>
