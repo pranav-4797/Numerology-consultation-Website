@@ -70,6 +70,7 @@ export default function CheckoutPage() {
                   image: targetOffer.image || '',
                   inStock: true,
                   featured: true,
+                  createdAt: targetOffer.createdAt || '',
                 };
               } else {
                 // Apply special offer discount price
