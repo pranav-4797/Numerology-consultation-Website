@@ -12,22 +12,34 @@ import type { Blog } from '@/types';
 
 interface BlogDetailClientProps {
   initialBlog?: Blog | null;
+  slug?: string;
 }
 
-export default function BlogDetailClient({ initialBlog }: BlogDetailClientProps) {
+export default function BlogDetailClient({ initialBlog, slug: propSlug }: BlogDetailClientProps) {
   const [blog, setBlog] = useState<Blog | null>(initialBlog ?? null);
-  const [loading, setLoading] = useState<boolean>(initialBlog === undefined);
+  const [loading, setLoading] = useState<boolean>(!initialBlog);
 
   useEffect(() => {
-    if (initialBlog !== undefined) return;
+    // If we already have the initialBlog, no need to fetch
+    if (initialBlog) {
+      setLoading(false);
+      return;
+    }
 
-    // Extract slug from browser URL as fallback
-    const pathParts = window.location.pathname.split('/').filter(Boolean);
-    const slug = pathParts[pathParts.length - 1];
+    // Extract slug from prop or browser URL as fallback
+    let currentSlug = propSlug;
+    if (!currentSlug && typeof window !== 'undefined') {
+      const pathParts = window.location.pathname.split('/').filter(Boolean);
+      currentSlug = pathParts[pathParts.length - 1];
+    }
+    if (currentSlug) {
+      currentSlug = decodeURIComponent(currentSlug);
+    }
 
     async function fetchBlog() {
       try {
-        const data = await getBlogBySlug(slug);
+        if (!currentSlug) return;
+        const data = await getBlogBySlug(currentSlug);
         setBlog(data && data.status !== 'draft' ? data : null);
       } catch (error) {
         console.error('Error fetching blog:', error);
@@ -36,12 +48,12 @@ export default function BlogDetailClient({ initialBlog }: BlogDetailClientProps)
       }
     }
 
-    if (slug && slug !== 'placeholder') {
+    if (currentSlug && currentSlug !== 'placeholder') {
       fetchBlog();
     } else {
       setLoading(false);
     }
-  }, [initialBlog]);
+  }, [initialBlog, propSlug]);
 
   if (loading) return <Loader text="Loading article..." />;
 

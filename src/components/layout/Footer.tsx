@@ -37,6 +37,7 @@ export default function Footer() {
     { href: '/workshops', label: t('nav.workshops') },
     { href: '/events', label: t('nav.events') },
     { href: '/blog', label: t('nav.blog') },
+    { href: '/offers', label: t('nav.offers') },
     { href: '/contact', label: t('nav.contact') },
   ];
 

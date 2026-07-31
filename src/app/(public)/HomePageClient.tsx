@@ -113,9 +113,9 @@ export default function HomePageClient({
                     className="w-full h-full object-contain p-4 group-hover:scale-102 transition-transform duration-500"
                   />
                 </div>
-                <div className="absolute -bottom-6 -right-6 px-6 py-4 bg-white rounded-2xl shadow-xl border border-gray-100">
-                  <p className="text-3xl font-bold text-primary">8+</p>
-                  <p className="text-xs text-text/50">Years Experience</p>
+                <div className="absolute -bottom-3 -right-3 sm:-bottom-6 sm:-right-6 px-4 py-3 sm:px-6 sm:py-4 bg-white rounded-2xl shadow-xl border border-gray-100">
+                  <p className="text-2xl sm:text-3xl font-bold text-primary">8+</p>
+                  <p className="text-[10px] sm:text-xs text-text/50">Years Experience</p>
                 </div>
               </div>
             </ScrollReveal>
@@ -243,6 +243,32 @@ export default function HomePageClient({
           </div>
         </section>
       )}
+
+      {/* Special Festive Offers Showcase Banner */}
+      <section className="py-16 bg-gradient-to-r from-amber-900 via-amber-950 to-gray-900 text-white relative overflow-hidden border-y border-amber-500/20">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8 bg-white/5 backdrop-blur-md p-8 sm:p-12 rounded-3xl border border-amber-400/20 shadow-2xl">
+            <div className="max-w-2xl">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/20 border border-amber-400/30 rounded-full text-amber-300 text-xs font-bold uppercase tracking-wider mb-4">
+                <span>🪔 Special Festive Offers & Discounts</span>
+              </div>
+              <h2 className="font-playfair text-3xl sm:text-4xl font-bold text-white mb-4 leading-tight">
+                Unlock Heavy Discounts on Products & Consultations
+              </h2>
+              <p className="text-amber-100/80 text-sm sm:text-base leading-relaxed">
+                Check out active Diwali specials, crystal bracelet discounts, and festive package offers before time runs out!
+              </p>
+            </div>
+            <Link
+              href="/offers"
+              className="shrink-0 inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-extrabold rounded-2xl shadow-xl hover:scale-105 active:scale-95 transition-all text-sm tracking-wide"
+            >
+              View Special Offers <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
 
       {/* Upcoming Events */}
       {events.length > 0 && (

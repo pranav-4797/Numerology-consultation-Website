@@ -38,6 +38,7 @@ This document serves as a token-efficient, comprehensive architecture map, data 
 │   │   │   ├── contact/        # Contact form (creates Lead in Firestore)
 │   │   │   ├── events/         # Upcoming events list & details page
 │   │   │   ├── gallery/        # Photo gallery grid & lightbox viewer page
+│   │   │   ├── offers/         # Customizable festive & special offers page
 │   │   │   ├── services/       # Services list & detailed modal view page
 │   │   │   ├── testimonials/   # Client reviews & rating page
 │   │   │   └── workshops/      # Workshop schedule & seat booking modal page
@@ -50,6 +51,7 @@ This document serves as a token-efficient, comprehensive architecture map, data 
 │   │   │   ├── gallery/        # Photo gallery CRUD
 │   │   │   ├── leads/          # Contact submissions pipeline & lead conversion tracker
 │   │   │   ├── numerology-calculator/ # Numerology report compiler & PDF download utility
+│   │   │   ├── offers/         # Festive offers & discount CRUD (products/services/custom)
 │   │   │   ├── orders/         # E-commerce store orders & fulfillment tracking
 │   │   │   ├── products/       # Store products CRUD (inventory, price, stock, category)
 │   │   │   ├── registrations/  # Workshop participant roster
@@ -119,6 +121,7 @@ This document serves as a token-efficient, comprehensive architecture map, data 
 | `Appointment` | `id`, `name`, `phone`, `email`, `serviceId`, `serviceTitle`, `fees`, `date`, `timeSlot`, `birthdate`, `personalityNumber`, `destinyNumber`, `zodiacSign`, `message`, `status` (`'pending' \| 'confirmed' \| 'completed' \| 'cancelled'`), `paid` | `appointments` |
 | `WorkshopRegistration` | `id`, `workshopId`, `workshopTitle`, `name`, `phone`, `email`, `status` (`'registered' \| 'confirmed' \| 'cancelled'`), `paid` | `registrations` |
 | `Product` | `id`, `name`, `description`, `price`, `category` (`'bracelets' \| 'crystals' \| 'yantras' \| 'rudraksha' \| 'pendants' \| 'other'`), `image`, `inStock`, `featured` | `products` |
+| `Offer` | `id`, `title`, `subtitle`, `badge`, `type` (`'product' \| 'service' \| 'custom'`), `itemId`, `itemName`, `description`, `originalPrice`, `discountedPrice`, `discountPercent`, `image`, `startDate`, `endDate`, `active`, `featured`, `category` | `offers` |
 | `Order` | `id`, `name`, `phone`, `email`, `address`, `district`, `state`, `pincode`, `items[]`, `subtotal`, `shippingCharges`, `total`, `status` (`'pending' \| 'completed' \| 'cancelled'`) | `orders` |
 | `SiteSettings` | `phone`, `whatsapp`, `email`, `address`, `workingHours`, `facebook`, `instagram`, `youtube`, `heroTitle`, `heroSubtitle` | `settings` (`main` doc) |
 
@@ -149,7 +152,7 @@ This document serves as a token-efficient, comprehensive architecture map, data 
 ---
 
 ## 5. Security Model (`firestore.rules`)
-- **Public Read**: `services`, `workshops`, `events`, `blogs`, `testimonials`, `gallery`, `products`, `settings`.
+- **Public Read**: `services`, `workshops`, `events`, `blogs`, `testimonials`, `gallery`, `products`, `offers`, `settings`.
 - **Public Write**:
   - `leads`, `appointments`, `orders`: Public creation is permitted (validated by security rule field rules).
   - `workshops`: Public users can only decrement `availableSeats` by 1 via atomic transaction.

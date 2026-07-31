@@ -20,6 +20,7 @@ const en: Dictionary = {
   'nav.testimonials': 'Testimonials',
   'nav.contact': 'Contact',
   'nav.catalogue': 'Catalogue',
+  'nav.offers': 'Special Offers',
   'nav.bookConsultation': 'Book Consultation',
 
   // Footer
@@ -95,6 +96,7 @@ const hi: Dictionary = {
   'nav.testimonials': 'प्रशंसापत्र',
   'nav.contact': 'संपर्क',
   'nav.catalogue': 'कैटलॉग',
+  'nav.offers': 'विशेष ऑफर्स',
   'nav.bookConsultation': 'परामर्श बुक करें',
 
   'footer.tagline':
@@ -165,6 +167,7 @@ const mr: Dictionary = {
   'nav.testimonials': 'अभिप्राय',
   'nav.contact': 'संपर्क',
   'nav.catalogue': 'कॅटलॉग',
+  'nav.offers': 'विशेष ऑफर्स',
   'nav.bookConsultation': 'सल्लामसलत बुक करा',
 
   'footer.tagline':

@@ -151,6 +151,30 @@ export interface DashboardStats {
   totalLeads: number;
   totalProducts: number;
   totalOrders: number;
+  totalOffers: number;
+}
+
+export type OfferItemType = 'product' | 'service' | 'custom';
+
+export interface Offer {
+  id: string;
+  title: string;
+  subtitle?: string;
+  badge?: string;
+  type: OfferItemType;
+  itemId?: string;
+  itemName: string;
+  description: string;
+  originalPrice: number;
+  discountedPrice: number;
+  discountPercent?: number;
+  image: string;
+  startDate?: string;
+  endDate?: string;
+  active: boolean;
+  featured: boolean;
+  category?: string;
+  createdAt: string;
 }
 
 export interface Certificate {

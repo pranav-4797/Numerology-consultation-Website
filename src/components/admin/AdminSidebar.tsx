@@ -6,12 +6,13 @@ import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, Layers, FileText, Calendar, GraduationCap,
   MessageSquare, Image, Users, CalendarCheck, ClipboardList, Settings, ShoppingBag, ShoppingCart,
-  Calculator
+  Calculator, Tag
 } from 'lucide-react';
 
 const menuItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/admin/services', label: 'Services', icon: Layers },
+  { href: '/admin/offers', label: 'Special Offers', icon: Tag },
   { href: '/admin/blogs', label: 'Blogs', icon: FileText },
   { href: '/admin/events', label: 'Events', icon: Calendar },
   { href: '/admin/workshops', label: 'Workshops', icon: GraduationCap },

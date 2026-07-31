@@ -30,6 +30,8 @@ import type {
   Product,
   Certificate,
   Order,
+  Offer,
+  DashboardStats,
 } from '@/types';
 
 // ─── Generic Helpers ────────────────────────────────────────
@@ -242,16 +244,30 @@ export const updateOrder = (id: string, data: Record<string, unknown>) => update
 export const deleteOrder = (id: string) => deleteDocument('orders', id);
 
 
+// ─── Offers ──────────────────────────────────────────────────
+
+export const getOffers = () => getCollection<Offer>('offers');
+export const getActiveOffers = async (): Promise<Offer[]> => {
+  const q = query(collection(db, 'offers'), where('active', '==', true));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Offer));
+};
+export const getOfferById = (id: string) => getDocById<Offer>('offers', id);
+export const createOffer = (data: Record<string, unknown>) => createDocument('offers', data);
+export const updateOffer = (id: string, data: Record<string, unknown>) => updateDocument('offers', id, data);
+export const deleteOffer = (id: string) => deleteDocument('offers', id);
+
 // ─── Dashboard Stats ────────────────────────────────────────
 
-export async function getDashboardStats() {
-  const [blogs, events, workshops, contacts, products, orders] = await Promise.all([
+export async function getDashboardStats(): Promise<DashboardStats> {
+  const [blogs, events, workshops, contacts, products, orders, offers] = await Promise.all([
     getDocs(collection(db, 'blogs')),
     getDocs(collection(db, 'events')),
     getDocs(collection(db, 'workshops')),
     getDocs(collection(db, 'contacts')),
     getDocs(collection(db, 'products')),
     getDocs(collection(db, 'orders')),
+    getDocs(collection(db, 'offers')),
   ]);
   return {
     totalPosts: blogs.size,
@@ -260,6 +276,7 @@ export async function getDashboardStats() {
     totalLeads: contacts.size,
     totalProducts: products.size,
     totalOrders: orders.size,
+    totalOffers: offers.size,
   };
 }
 
@@ -273,6 +290,7 @@ export interface SectionVisibility {
   gallery: boolean;
   testimonials: boolean;
   catalogue: boolean;
+  offers: boolean;
 }
 
 const DEFAULT_VISIBILITY: SectionVisibility = {
@@ -283,6 +301,7 @@ const DEFAULT_VISIBILITY: SectionVisibility = {
   gallery: true,
   testimonials: true,
   catalogue: true,
+  offers: true,
 };
 
 export async function getSectionVisibility(): Promise<SectionVisibility> {

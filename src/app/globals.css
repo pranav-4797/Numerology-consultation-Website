@@ -140,13 +140,8 @@ body {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* Better tap targets on mobile */
+/* Better tap targets on mobile – only for standalone CTAs, not inline/icon elements */
 @media (max-width: 640px) {
-  button, a, [role="button"] {
-    min-height: 44px;
-    min-width: 44px;
-  }
-
   /* Reduce animations on mobile for performance */
   .motion-reduce * {
     animation-duration: 0.01ms !important;
@@ -166,11 +161,9 @@ body {
   }
 }
 
-/* Disable hover effects on touch devices */
+/* Simplify hover lift on touch devices without breaking Framer Motion */
 @media (hover: none) {
-  *:hover {
-    transform: none !important;
-  }
+  /* Intentionally empty: let Framer Motion handle animation states */
 }
 
 /* Fix fixed position elements on iOS */
@@ -188,4 +181,13 @@ body {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
+}
+
+/* Hide scrollbar utility */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }

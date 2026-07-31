@@ -63,7 +63,7 @@ export default function ServiceCard({ service, index = 0 }: ServiceCardProps) {
           >
             {service.description}
           </p>
-          <div className="flex items-center justify-between gap-3 pt-3 border-t border-gray-100">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-3 border-t border-gray-100">
             <div>
               {service.fees && (
                 <span className="flex items-center gap-0.5 text-sm font-bold text-primary mb-1">
@@ -80,7 +80,7 @@ export default function ServiceCard({ service, index = 0 }: ServiceCardProps) {
             </div>
             <Link
               href={`/book?service=${service.id}`}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-primary/90 group-hover:gap-3 transition-all whitespace-nowrap"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-primary/90 group-hover:gap-3 transition-all text-center"
             >
               {t('nav.bookConsultation')} <ArrowRight className="w-4 h-4" />
             </Link>

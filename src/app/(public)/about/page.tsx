@@ -303,7 +303,7 @@ export default function AboutPage() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="relative bg-white rounded-3xl overflow-hidden max-w-4xl w-full shadow-2xl border border-gray-100 grid grid-cols-1 md:grid-cols-12"
+              className="relative bg-white rounded-3xl overflow-hidden max-w-4xl w-full shadow-2xl border border-gray-100 grid grid-cols-1 md:grid-cols-12 max-h-[90vh] overflow-y-auto"
             >
               {/* Close Button */}
               <button
@@ -314,7 +314,7 @@ export default function AboutPage() {
               </button>
 
               {/* Image Section */}
-              <div className="md:col-span-7 bg-gray-900 flex items-center justify-center p-6 md:p-12 aspect-[4/3] md:aspect-auto md:min-h-[500px]">
+              <div className="md:col-span-7 bg-gray-900 flex items-center justify-center p-4 sm:p-6 md:p-12 max-h-[40vh] md:max-h-none md:min-h-[500px]">
                 <img
                   src={selectedCert.image}
                   alt={selectedCert.title}

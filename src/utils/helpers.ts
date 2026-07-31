@@ -1,10 +1,11 @@
 export function generateSlug(title: string): string {
-  return title
+  const cleaned = title
     .toLowerCase()
     .trim()
-    .replace(/[^\w\s-]/g, '')
+    .replace(/[^\p{L}\p{N}\s-]/gu, '')
     .replace(/[\s_]+/g, '-')
     .replace(/^-+|-+$/g, '');
+  return cleaned || `post-${Date.now()}`;
 }
 
 export function formatDate(dateString: string): string {

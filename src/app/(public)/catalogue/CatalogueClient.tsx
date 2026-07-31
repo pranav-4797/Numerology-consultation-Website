@@ -163,12 +163,12 @@ export default function CatalogueClient({ initialProducts, initialWhatsapp = '91
           </div>
 
           {/* Category Tabs */}
-          <div className="flex items-center justify-center flex-wrap gap-2 mb-12">
+          <div className="flex items-center gap-2 mb-12 overflow-x-auto pb-2 scrollbar-none sm:flex-wrap sm:justify-center sm:overflow-visible sm:pb-0">
             {CATEGORIES.map((cat) => (
               <button
                 key={cat.key}
                 onClick={() => setActiveCategory(cat.key)}
-                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all cursor-pointer flex items-center gap-1.5 ${
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
                   activeCategory === cat.key
                     ? 'bg-primary text-white shadow-md shadow-primary/20 scale-105'
                     : 'bg-white text-text/70 border border-gray-100 hover:border-primary/20 hover:bg-primary/5'

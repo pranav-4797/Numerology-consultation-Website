@@ -119,4 +119,24 @@ export const orderSchema = z.object({
 
 export type OrderFormData = z.infer<typeof orderSchema>;
 
+export const offerSchema = z.object({
+  title: z.string().min(2, 'Offer title is required'),
+  subtitle: z.string().optional(),
+  badge: z.string().optional(),
+  type: z.enum(['product', 'service', 'custom']),
+  itemId: z.string().optional(),
+  itemName: z.string().min(2, 'Item name is required'),
+  description: z.string().min(5, 'Description is required'),
+  originalPrice: z.number().min(0, 'Original price must be 0 or higher'),
+  discountedPrice: z.number().min(0, 'Discounted price must be 0 or higher'),
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
+  active: z.boolean(),
+  featured: z.boolean(),
+  category: z.string().optional(),
+});
+
+export type OfferFormData = z.infer<typeof offerSchema>;
+
+
 
