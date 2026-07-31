@@ -242,8 +242,8 @@ export default function AdminOrdersPage() {
                 <div class="info-block">
                   <h3>Shipping Destination</h3>
                   <p><strong>${selectedOrder.address}</strong></p>
-                  ${districtState ? `<p><strong>${districtState}</strong></p>` : ''}
-                  ${selectedOrder.pincode ? `<p><strong>PIN: ${selectedOrder.pincode}</strong></p>` : ''}
+                  ${districtState ? `<p>${districtState}</p>` : ''}
+                  ${selectedOrder.pincode ? `<p>PIN Code: ${selectedOrder.pincode}</p>` : ''}
                 </div>
               </div>
 
@@ -356,9 +356,11 @@ export default function AdminOrdersPage() {
             </td>
             <td style="width: 50%; vertical-align: top; background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 14px 16px;">
               <p style="font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.8px; margin: 0 0 6px 0;">SHIPPING DESTINATION</p>
-              <p style="font-size: 12px; font-weight: 700; color: #1e293b; margin: 0 0 4px 0; line-height: 1.4;">${order.address}</p>
-              ${districtStateStr ? `<p style="font-size: 12px; color: #334155; margin: 0 0 3px 0;">${districtStateStr}</p>` : ''}
-              ${order.pincode ? `<p style="font-size: 12px; color: #334155; margin: 0;">PIN Code: <strong>${order.pincode}</strong></p>` : ''}
+              <div style="font-size: 12px; color: #1e293b; line-height: 1.5;">
+                <p style="font-weight: 700; color: #1e293b; margin: 0 0 4px 0;">${order.address}</p>
+                ${districtStateStr && !order.address.toLowerCase().includes(districtStateStr.toLowerCase()) ? `<p style="color: #334155; margin: 0 0 3px 0;">${districtStateStr}</p>` : ''}
+                ${order.pincode && !order.address.includes(order.pincode) ? `<p style="color: #334155; margin: 0;">PIN Code: <strong>${order.pincode}</strong></p>` : ''}
+              </div>
             </td>
           </tr>
         </table>
@@ -556,19 +558,21 @@ export default function AdminOrdersPage() {
       doc.text('SHIPPING DESTINATION', 112, 55);
 
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(9);
+      doc.setFontSize(8.5);
       doc.setTextColor(...darkText);
       const splitAddress = doc.splitTextToSize(target.address || '', 80);
-      doc.text(splitAddress, 112, 62);
+      doc.text(splitAddress, 112, 60);
 
+      let currentAddrY = 60 + splitAddress.length * 4;
       const cityState = [target.district, target.state].filter(Boolean).join(', ');
       doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8.5);
-      if (cityState) {
-        doc.text(cityState, 112, 69);
+      doc.setFontSize(8);
+      if (cityState && !target.address.toLowerCase().includes(cityState.toLowerCase())) {
+        doc.text(cityState, 112, currentAddrY);
+        currentAddrY += 4.5;
       }
-      if (target.pincode) {
-        doc.text(`PIN Code: ${target.pincode}`, 112, 75);
+      if (target.pincode && !target.address.includes(target.pincode)) {
+        doc.text(`PIN Code: ${target.pincode}`, 112, currentAddrY);
       }
 
       // 4. Products Table (jsPDF AutoTable Monochrome Header & Grid)
@@ -1007,10 +1011,13 @@ export default function AdminOrdersPage() {
                   <h3 className="text-[11px] font-bold text-primary uppercase tracking-wider mb-2">SHIPPING DESTINATION</h3>
                   <div className="text-xs text-text/80 leading-relaxed whitespace-pre-wrap">
                     <p className="font-semibold text-text">{selectedOrder.address}</p>
-                    {(selectedOrder.district || selectedOrder.state) && (
+                    {(selectedOrder.district || selectedOrder.state) &&
+                      ![selectedOrder.district, selectedOrder.state].filter(Boolean).some(s => selectedOrder.address.toLowerCase().includes(s!.toLowerCase())) && (
                       <p className="text-text/70">{[selectedOrder.district, selectedOrder.state].filter(Boolean).join(', ')}</p>
                     )}
-                    {selectedOrder.pincode && <p className="font-semibold text-text mt-0.5">PIN Code: {selectedOrder.pincode}</p>}
+                    {selectedOrder.pincode && !selectedOrder.address.includes(selectedOrder.pincode) && (
+                      <p className="font-semibold text-text mt-0.5">PIN Code: {selectedOrder.pincode}</p>
+                    )}
                   </div>
                 </div>
               </div>
