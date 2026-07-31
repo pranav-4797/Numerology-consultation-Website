@@ -1,12 +1,18 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { MessageCircle } from 'lucide-react';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { getWhatsAppUrl } from '@/utils/helpers';
 
 export default function WhatsAppButton() {
   const { settings } = useSiteSettings();
+  const pathname = usePathname();
+
+  // Hide WhatsApp button on checkout page to avoid clutter during checkout
+  if (pathname === '/checkout') {
+    return null;
+  }
 
   return (
     <motion.a
