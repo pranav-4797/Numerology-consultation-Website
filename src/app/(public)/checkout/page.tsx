@@ -29,20 +29,67 @@ export default function CheckoutPage() {
     resolver: zodResolver(orderSchema),
   });
 
-  // Load cart and WhatsApp number
+  // Load cart, query params for direct offer/product checkout, and WhatsApp number
   useEffect(() => {
-    try {
-      const savedCart = localStorage.getItem('divyaurja_cart');
-      if (savedCart) {
-        setCart(JSON.parse(savedCart));
-      }
-    } catch (e) {
-      console.error('Error parsing cart:', e);
-    } finally {
-      setLoadingCart(false);
-    }
+    async function initCheckout() {
+      try {
+        let currentCart: CartItem[] = [];
+        const savedCart = localStorage.getItem('divyaurja_cart');
+        if (savedCart) {
+          currentCart = JSON.parse(savedCart);
+        }
 
-    async function fetchSettings() {
+        // Check query parameters (e.g. ?product=<id> or ?offer=<id>)
+        const searchParams = new URLSearchParams(window.location.search);
+        const productId = searchParams.get('product');
+        const offerId = searchParams.get('offer');
+
+        if (currentCart.length === 0) {
+          if (productId) {
+            const { getProducts } = await import('@/services/firestore');
+            const products = await getProducts();
+            const targetProd = products.find((p) => p.id === productId);
+            if (targetProd) {
+              currentCart = [{ product: targetProd, quantity: 1 }];
+              localStorage.setItem('divyaurja_cart', JSON.stringify(currentCart));
+            }
+          } else if (offerId) {
+            const { getOffers, getProducts } = await import('@/services/firestore');
+            const [offers, products] = await Promise.all([getOffers(), getProducts()]);
+            const targetOffer = offers.find((o) => o.id === offerId);
+            if (targetOffer) {
+              let matchedProduct = targetOffer.itemId ? products.find((p) => p.id === targetOffer.itemId) : null;
+              if (!matchedProduct) {
+                // Synthesize product object from offer details
+                matchedProduct = {
+                  id: targetOffer.id,
+                  name: `${targetOffer.title} (${targetOffer.itemName})`,
+                  description: targetOffer.description,
+                  price: targetOffer.discountedPrice,
+                  category: (targetOffer.category as any) || 'other',
+                  image: targetOffer.image || '',
+                  inStock: true,
+                  featured: true,
+                };
+              } else {
+                // Apply special offer discount price
+                matchedProduct = {
+                  ...matchedProduct,
+                  price: targetOffer.discountedPrice,
+                };
+              }
+              currentCart = [{ product: matchedProduct, quantity: 1 }];
+              localStorage.setItem('divyaurja_cart', JSON.stringify(currentCart));
+            }
+          }
+        }
+        setCart(currentCart);
+      } catch (e) {
+        console.error('Error initializing checkout:', e);
+      } finally {
+        setLoadingCart(false);
+      }
+
       try {
         const settings = await getSiteSettings();
         if (settings.whatsapp) {
@@ -52,7 +99,7 @@ export default function CheckoutPage() {
         console.error('Error fetching settings:', e);
       }
     }
-    fetchSettings();
+    initCheckout();
   }, []);
 
   const subtotal = cart.reduce((acc, item) => acc + item.product.price * item.quantity, 0);

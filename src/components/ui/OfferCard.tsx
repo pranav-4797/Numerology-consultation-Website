@@ -26,13 +26,17 @@ export default function OfferCard({ offer, index = 0 }: OfferCardProps) {
   let Icon = Sparkles;
 
   if (offer.type === 'product') {
-    ctaLink = offer.itemId ? `/checkout?product=${offer.itemId}` : '/catalogue';
+    ctaLink = offer.itemId ? `/checkout?product=${offer.itemId}` : `/checkout?offer=${offer.id}`;
     ctaText = 'Buy Now';
     Icon = ShoppingBag;
   } else if (offer.type === 'service') {
     ctaLink = offer.itemId ? `/book?service=${offer.itemId}` : '/book';
     ctaText = 'Book Consultation';
     Icon = CalendarCheck;
+  } else if (offer.type === 'custom') {
+    ctaLink = `/checkout?offer=${offer.id}`;
+    ctaText = 'Claim Special Offer';
+    Icon = Sparkles;
   }
 
   return (
