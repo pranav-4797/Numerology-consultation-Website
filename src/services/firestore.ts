@@ -13,6 +13,7 @@ import {
   Timestamp,
   runTransaction,
   setDoc,
+  getCountFromServer,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import type {
@@ -259,24 +260,41 @@ export const deleteOffer = (id: string) => deleteDocument('offers', id);
 
 // ─── Dashboard Stats ────────────────────────────────────────
 
+async function getCollectionCount(collectionName: string): Promise<number> {
+  try {
+    const coll = collection(db, collectionName);
+    const snapshot = await getCountFromServer(coll);
+    return snapshot.data().count;
+  } catch {
+    try {
+      const coll = collection(db, collectionName);
+      const snapshot = await getDocs(coll);
+      return snapshot.size;
+    } catch (e) {
+      console.warn(`Failed to fetch count for collection "${collectionName}":`, e);
+      return 0;
+    }
+  }
+}
+
 export async function getDashboardStats(): Promise<DashboardStats> {
   const [blogs, events, workshops, contacts, products, orders, offers] = await Promise.all([
-    getDocs(collection(db, 'blogs')),
-    getDocs(collection(db, 'events')),
-    getDocs(collection(db, 'workshops')),
-    getDocs(collection(db, 'contacts')),
-    getDocs(collection(db, 'products')),
-    getDocs(collection(db, 'orders')),
-    getDocs(collection(db, 'offers')),
+    getCollectionCount('blogs'),
+    getCollectionCount('events'),
+    getCollectionCount('workshops'),
+    getCollectionCount('contacts'),
+    getCollectionCount('products'),
+    getCollectionCount('orders'),
+    getCollectionCount('offers'),
   ]);
   return {
-    totalPosts: blogs.size,
-    totalEvents: events.size,
-    totalWorkshops: workshops.size,
-    totalLeads: contacts.size,
-    totalProducts: products.size,
-    totalOrders: orders.size,
-    totalOffers: offers.size,
+    totalPosts: blogs,
+    totalEvents: events,
+    totalWorkshops: workshops,
+    totalLeads: contacts,
+    totalProducts: products,
+    totalOrders: orders,
+    totalOffers: offers,
   };
 }
 
@@ -293,7 +311,7 @@ export interface SectionVisibility {
   offers: boolean;
 }
 
-const DEFAULT_VISIBILITY: SectionVisibility = {
+export const DEFAULT_VISIBILITY: SectionVisibility = {
   services: true,
   workshops: true,
   events: true,
@@ -305,10 +323,15 @@ const DEFAULT_VISIBILITY: SectionVisibility = {
 };
 
 export async function getSectionVisibility(): Promise<SectionVisibility> {
-  const docRef = doc(db, 'siteSettings', 'visibility');
-  const snapshot = await getDoc(docRef);
-  if (!snapshot.exists()) return DEFAULT_VISIBILITY;
-  return { ...DEFAULT_VISIBILITY, ...snapshot.data() } as SectionVisibility;
+  try {
+    const docRef = doc(db, 'siteSettings', 'visibility');
+    const snapshot = await getDoc(docRef);
+    if (!snapshot.exists()) return DEFAULT_VISIBILITY;
+    return { ...DEFAULT_VISIBILITY, ...snapshot.data() } as SectionVisibility;
+  } catch (error) {
+    console.warn('Failed to fetch section visibility settings, using defaults:', error);
+    return DEFAULT_VISIBILITY;
+  }
 }
 
 export async function updateSectionVisibility(data: Partial<SectionVisibility>): Promise<void> {
@@ -333,10 +356,15 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
 };
 
 export async function getSiteSettings(): Promise<SiteSettings> {
-  const docRef = doc(db, 'siteSettings', 'general');
-  const snapshot = await getDoc(docRef);
-  if (!snapshot.exists()) return DEFAULT_SITE_SETTINGS;
-  return { ...DEFAULT_SITE_SETTINGS, ...snapshot.data() } as SiteSettings;
+  try {
+    const docRef = doc(db, 'siteSettings', 'general');
+    const snapshot = await getDoc(docRef);
+    if (!snapshot.exists()) return DEFAULT_SITE_SETTINGS;
+    return { ...DEFAULT_SITE_SETTINGS, ...snapshot.data() } as SiteSettings;
+  } catch (error) {
+    console.warn('Failed to fetch general site settings, using defaults:', error);
+    return DEFAULT_SITE_SETTINGS;
+  }
 }
 
 export async function updateSiteSettings(data: Partial<SiteSettings>): Promise<void> {

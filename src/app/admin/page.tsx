@@ -5,7 +5,7 @@ import { FileText, Calendar, GraduationCap, Users, Eye, EyeOff, Settings, Shoppi
 import { toast } from 'sonner';
 import StatCard from '@/components/ui/StatCard';
 import Loader from '@/components/ui/Loader';
-import { getDashboardStats, getSectionVisibility, updateSectionVisibility } from '@/services/firestore';
+import { getDashboardStats, getSectionVisibility, updateSectionVisibility, DEFAULT_VISIBILITY } from '@/services/firestore';
 import type { DashboardStats } from '@/types';
 import type { SectionVisibility } from '@/services/firestore';
 
@@ -22,26 +22,35 @@ const sectionLabels: { key: keyof SectionVisibility; label: string; icon: string
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [visibility, setVisibility] = useState<SectionVisibility | null>(null);
+  const [visibility, setVisibility] = useState<SectionVisibility>(DEFAULT_VISIBILITY);
   const [loading, setLoading] = useState(true);
   const [toggling, setToggling] = useState<string | null>(null);
 
   useEffect(() => {
+    let isMounted = true;
     async function fetchData() {
       try {
-        const [statsData, visibilityData] = await Promise.all([
+        const [statsResult, visibilityResult] = await Promise.allSettled([
           getDashboardStats(),
           getSectionVisibility(),
         ]);
-        setStats(statsData);
-        setVisibility(visibilityData);
+        if (!isMounted) return;
+        if (statsResult.status === 'fulfilled') {
+          setStats(statsResult.value);
+        }
+        if (visibilityResult.status === 'fulfilled') {
+          setVisibility(visibilityResult.value);
+        }
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     }
     fetchData();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const handleToggle = async (key: keyof SectionVisibility) => {
