@@ -35,18 +35,20 @@ export default function CatalogueClient({ initialProducts, initialWhatsapp = '91
   const router = useRouter();
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [activeCategory, setActiveCategory] = useState<ProductCategory | 'all'>('all');
-  const [cart, setCart] = useState<CartItem[]>([]);
+  const [cart, setCart] = useState<CartItem[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('divyaurja_cart');
+        return saved ? JSON.parse(saved) : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  });
   const [showCart, setShowCart] = useState(false);
   const [whatsappNumber, setWhatsappNumber] = useState(initialWhatsapp);
   const [searchQuery, setSearchQuery] = useState('');
-
-  // Load cart from localStorage
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem('divyaurja_cart');
-      if (saved) setCart(JSON.parse(saved));
-    } catch { /* ignore */ }
-  }, []);
 
   // Persist cart to localStorage
   const saveCart = useCallback((items: CartItem[]) => {

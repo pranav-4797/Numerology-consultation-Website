@@ -80,11 +80,13 @@ export const productSchema = z.object({
   name: z.string().min(2, 'Product name is required'),
   description: z.string().min(10, 'Description must be at least 10 characters'),
   price: z.number().min(1, 'Price must be at least ₹1'),
+  originalPrice: z.number().min(0, 'Original price must be positive').optional(),
   category: z.enum(['bracelets', 'crystals', 'yantras', 'rudraksha', 'pendants', 'other'], {
     message: 'Please select a category',
   }),
   inStock: z.boolean(),
   featured: z.boolean(),
+  highlights: z.string().optional(),
 });
 
 export type ServiceFormData = z.infer<typeof serviceSchema>;

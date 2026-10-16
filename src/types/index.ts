@@ -137,10 +137,17 @@ export interface Product {
   name: string;
   description: string;
   price: number;
+  originalPrice?: number;
   category: ProductCategory;
   image: string;
+  images?: string[];
   inStock: boolean;
   featured: boolean;
+  highlights?: string[];
+  benefits?: string[];
+  specifications?: Record<string, string>;
+  rating?: number;
+  ratingCount?: number;
   createdAt: string;
 }
 

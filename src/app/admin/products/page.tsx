@@ -27,7 +27,7 @@ export default function AdminProductsPage() {
   const { data: products, loading } = useFirestoreCollection<Product>('products');
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [deleteModal, setDeleteModal] = useState<{ open: boolean; id: string }>({ open: false, id: '' });
   const [deleting, setDeleting] = useState(false);
@@ -37,9 +37,9 @@ export default function AdminProductsPage() {
   });
 
   const openCreate = () => {
-    reset({ name: '', description: '', price: 0, category: 'bracelets', inStock: true, featured: false });
+    reset({ name: '', description: '', price: 0, originalPrice: 0, category: 'bracelets', inStock: true, featured: false });
     setEditingId(null);
-    setImageFile(null);
+    setImageFiles([]);
     setShowForm(true);
   };
 
@@ -47,30 +47,37 @@ export default function AdminProductsPage() {
     setValue('name', product.name);
     setValue('description', product.description);
     setValue('price', product.price);
+    setValue('originalPrice', product.originalPrice || 0);
     setValue('category', product.category);
     setValue('inStock', product.inStock);
     setValue('featured', product.featured);
     setEditingId(product.id);
-    setImageFile(null);
+    setImageFiles([]);
     setShowForm(true);
   };
 
   const onSubmit = async (data: ProductFormData) => {
     setSubmitting(true);
     try {
-      let image = '';
-      if (imageFile) {
-        image = await compressAndConvertToBase64(imageFile);
+      const newImages: string[] = [];
+      if (imageFiles.length > 0) {
+        for (const file of imageFiles) {
+          const b64 = await compressAndConvertToBase64(file);
+          if (b64) newImages.push(b64);
+        }
       }
 
       const payload: Record<string, unknown> = { ...data };
-      if (image) payload.image = image;
-      else if (!editingId) payload.image = '';
+      if (newImages.length > 0) {
+        payload.image = newImages[0];
+        payload.images = newImages;
+      }
 
       if (editingId) {
         await updateProduct(editingId, payload);
         toast.success('Product updated');
       } else {
+        if (!payload.image) payload.image = '';
         await createProduct(payload);
         toast.success('Product created');
       }
@@ -153,22 +160,32 @@ export default function AdminProductsPage() {
                 />
                 {errors.description && <p className="text-xs text-red-500 mt-1">{errors.description.message}</p>}
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className="block text-sm font-medium text-text mb-1">Price (₹)</label>
                   <input
                     type="number"
                     {...register('price', { valueAsNumber: true })}
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                     placeholder="999"
                   />
                   {errors.price && <p className="text-xs text-red-500 mt-1">{errors.price.message}</p>}
                 </div>
                 <div>
+                  <label className="block text-sm font-medium text-text mb-1">M.R.P. (₹)</label>
+                  <input
+                    type="number"
+                    {...register('originalPrice', { valueAsNumber: true })}
+                    className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    placeholder="1499"
+                  />
+                  {errors.originalPrice && <p className="text-xs text-red-500 mt-1">{errors.originalPrice.message}</p>}
+                </div>
+                <div>
                   <label className="block text-sm font-medium text-text mb-1">Category</label>
                   <select
                     {...register('category')}
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white"
+                    className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white"
                   >
                     {CATEGORY_OPTIONS.map((opt) => (
                       <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -177,34 +194,46 @@ export default function AdminProductsPage() {
                   {errors.category && <p className="text-xs text-red-500 mt-1">{errors.category.message}</p>}
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center gap-3">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 pt-1">
+                <label htmlFor="inStock" className="flex items-center gap-2.5 text-sm font-medium text-text cursor-pointer">
                   <input
                     type="checkbox"
                     id="inStock"
                     {...register('inStock')}
-                    className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary/20"
+                    className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary/20 shrink-0"
                   />
-                  <label htmlFor="inStock" className="text-sm font-medium text-text">In Stock</label>
-                </div>
-                <div className="flex items-center gap-3">
+                  <span>In Stock (Available for Purchase)</span>
+                </label>
+                <label htmlFor="featured" className="flex items-center gap-2.5 text-sm font-medium text-text cursor-pointer">
                   <input
                     type="checkbox"
                     id="featured"
                     {...register('featured')}
-                    className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary/20"
+                    className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary/20 shrink-0"
                   />
-                  <label htmlFor="featured" className="text-sm font-medium text-text">Featured</label>
-                </div>
+                  <span>Featured Product</span>
+                </label>
               </div>
               <div>
-                <label className="block text-sm font-medium text-text mb-1">Product Image</label>
+                <label className="block text-sm font-medium text-text mb-1">
+                  Product Photos (Select 1 or multiple images to swipe)
+                </label>
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+                  multiple
+                  onChange={(e) => {
+                    if (e.target.files) {
+                      setImageFiles(Array.from(e.target.files));
+                    }
+                  }}
                   className="w-full text-sm text-text/50 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:bg-primary/10 file:text-primary file:font-medium"
                 />
+                {imageFiles.length > 0 && (
+                  <p className="text-xs text-green-600 font-medium mt-1">
+                    ✓ {imageFiles.length} {imageFiles.length === 1 ? 'photo' : 'photos'} selected
+                  </p>
+                )}
               </div>
               <button
                 type="submit"

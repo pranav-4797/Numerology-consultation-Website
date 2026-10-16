@@ -25,25 +25,39 @@ export default function ProductCard({ product, index, whatsappNumber, onAddToCar
   const router = useRouter();
   const category = CATEGORY_LABELS[product.category] || CATEGORY_LABELS.other;
 
-  const handleBuyNow = () => {
-    onAddToCart(product);
-    router.push('/checkout');
+  const handleCardClick = () => {
+    router.push(`/catalogue/${product.id}`);
   };
+
+  const handleBuyNow = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onAddToCart(product);
+    router.push(`/checkout?product=${product.id}`);
+  };
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onAddToCart(product);
+  };
+
+  const originalPrice = product.originalPrice || Math.round(product.price * 1.35);
+  const discountPercent = Math.round(((originalPrice - product.price) / originalPrice) * 100);
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.08 }}
-      className="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 transition-all duration-500"
+      onClick={handleCardClick}
+      className="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1.5 transition-all duration-500 cursor-pointer flex flex-col h-full"
     >
-      {/* Image */}
-      <div className="relative aspect-square overflow-hidden bg-gray-50">
+      {/* Image Container */}
+      <div className="relative aspect-square overflow-hidden bg-gray-50 select-none">
         {product.image ? (
           <img
             src={product.image}
             alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
@@ -58,54 +72,78 @@ export default function ProductCard({ product, index, whatsappNumber, onAddToCar
 
         {/* Out of Stock Overlay */}
         {!product.inStock && (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-            <span className="text-white text-sm font-bold bg-red-500 px-4 py-1.5 rounded-full">
+          <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+            <span className="text-white text-xs font-bold bg-red-600 px-3 py-1 rounded-full shadow-md">
               Out of Stock
             </span>
           </div>
         )}
 
-        {/* Featured Badge */}
-        {product.featured && (
-          <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-secondary/90 text-white">
-            ✨ Featured
-          </div>
-        )}
+        {/* Featured / Discount Badge */}
+        <div className="absolute top-3 right-3 flex flex-col items-end gap-1">
+          {product.featured && (
+            <div className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-secondary text-white shadow-xs">
+              ✨ Featured
+            </div>
+          )}
+          {discountPercent > 0 && (
+            <div className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500 text-white shadow-xs">
+              {discountPercent}% OFF
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Content */}
-      <div className="p-5">
-        <h3 className="font-playfair text-lg font-bold text-text mb-1.5 line-clamp-2 group-hover:text-primary transition-colors">
-          {product.name}
-        </h3>
-        <p className="text-sm text-text/50 line-clamp-2 mb-4 leading-relaxed">
-          {product.description}
-        </p>
+      <div className="p-4 sm:p-5 flex flex-col flex-1 justify-between">
+        <div>
+          {/* Rating stars (Amazon style) */}
+          <div className="flex items-center gap-1.5 mb-1.5">
+            <div className="flex text-amber-400 text-xs">
+              {'★★★★★'}
+            </div>
+            <span className="text-[11px] font-bold text-gray-700">4.9</span>
+            <span className="text-[10px] text-gray-600">(120+)</span>
+          </div>
 
-        {/* Price */}
-        <div className="flex items-center gap-2 mb-4">
-          <span className="text-2xl font-bold text-primary">
-            ₹{product.price.toLocaleString('en-IN')}
-          </span>
+          <h3 className="font-playfair text-base sm:text-lg font-bold text-text mb-1.5 line-clamp-2 group-hover:text-primary transition-colors">
+            {product.name}
+          </h3>
+          <p className="text-xs text-text/60 line-clamp-2 mb-3 leading-relaxed">
+            {product.description}
+          </p>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex gap-2">
-          <button
-            onClick={handleBuyNow}
-            disabled={!product.inStock}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-green-500 to-green-600 text-white text-sm font-semibold rounded-xl hover:from-green-600 hover:to-green-700 hover:shadow-lg hover:shadow-green-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
-          >
-            <MessageCircle className="w-4 h-4" />
-            Buy Now
-          </button>
-          <button
-            onClick={() => onAddToCart(product)}
-            disabled={!product.inStock}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-primary/10 text-primary text-sm font-semibold rounded-xl hover:bg-primary hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
-          >
-            <ShoppingCart className="w-4 h-4" />
-          </button>
+        <div>
+          {/* Price */}
+          <div className="flex items-baseline gap-2 mb-3">
+            <span className="text-xl sm:text-2xl font-bold text-gray-900">
+              ₹{product.price.toLocaleString('en-IN')}
+            </span>
+            <span className="text-xs line-through text-gray-600">
+              ₹{originalPrice.toLocaleString('en-IN')}
+            </span>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-2">
+            <button
+              onClick={handleBuyNow}
+              disabled={!product.inStock}
+              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-xs sm:text-sm font-semibold rounded-xl hover:from-amber-600 hover:to-amber-700 hover:shadow-md hover:shadow-amber-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+            >
+              <MessageCircle className="w-3.5 h-3.5" />
+              Buy Now
+            </button>
+            <button
+              onClick={handleAddToCart}
+              disabled={!product.inStock}
+              title="Add to cart"
+              className="flex items-center justify-center gap-1.5 px-3 py-2 bg-primary/10 text-primary text-xs sm:text-sm font-semibold rounded-xl hover:bg-primary hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+            >
+              <ShoppingCart className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
     </motion.div>

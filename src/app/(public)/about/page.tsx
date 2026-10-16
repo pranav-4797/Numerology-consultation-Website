@@ -273,7 +273,7 @@ export default function AboutPage() {
                       {cert.title}
                     </h3>
                     <p className="text-xs text-text/60 leading-relaxed mb-4 flex-grow italic">
-                      "{cert.caption}"
+                      &quot;{cert.caption}&quot;
                     </p>
                     <div className="pt-4 border-t border-gray-100 flex items-center justify-between text-[11px] text-text/50">
                       <span className="flex items-center gap-1">
@@ -332,7 +332,7 @@ export default function AboutPage() {
                     {selectedCert.title}
                   </h3>
                   <p className="text-xs text-text/60 leading-relaxed italic mb-6">
-                    "{selectedCert.caption}"
+                    &quot;{selectedCert.caption}&quot;
                   </p>
 
                   <div className="space-y-4 border-t border-gray-100 pt-6">

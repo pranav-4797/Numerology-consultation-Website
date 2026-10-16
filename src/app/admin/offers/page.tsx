@@ -407,14 +407,14 @@ export default function AdminOffersPage() {
               </div>
 
               {/* Toggles */}
-              <div className="flex items-center gap-6 pt-2">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 pt-2">
                 <label className="flex items-center gap-2 text-sm font-medium text-text cursor-pointer">
-                  <input type="checkbox" {...register('active')} className="w-4 h-4 rounded text-amber-600 focus:ring-amber-500" />
-                  Active (Visible on Website)
+                  <input type="checkbox" {...register('active')} className="w-4 h-4 rounded text-amber-600 focus:ring-amber-500 shrink-0" />
+                  <span>Active (Visible on Website)</span>
                 </label>
                 <label className="flex items-center gap-2 text-sm font-medium text-text cursor-pointer">
-                  <input type="checkbox" {...register('featured')} className="w-4 h-4 rounded text-amber-600 focus:ring-amber-500" />
-                  Featured (Highlight on Homepage)
+                  <input type="checkbox" {...register('featured')} className="w-4 h-4 rounded text-amber-600 focus:ring-amber-500 shrink-0" />
+                  <span>Featured (Highlight on Homepage)</span>
                 </label>
               </div>
 

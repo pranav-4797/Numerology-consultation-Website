@@ -31,24 +31,30 @@ function LanguageToggle({ compact = false }: { compact?: boolean }) {
   const { lang, setLang } = useLanguage();
   return (
     <div
-      className={`flex items-center gap-0.5 bg-gray-50 border border-gray-200 rounded-lg p-0.5 ${
-        compact ? '' : 'ml-1'
+      className={`flex items-center gap-1 bg-gray-50/90 border border-gray-200 rounded-xl p-1 ${
+        compact ? 'w-full justify-between' : 'ml-1'
       }`}
       role="group"
       aria-label="Language"
     >
-      <Globe className="w-3.5 h-3.5 text-text/40 ml-1.5 mr-0.5" />
-      {languages.map((code) => (
-        <button
-          key={code}
-          onClick={() => setLang(code)}
-          className={`px-2 py-1 text-xs font-semibold rounded-md transition-colors ${
-            lang === code ? 'bg-primary text-white' : 'text-text/50 hover:text-primary'
-          }`}
-        >
-          {LANG_LABELS[code]}
-        </button>
-      ))}
+      <Globe className="w-4 h-4 text-text/40 ml-1.5 mr-1 shrink-0" />
+      <div className={`flex items-center gap-1 ${compact ? 'flex-1' : ''}`}>
+        {languages.map((code) => (
+          <button
+            key={code}
+            onClick={() => setLang(code)}
+            className={`px-2.5 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+              compact ? 'flex-1 text-center' : ''
+            } ${
+              lang === code
+                ? 'bg-primary text-white shadow-xs font-bold'
+                : 'text-text/60 hover:text-primary hover:bg-gray-100'
+            }`}
+          >
+            {LANG_LABELS[code]}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
