@@ -16,6 +16,8 @@ import {
   getCountFromServer,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { fetchWithCache, invalidateCache } from '@/utils/cacheStore';
+export { invalidateCache };
 import type {
   Service,
   Workshop,
@@ -35,23 +37,42 @@ import type {
   DashboardStats,
 } from '@/types';
 
-// ─── Generic Helpers ────────────────────────────────────────
+// Administrative write-heavy pipeline collections use shorter 15s cache, marketing content uses 10m cache
+const ADMIN_PIPELINE_COLLECTIONS = new Set(['contacts', 'appointments', 'registrations', 'orders']);
 
 async function getCollection<T>(
   collectionName: string,
   orderField: string = 'createdAt',
   direction: 'asc' | 'desc' = 'desc'
 ): Promise<T[]> {
-  const q = query(collection(db, collectionName), orderBy(orderField, direction));
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as T));
+  const cacheKey = `col_${collectionName}_${orderField}_${direction}`;
+  const isPipeline = ADMIN_PIPELINE_COLLECTIONS.has(collectionName);
+
+  return fetchWithCache(
+    cacheKey,
+    async () => {
+      const q = query(collection(db, collectionName), orderBy(orderField, direction));
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as T));
+    },
+    { staleMs: isPipeline ? 15 * 1000 : 10 * 60 * 1000 }
+  );
 }
 
 async function getDocById<T>(collectionName: string, id: string): Promise<T | null> {
-  const docRef = doc(db, collectionName, id);
-  const snapshot = await getDoc(docRef);
-  if (!snapshot.exists()) return null;
-  return { id: snapshot.id, ...snapshot.data() } as T;
+  const cacheKey = `doc_${collectionName}_${id}`;
+  const isPipeline = ADMIN_PIPELINE_COLLECTIONS.has(collectionName);
+
+  return fetchWithCache(
+    cacheKey,
+    async () => {
+      const docRef = doc(db, collectionName, id);
+      const snapshot = await getDoc(docRef);
+      if (!snapshot.exists()) return null;
+      return { id: snapshot.id, ...snapshot.data() } as T;
+    },
+    { staleMs: isPipeline ? 15 * 1000 : 10 * 60 * 1000 }
+  );
 }
 
 async function createDocument(collectionName: string, data: Record<string, unknown>): Promise<string> {
@@ -59,26 +80,33 @@ async function createDocument(collectionName: string, data: Record<string, unkno
     ...data,
     createdAt: Timestamp.now().toDate().toISOString(),
   });
+  invalidateCache(collectionName);
   return docRef.id;
 }
 
 async function updateDocument(collectionName: string, id: string, data: Record<string, unknown>): Promise<void> {
   const docRef = doc(db, collectionName, id);
   await updateDoc(docRef, data);
+  invalidateCache(collectionName);
+  invalidateCache(`doc_${collectionName}_${id}`);
 }
 
 async function deleteDocument(collectionName: string, id: string): Promise<void> {
   const docRef = doc(db, collectionName, id);
   await deleteDoc(docRef);
+  invalidateCache(collectionName);
+  invalidateCache(`doc_${collectionName}_${id}`);
 }
 
 // ─── Services ───────────────────────────────────────────────
 
 export const getServices = () => getCollection<Service>('services');
 export const getFeaturedServices = async (): Promise<Service[]> => {
-  const q = query(collection(db, 'services'), where('featured', '==', true));
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Service));
+  return fetchWithCache('services_featured', async () => {
+    const q = query(collection(db, 'services'), where('featured', '==', true));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Service));
+  });
 };
 export const getServiceById = (id: string) => getDocById<Service>('services', id);
 export const createService = (data: Record<string, unknown>) => createDocument('services', data);
@@ -89,15 +117,17 @@ export const deleteService = (id: string) => deleteDocument('services', id);
 
 export const getWorkshops = () => getCollection<Workshop>('workshops');
 export const getUpcomingWorkshops = async (): Promise<Workshop[]> => {
-  const today = new Date().toISOString().split('T')[0];
-  const q = query(
-    collection(db, 'workshops'),
-    where('date', '>=', today),
-    orderBy('date', 'asc'),
-    limit(6)
-  );
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Workshop));
+  return fetchWithCache('workshops_upcoming', async () => {
+    const today = new Date().toISOString().split('T')[0];
+    const q = query(
+      collection(db, 'workshops'),
+      where('date', '>=', today),
+      orderBy('date', 'asc'),
+      limit(6)
+    );
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Workshop));
+  }, { staleMs: 3 * 60 * 1000 });
 };
 export const getWorkshopById = (id: string) => getDocById<Workshop>('workshops', id);
 export const createWorkshop = (data: Record<string, unknown>) => createDocument('workshops', data);
@@ -108,15 +138,17 @@ export const deleteWorkshop = (id: string) => deleteDocument('workshops', id);
 
 export const getEvents = () => getCollection<Event>('events');
 export const getUpcomingEvents = async (): Promise<Event[]> => {
-  const today = new Date().toISOString().split('T')[0];
-  const q = query(
-    collection(db, 'events'),
-    where('date', '>=', today),
-    orderBy('date', 'asc'),
-    limit(6)
-  );
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Event));
+  return fetchWithCache('events_upcoming', async () => {
+    const today = new Date().toISOString().split('T')[0];
+    const q = query(
+      collection(db, 'events'),
+      where('date', '>=', today),
+      orderBy('date', 'asc'),
+      limit(6)
+    );
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Event));
+  });
 };
 export const getEventById = (id: string) => getDocById<Event>('events', id);
 export const createEvent = (data: Record<string, unknown>) => createDocument('events', data);
@@ -127,11 +159,13 @@ export const deleteEvent = (id: string) => deleteDocument('events', id);
 
 export const getBlogs = () => getCollection<Blog>('blogs', 'publishedAt');
 export const getBlogBySlug = async (slug: string): Promise<Blog | null> => {
-  const q = query(collection(db, 'blogs'), where('slug', '==', slug), limit(1));
-  const snapshot = await getDocs(q);
-  if (snapshot.empty) return null;
-  const d = snapshot.docs[0];
-  return { id: d.id, ...d.data() } as Blog;
+  return fetchWithCache(`blog_slug_${slug}`, async () => {
+    const q = query(collection(db, 'blogs'), where('slug', '==', slug), limit(1));
+    const snapshot = await getDocs(q);
+    if (snapshot.empty) return null;
+    const d = snapshot.docs[0];
+    return { id: d.id, ...d.data() } as Blog;
+  });
 };
 export const getBlogById = (id: string) => getDocById<Blog>('blogs', id);
 export const createBlog = (data: Record<string, unknown>) => createDocument('blogs', data);
@@ -213,15 +247,18 @@ export async function registerForWorkshop(
       createdAt: Timestamp.now().toDate().toISOString(),
     });
   });
+  invalidateCache('workshops');
 }
 
 // ─── Products (Catalogue) ───────────────────────────────────
 
 export const getProducts = () => getCollection<Product>('products');
 export const getProductsByCategory = async (category: string): Promise<Product[]> => {
-  const q = query(collection(db, 'products'), where('category', '==', category), orderBy('createdAt', 'desc'));
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Product));
+  return fetchWithCache(`products_cat_${category}`, async () => {
+    const q = query(collection(db, 'products'), where('category', '==', category), orderBy('createdAt', 'desc'));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Product));
+  });
 };
 export const getProductById = (id: string) => getDocById<Product>('products', id);
 export const createProduct = (data: Record<string, unknown>) => createDocument('products', data);
@@ -249,9 +286,11 @@ export const deleteOrder = (id: string) => deleteDocument('orders', id);
 
 export const getOffers = () => getCollection<Offer>('offers');
 export const getActiveOffers = async (): Promise<Offer[]> => {
-  const q = query(collection(db, 'offers'), where('active', '==', true));
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Offer));
+  return fetchWithCache('offers_active', async () => {
+    const q = query(collection(db, 'offers'), where('active', '==', true));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Offer));
+  }, { staleMs: 3 * 60 * 1000 });
 };
 export const getOfferById = (id: string) => getDocById<Offer>('offers', id);
 export const createOffer = (data: Record<string, unknown>) => createDocument('offers', data);
@@ -323,20 +362,23 @@ export const DEFAULT_VISIBILITY: SectionVisibility = {
 };
 
 export async function getSectionVisibility(): Promise<SectionVisibility> {
-  try {
-    const docRef = doc(db, 'siteSettings', 'visibility');
-    const snapshot = await getDoc(docRef);
-    if (!snapshot.exists()) return DEFAULT_VISIBILITY;
-    return { ...DEFAULT_VISIBILITY, ...snapshot.data() } as SectionVisibility;
-  } catch (error) {
-    console.warn('Failed to fetch section visibility settings, using defaults:', error);
-    return DEFAULT_VISIBILITY;
-  }
+  return fetchWithCache('settings_visibility', async () => {
+    try {
+      const docRef = doc(db, 'siteSettings', 'visibility');
+      const snapshot = await getDoc(docRef);
+      if (!snapshot.exists()) return DEFAULT_VISIBILITY;
+      return { ...DEFAULT_VISIBILITY, ...snapshot.data() } as SectionVisibility;
+    } catch (error) {
+      console.warn('Failed to fetch section visibility settings, using defaults:', error);
+      return DEFAULT_VISIBILITY;
+    }
+  });
 }
 
 export async function updateSectionVisibility(data: Partial<SectionVisibility>): Promise<void> {
   const docRef = doc(db, 'siteSettings', 'visibility');
   await setDoc(docRef, data, { merge: true });
+  invalidateCache('settings_visibility');
 }
 
 // ─── Site Settings (General: contact, social, hero) ─────────
@@ -356,18 +398,21 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
 };
 
 export async function getSiteSettings(): Promise<SiteSettings> {
-  try {
-    const docRef = doc(db, 'siteSettings', 'general');
-    const snapshot = await getDoc(docRef);
-    if (!snapshot.exists()) return DEFAULT_SITE_SETTINGS;
-    return { ...DEFAULT_SITE_SETTINGS, ...snapshot.data() } as SiteSettings;
-  } catch (error) {
-    console.warn('Failed to fetch general site settings, using defaults:', error);
-    return DEFAULT_SITE_SETTINGS;
-  }
+  return fetchWithCache('settings_general', async () => {
+    try {
+      const docRef = doc(db, 'siteSettings', 'general');
+      const snapshot = await getDoc(docRef);
+      if (!snapshot.exists()) return DEFAULT_SITE_SETTINGS;
+      return { ...DEFAULT_SITE_SETTINGS, ...snapshot.data() } as SiteSettings;
+    } catch (error) {
+      console.warn('Failed to fetch general site settings, using defaults:', error);
+      return DEFAULT_SITE_SETTINGS;
+    }
+  });
 }
 
 export async function updateSiteSettings(data: Partial<SiteSettings>): Promise<void> {
   const docRef = doc(db, 'siteSettings', 'general');
   await setDoc(docRef, data, { merge: true });
+  invalidateCache('settings_general');
 }

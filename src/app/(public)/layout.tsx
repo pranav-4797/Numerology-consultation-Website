@@ -1,6 +1,7 @@
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import WhatsAppButton from '@/components/ui/WhatsAppButton';
+import CookieConsent from '@/components/ui/CookieConsent';
 import { LanguageProvider } from '@/context/LanguageContext';
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
@@ -10,6 +11,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
       <main className="min-h-screen pt-20">{children}</main>
       <Footer />
       <WhatsAppButton />
+      <CookieConsent />
     </LanguageProvider>
   );
 }

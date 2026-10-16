@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { translations, type Lang } from '@/i18n/translations';
+import { setCookie, getCookie, COOKIE_LANG_KEY } from '@/utils/cookies';
 
 interface LanguageContextValue {
   lang: Lang;
@@ -22,14 +23,23 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     try {
+      // 1. Try reading from persistent cookie first
+      const cookieLang = getCookie(COOKIE_LANG_KEY);
+      if (cookieLang === 'en' || cookieLang === 'hi' || cookieLang === 'mr') {
+        setTimeout(() => setLangState(cookieLang), 0);
+        return;
+      }
+
+      // 2. Fallback to localStorage
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored === 'en' || stored === 'hi' || stored === 'mr') {
         setTimeout(() => {
           setLangState(stored);
+          setCookie(COOKIE_LANG_KEY, stored, 365);
         }, 0);
       }
     } catch {
-      // localStorage unavailable — stay on English
+      // Storage unavailable — stay on English
     }
   }, []);
 
@@ -37,6 +47,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     setLangState(next);
     try {
       localStorage.setItem(STORAGE_KEY, next);
+      setCookie(COOKIE_LANG_KEY, next, 365);
     } catch {
       // ignore
     }
