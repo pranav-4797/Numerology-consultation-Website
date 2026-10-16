@@ -172,7 +172,7 @@ export default function ProductDetailClient({
   return (
     <div className="min-h-screen bg-[#FDFBF7] text-[#1E293B]">
       {/* Top Breadcrumb & Back Bar */}
-      <div className="bg-white border-b border-gray-200/80 sticky top-16 z-20 shadow-xs">
+      <div className="bg-white border-b border-gray-200/80 sticky top-0 z-20 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between text-xs sm:text-sm">
           <div className="flex items-center gap-2 text-gray-500 overflow-x-auto whitespace-nowrap scrollbar-none py-1">
             <Link href="/" className="hover:text-primary transition-colors">

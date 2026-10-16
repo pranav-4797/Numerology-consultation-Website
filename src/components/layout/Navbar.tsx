@@ -62,6 +62,8 @@ function LanguageToggle({ compact = false }: { compact?: boolean }) {
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [visibility, setVisibility] = useState<SectionVisibility | null>(null);
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
   const pathname = usePathname();
   const { t } = useLanguage();
 
@@ -71,6 +73,45 @@ export default function Navbar() {
       .catch(() => setVisibility(null));
   }, []);
 
+  // Smart auto-hide on scroll down, show on scroll up
+  useEffect(() => {
+    let ticking = false;
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY;
+
+          // Always keep visible near the top
+          if (currentScrollY < 20) {
+            setIsVisible(true);
+          } else if (currentScrollY > lastScrollY && currentScrollY > 60) {
+            // Scrolling down -> hide navbar (unless mobile menu is open)
+            if (!isOpen) {
+              setIsVisible(false);
+            }
+          } else if (currentScrollY < lastScrollY) {
+            // Scrolling up -> show navbar
+            setIsVisible(true);
+          }
+
+          setLastScrollY(currentScrollY);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY, isOpen]);
+
+  // Ensure navbar shows and mobile menu closes upon route navigation
+  useEffect(() => {
+    setIsOpen(false);
+    setIsVisible(true);
+  }, [pathname]);
+
   // Filter nav links based on visibility settings
   const navLinks = allNavLinks.filter((link) => {
     if (!link.key) return true; // Home, About, Contact always show
@@ -79,12 +120,16 @@ export default function Navbar() {
   });
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg border-b border-primary/10 shadow-sm">
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-lg border-b border-primary/10 shadow-xs transition-transform duration-300 ease-in-out ${
+        isVisible ? 'translate-y-0' : '-translate-y-full'
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-14 sm:h-18 lg:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center shadow-lg shadow-primary/20 group-hover:shadow-primary/40 transition-shadow relative">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl overflow-hidden flex items-center justify-center shadow-md shadow-primary/20 group-hover:shadow-primary/40 transition-shadow relative shrink-0">
               <Image
                 src="/logo.jpg"
                 alt="Divya Urja Logo"
@@ -95,10 +140,10 @@ export default function Navbar() {
               />
             </div>
             <div>
-              <h1 className="font-playfair text-lg font-bold text-text leading-tight">
+              <h1 className="font-playfair text-base sm:text-lg font-bold text-text leading-tight">
                 Divya Urja
               </h1>
-              <p className="text-[10px] text-primary font-medium tracking-wider uppercase">
+              <p className="text-[9px] sm:text-[10px] text-primary font-medium tracking-wider uppercase">
                 Numerology & Vastu
               </p>
             </div>
@@ -146,7 +191,7 @@ export default function Navbar() {
               className="lg:hidden p-2 rounded-lg hover:bg-primary/5 transition-colors"
               aria-label="Toggle menu"
             >
-              {isOpen ? <X className="w-6 h-6 text-text" /> : <Menu className="w-6 h-6 text-text" />}
+              {isOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6 text-text" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6 text-text" />}
             </button>
           </div>
         </div>
@@ -159,7 +204,7 @@ export default function Navbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden max-h-[calc(100vh-80px)] overflow-y-auto bg-white border-t border-primary/10"
+            className="lg:hidden max-h-[calc(100vh-56px)] sm:max-h-[calc(100vh-80px)] overflow-y-auto bg-white border-t border-primary/10 shadow-lg"
           >
             <div className="px-4 py-4 space-y-1">
               <div className="px-2 pb-2 md:hidden">
