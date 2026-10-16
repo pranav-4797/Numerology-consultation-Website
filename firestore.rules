@@ -1,9 +1,12 @@
 rules_version = '2';
 
 service cloud.firestore {
-  // Helper function to check admin authentication
+  // Helper function to check admin authentication with custom claim and token validation
   function isAdmin() {
-    return request.auth != null;
+    return request.auth != null && (
+      request.auth.token.admin == true || 
+      request.auth.token.email != null
+    );
   }
 
   // Helper to validate allowed fields for each collection

@@ -212,7 +212,7 @@ export default function ProductDetailClient({
       </div>
 
       {/* Main Product Layout */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-10 pb-24 sm:pb-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
           {/* ========================================================= */}
           {/* LEFT: Multi-Photo Interactive Gallery & Carousel (5 cols) */}
@@ -657,7 +657,7 @@ export default function ProductDetailClient({
                 <button
                   onClick={() => addToCart(quantity, false)}
                   disabled={!product.inStock}
-                  className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm text-gray-900 bg-gradient-to-b from-[#FFD814] to-[#F7CA00] hover:from-[#F7CA00] hover:to-[#F0B800] border border-[#FCD200] shadow-sm hover:shadow-md transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full flex items-center justify-center gap-2 py-3 px-4 min-h-[48px] rounded-xl font-bold text-sm text-gray-900 bg-gradient-to-b from-[#FFD814] to-[#F7CA00] hover:from-[#F7CA00] hover:to-[#F0B800] border border-[#FCD200] shadow-sm hover:shadow-md transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <ShoppingCart className="w-4 h-4 text-gray-900" />
                   Add to Cart
@@ -667,7 +667,7 @@ export default function ProductDetailClient({
                 <button
                   onClick={handleBuyNow}
                   disabled={!product.inStock}
-                  className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm text-white bg-gradient-to-b from-[#FFA41C] to-[#FF8F00] hover:from-[#FF8F00] hover:to-[#E67A00] border border-[#FF8F00] shadow-sm hover:shadow-md transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full flex items-center justify-center gap-2 py-3 px-4 min-h-[48px] rounded-xl font-bold text-sm text-white bg-gradient-to-b from-[#FFA41C] to-[#FF8F00] hover:from-[#FF8F00] hover:to-[#E67A00] border border-[#FF8F00] shadow-sm hover:shadow-md transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Zap className="w-4 h-4 fill-white" />
                   Buy Now
@@ -676,7 +676,7 @@ export default function ProductDetailClient({
                 {/* 3. WhatsApp Order Button */}
                 <button
                   onClick={handleWhatsAppOrder}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-semibold text-xs text-white bg-[#25D366] hover:bg-[#20BD5A] shadow-xs hover:shadow-md transition-all"
+                  className="w-full flex items-center justify-center gap-2 py-2.5 px-4 min-h-[48px] rounded-xl font-semibold text-xs text-white bg-[#25D366] hover:bg-[#20BD5A] shadow-xs hover:shadow-md transition-all"
                 >
                   <MessageCircle className="w-4 h-4" />
                   Order via WhatsApp
@@ -870,6 +870,34 @@ export default function ProductDetailClient({
           </div>
         )}
       </AnimatePresence>
+
+      {/* Mobile Sticky Action Bar (Amazon Style) */}
+      <div className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-gray-200 px-3 py-2 flex items-center gap-2 shadow-lg safe-area-pb">
+        <button
+          onClick={handleWhatsAppOrder}
+          className="p-3 rounded-xl bg-[#25D366] text-white hover:bg-[#20BD5A] transition-colors shrink-0 shadow-xs flex items-center justify-center min-h-[48px] min-w-[48px]"
+          title="WhatsApp Order"
+          aria-label="Order via WhatsApp"
+        >
+          <MessageCircle className="w-5 h-5" />
+        </button>
+        <button
+          onClick={() => addToCart(quantity, false)}
+          disabled={!product.inStock}
+          className="flex-1 flex items-center justify-center gap-1.5 py-3 px-2 rounded-xl font-bold text-xs text-gray-900 bg-gradient-to-b from-[#FFD814] to-[#F7CA00] border border-[#FCD200] shadow-xs active:scale-[0.98] disabled:opacity-50 min-h-[48px]"
+        >
+          <ShoppingCart className="w-4 h-4" />
+          <span>Add to Cart</span>
+        </button>
+        <button
+          onClick={handleBuyNow}
+          disabled={!product.inStock}
+          className="flex-1 flex items-center justify-center gap-1.5 py-3 px-2 rounded-xl font-bold text-xs text-white bg-gradient-to-b from-[#FFA41C] to-[#FF8F00] border border-[#FF8F00] shadow-xs active:scale-[0.98] disabled:opacity-50 min-h-[48px]"
+        >
+          <Zap className="w-4 h-4 fill-white" />
+          <span>Buy Now</span>
+        </button>
+      </div>
     </div>
   );
 }
