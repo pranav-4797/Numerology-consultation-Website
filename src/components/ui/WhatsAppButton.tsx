@@ -9,8 +9,10 @@ export default function WhatsAppButton() {
   const { settings } = useSiteSettings();
   const pathname = usePathname();
 
-  // Hide WhatsApp button on checkout page to avoid clutter during checkout
-  if (pathname === '/checkout') {
+  // Only show floating WhatsApp button on primary consultation inquiry pages (Home, Contact, Book, Services)
+  // Hide on catalogue, product detail, checkout, blog, gallery, etc. to prevent visual clutter and overlapping bars
+  const NECESSARY_PAGES = ['/', '/contact', '/book', '/services'];
+  if (!NECESSARY_PAGES.includes(pathname)) {
     return null;
   }
 

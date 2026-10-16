@@ -16,7 +16,6 @@ import {
   Truck,
   Sparkles,
   RotateCcw,
-  Lock,
   ArrowLeft,
   Heart,
   ExternalLink,
@@ -683,21 +682,6 @@ export default function ProductDetailClient({
                 </button>
               </div>
 
-              {/* Secure Transaction Note */}
-              <div className="pt-2 border-t border-gray-100 text-[11px] text-gray-500 space-y-1">
-                <div className="flex items-center gap-1.5 text-gray-600 font-medium">
-                  <Lock className="w-3.5 h-3.5 text-green-600" />
-                  <span>Secure 256-Bit Encrypted Payment</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span>Ships from:</span>
-                  <span className="font-medium text-gray-800">Divya Urja Store</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span>Sold by:</span>
-                  <span className="font-medium text-gray-800">Pranav Holistic Arts</span>
-                </div>
-              </div>
 
               {/* Share Product Direct Trigger */}
               <button
