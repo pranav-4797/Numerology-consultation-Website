@@ -17,13 +17,17 @@ export default function ServicesClient({ initialServices }: ServicesClientProps)
   const [services, setServices] = useState<Service[]>(initialServices);
 
   useEffect(() => {
-    // Client side refresh if initial data was empty or on navigation
-    if (initialServices.length === 0) {
-      getServices()
-        .then((data) => setServices(data))
-        .catch((err) => console.error('Error fetching services:', err));
-    }
-  }, [initialServices]);
+    let isMounted = true;
+    getServices()
+      .then((data) => {
+        if (isMounted) setServices(data);
+      })
+      .catch((err) => console.error('Error refreshing services:', err));
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <>

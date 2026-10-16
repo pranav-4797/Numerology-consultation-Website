@@ -59,15 +59,19 @@ export default function CatalogueClient({ initialProducts, initialWhatsapp = '91
   }, []);
 
   useEffect(() => {
-    if (initialProducts.length === 0) {
-      Promise.all([getProducts(), getSiteSettings()])
-        .then(([productsData, settings]) => {
-          setProducts(productsData);
-          if (settings.whatsapp) setWhatsappNumber(settings.whatsapp);
-        })
-        .catch((err) => console.error('Error fetching products:', err));
-    }
-  }, [initialProducts]);
+    let isMounted = true;
+    Promise.all([getProducts(), getSiteSettings()])
+      .then(([productsData, settings]) => {
+        if (!isMounted) return;
+        setProducts(productsData);
+        if (settings.whatsapp) setWhatsappNumber(settings.whatsapp);
+      })
+      .catch((err) => console.error('Error refreshing products:', err));
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const filteredProducts = products.filter((product) => {
     const matchesCategory = activeCategory === 'all' || product.category === activeCategory;

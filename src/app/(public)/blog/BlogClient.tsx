@@ -17,12 +17,17 @@ export default function BlogClient({ initialBlogs }: BlogClientProps) {
   const [blogs, setBlogs] = useState<Blog[]>(initialBlogs);
 
   useEffect(() => {
-    if (initialBlogs.length === 0) {
-      getBlogs()
-        .then((data) => setBlogs(data.filter((b) => b.status !== 'draft')))
-        .catch((err) => console.error('Error fetching blogs client side:', err));
-    }
-  }, [initialBlogs]);
+    let isMounted = true;
+    getBlogs()
+      .then((data) => {
+        if (isMounted) setBlogs(data.filter((b) => b.status !== 'draft'));
+      })
+      .catch((err) => console.error('Error refreshing blogs client side:', err));
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <>

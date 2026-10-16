@@ -17,12 +17,17 @@ export default function WorkshopsClient({ initialWorkshops }: WorkshopsClientPro
   const [workshops, setWorkshops] = useState<Workshop[]>(initialWorkshops);
 
   useEffect(() => {
-    if (initialWorkshops.length === 0) {
-      getWorkshops()
-        .then((data) => setWorkshops(data))
-        .catch((err) => console.error('Error fetching workshops client side:', err));
-    }
-  }, [initialWorkshops]);
+    let isMounted = true;
+    getWorkshops()
+      .then((data) => {
+        if (isMounted) setWorkshops(data);
+      })
+      .catch((err) => console.error('Error refreshing workshops client side:', err));
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <>

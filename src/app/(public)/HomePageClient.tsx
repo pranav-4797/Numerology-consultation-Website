@@ -73,22 +73,21 @@ export default function HomePageClient({
   const isMobile = useIsMobile();
 
   useEffect(() => {
-    if (
-      initialServices.length === 0 &&
-      initialWorkshops.length === 0 &&
-      initialEvents.length === 0 &&
-      initialTestimonials.length === 0
-    ) {
-      Promise.all([getServices(), getWorkshops(), getEvents(), getTestimonials()])
-        .then(([s, w, e, t]) => {
-          setServices(s.slice(0, 6));
-          setWorkshops(w.slice(0, 3));
-          setEvents(e.slice(0, 3));
-          setTestimonials(t.slice(0, 6));
-        })
-        .catch((err) => console.error('Error fetching homepage data:', err));
-    }
-  }, [initialServices, initialWorkshops, initialEvents, initialTestimonials]);
+    let isMounted = true;
+    Promise.all([getServices(), getWorkshops(), getEvents(), getTestimonials()])
+      .then(([s, w, e, t]) => {
+        if (!isMounted) return;
+        setServices(s.slice(0, 6));
+        setWorkshops(w.slice(0, 3));
+        setEvents(e.slice(0, 3));
+        setTestimonials(t.slice(0, 6));
+      })
+      .catch((err) => console.error('Error refreshing homepage data:', err));
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <>

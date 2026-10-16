@@ -14,9 +14,9 @@ const MEMORY_CACHE = new Map<string, CacheEntry<unknown>>();
 const PENDING_PROMISES = new Map<string, Promise<unknown>>();
 const CACHE_PREFIX = 'divya_cache_v2_';
 
-// Default times
-const DEFAULT_STALE_MS = 5 * 60 * 1000; // 5 minutes fresh
-const DEFAULT_EXPIRE_MS = 30 * 60 * 1000; // 30 minutes max retention
+// Default times: 10s fresh allows instant navigation while reflecting admin updates within seconds
+const DEFAULT_STALE_MS = 10 * 1000; // 10 seconds fresh
+const DEFAULT_EXPIRE_MS = 2 * 60 * 1000; // 2 minutes max retention
 
 /**
  * Checks if client storage is available.
@@ -173,6 +173,13 @@ function revalidateInBackground<T>(
   const bgPromise = fetcher()
     .then((fresh) => {
       writeToCache(key, fresh, staleMs, expireMs);
+      if (typeof window !== 'undefined') {
+        try {
+          window.dispatchEvent(new CustomEvent('divya_cache_updated', { detail: { key, data: fresh } }));
+        } catch {
+          // ignore
+        }
+      }
       return fresh;
     })
     .catch((err) => {
@@ -186,8 +193,22 @@ function revalidateInBackground<T>(
 }
 
 /**
- * Invalidates cache by exact key or prefix pattern (e.g. 'products', 'services').
- * Used when admins add, edit, or delete items.
+ * Helper to test if a key matches an invalidation target.
+ */
+function keyMatchesTarget(key: string, target: string): boolean {
+  return (
+    key === target ||
+    key.startsWith(target) ||
+    key.includes(`_${target}`) ||
+    key.includes(`${target}_`) ||
+    key.includes(target)
+  );
+}
+
+/**
+ * Invalidates cache by exact key or collection target (e.g. 'products', 'services', 'workshops').
+ * Matches all related query keys such as col_products_*, doc_products_*, products_cat_*, etc.
+ * Emits cross-tab event to ensure instant updates.
  */
 export function invalidateCache(prefixOrKey?: string): void {
   if (!prefixOrKey) {
@@ -209,7 +230,7 @@ export function invalidateCache(prefixOrKey?: string): void {
 
   // Clear matching keys in memory
   for (const k of Array.from(MEMORY_CACHE.keys())) {
-    if (k === prefixOrKey || k.startsWith(prefixOrKey)) {
+    if (keyMatchesTarget(k, prefixOrKey)) {
       MEMORY_CACHE.delete(k);
     }
   }
@@ -219,12 +240,24 @@ export function invalidateCache(prefixOrKey?: string): void {
     try {
       const toRemove: string[] = [];
       for (let i = 0; i < localStorage.length; i++) {
-        const k = localStorage.key(i);
-        if (k && (k === CACHE_PREFIX + prefixOrKey || k.startsWith(CACHE_PREFIX + prefixOrKey))) {
-          toRemove.push(k);
+        const rawKey = localStorage.key(i);
+        if (rawKey && rawKey.startsWith(CACHE_PREFIX)) {
+          const keyWithoutPrefix = rawKey.slice(CACHE_PREFIX.length);
+          if (keyMatchesTarget(keyWithoutPrefix, prefixOrKey)) {
+            toRemove.push(rawKey);
+          }
         }
       }
       toRemove.forEach((k) => localStorage.removeItem(k));
+    } catch {
+      // ignore
+    }
+  }
+
+  // Broadcast cross-tab cache invalidation event
+  if (typeof window !== 'undefined') {
+    try {
+      window.dispatchEvent(new CustomEvent('divya_cache_invalidated', { detail: { prefixOrKey } }));
     } catch {
       // ignore
     }
