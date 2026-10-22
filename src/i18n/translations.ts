@@ -22,6 +22,10 @@ const en: Dictionary = {
   'nav.catalogue': 'Catalogue',
   'nav.offers': 'Special Offers',
   'nav.bookConsultation': 'Book Consultation',
+  'nav.hubServices': 'Consultations',
+  'nav.hubStore': 'Sacred Store',
+  'nav.hubWisdom': 'Wisdom & Events',
+  'nav.hubAbout': 'About & Trust',
 
   // Footer
   'footer.tagline':
@@ -98,6 +102,10 @@ const hi: Dictionary = {
   'nav.catalogue': 'कैटलॉग',
   'nav.offers': 'विशेष ऑफर्स',
   'nav.bookConsultation': 'परामर्श बुक करें',
+  'nav.hubServices': 'परामर्श सेवाएं',
+  'nav.hubStore': 'पवित्र स्टोर',
+  'nav.hubWisdom': 'ज्ञान एवं आयोजन',
+  'nav.hubAbout': 'परिचय एवं विश्वास',
 
   'footer.tagline':
     'अंकशास्त्र, वास्तु शास्त्र और समग्र ऊर्जा विज्ञान के प्राचीन ज्ञान से अपना जीवन बदलें। व्यक्तिगत परामर्श के माध्यम से अपनी वास्तविक क्षमता को पहचानें।',
@@ -169,6 +177,10 @@ const mr: Dictionary = {
   'nav.catalogue': 'कॅटलॉग',
   'nav.offers': 'विशेष ऑफर्स',
   'nav.bookConsultation': 'सल्लामसलत बुक करा',
+  'nav.hubServices': 'सल्लामसलत',
+  'nav.hubStore': 'पवित्र स्टोअर',
+  'nav.hubWisdom': 'ज्ञान आणि कार्यक्रम',
+  'nav.hubAbout': 'परिचय आणि विश्वास',
 
   'footer.tagline':
     'अंकशास्त्र, वास्तुशास्त्र आणि समग्र ऊर्जा विज्ञानाच्या प्राचीन ज्ञानाने आपले जीवन बदला. वैयक्तिक सल्लामसलतीद्वारे आपली खरी क्षमता ओळखा.',

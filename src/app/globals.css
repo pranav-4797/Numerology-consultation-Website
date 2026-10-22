@@ -1,15 +1,24 @@
 @import "tailwindcss";
 
 :root {
-  --background: #F8F7F4;
+  --background: #FDFBF7;
   --foreground: #1F2937;
+  --canvas: #FDFBF7;
+  --sacred-gold: #D4AF37;
+  --sacred-gold-light: #F7E9B7;
+  --vedic-teal: #0F766E;
+  --amber-radiance: #EA580C;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-canvas: var(--canvas);
   --color-primary: #0F766E;
   --color-secondary: #D4AF37;
+  --color-gold: #D4AF37;
+  --color-gold-light: #F7E9B7;
+  --color-amber-radiance: #EA580C;
   --color-text: #1F2937;
   --font-playfair: "Playfair Display", serif;
   --font-poppins: "Poppins", sans-serif;
@@ -21,6 +30,21 @@ body {
   font-family: var(--font-poppins);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* UI/UX Pro Max Sacred Aura Utilities */
+.aura-gold {
+  box-shadow: 0 0 25px -5px rgba(212, 175, 55, 0.25), 0 0 10px -3px rgba(212, 175, 55, 0.15);
+}
+
+.aura-teal {
+  box-shadow: 0 0 25px -5px rgba(15, 118, 110, 0.25), 0 0 10px -3px rgba(15, 118, 110, 0.15);
+}
+
+.gold-gradient-text {
+  background: linear-gradient(135deg, #B8860B 0%, #D4AF37 50%, #AA771C 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 /* Smooth scrolling */
