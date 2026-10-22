@@ -31,10 +31,21 @@ interface CatalogueClientProps {
   initialWhatsapp?: string;
 }
 
+const INTENTIONS = [
+  { id: 'all', label: 'All Intentions', emoji: '✨', keywords: [] },
+  { id: 'wealth', label: 'Wealth & Abundance', emoji: '💰', keywords: ['wealth', 'money', 'pyrite', 'citrine', 'lakshmi', 'kuber', 'prosperity', 'abundance', 'fortune'] },
+  { id: 'protection', label: 'Protection & Aura', emoji: '🛡️', keywords: ['protection', 'evil eye', 'tourmaline', 'shani', 'nazar', 'shield', 'negative', 'aura', 'raksha'] },
+  { id: 'health', label: 'Health & Peace', emoji: '🧘', keywords: ['peace', 'health', 'amethyst', 'quartz', 'healing', 'stress', 'calm', 'sleep', 'chakra'] },
+  { id: 'career', label: 'Career & Focus', emoji: '🎯', keywords: ['career', 'focus', 'tiger eye', 'success', 'job', 'study', 'confidence', 'business'] },
+];
+
+const FREE_SHIPPING_THRESHOLD = 999;
+
 export default function CatalogueClient({ initialProducts, initialWhatsapp = '919822492488' }: CatalogueClientProps) {
   const router = useRouter();
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [activeCategory, setActiveCategory] = useState<ProductCategory | 'all'>('all');
+  const [activeIntention, setActiveIntention] = useState<string>('all');
   const [cart, setCart] = useState<CartItem[]>(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -78,7 +89,17 @@ export default function CatalogueClient({ initialProducts, initialWhatsapp = '91
     const matchesSearch =
       product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.description.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
+    
+    let matchesIntention = true;
+    if (activeIntention !== 'all') {
+      const selectedIntentionObj = INTENTIONS.find((i) => i.id === activeIntention);
+      if (selectedIntentionObj && selectedIntentionObj.keywords.length > 0) {
+        const textToSearch = `${product.name} ${product.description} ${product.category}`.toLowerCase();
+        matchesIntention = selectedIntentionObj.keywords.some((kw) => textToSearch.includes(kw));
+      }
+    }
+
+    return matchesCategory && matchesSearch && matchesIntention;
   });
 
   const addToCart = (product: Product) => {
@@ -92,6 +113,7 @@ export default function CatalogueClient({ initialProducts, initialWhatsapp = '91
     } else {
       saveCart([...cart, { product, quantity: 1 }]);
     }
+    setShowCart(true);
   };
 
   const removeFromCart = (productId: string) => {
@@ -169,7 +191,7 @@ export default function CatalogueClient({ initialProducts, initialWhatsapp = '91
           </div>
 
           {/* Category Tabs */}
-          <div className="flex items-center gap-2 mb-12 overflow-x-auto pb-2 scrollbar-none sm:flex-wrap sm:justify-center sm:overflow-visible sm:pb-0">
+          <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-2 scrollbar-none sm:flex-wrap sm:justify-center sm:overflow-visible sm:pb-0">
             {CATEGORIES.map((cat) => (
               <button
                 key={cat.key}
@@ -182,6 +204,27 @@ export default function CatalogueClient({ initialProducts, initialWhatsapp = '91
               >
                 <span>{cat.emoji}</span>
                 <span>{cat.label}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Intention Quick-Pills (Wealth, Protection, Health, Career) */}
+          <div className="flex items-center gap-2 mb-10 overflow-x-auto pb-2 scrollbar-none sm:flex-wrap sm:justify-center sm:overflow-visible sm:pb-0">
+            <span className="text-xs font-bold text-text/40 uppercase tracking-wider pl-1 pr-1 hidden sm:inline">
+              Intent:
+            </span>
+            {INTENTIONS.map((intention) => (
+              <button
+                key={intention.id}
+                onClick={() => setActiveIntention(intention.id)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1 whitespace-nowrap shrink-0 ${
+                  activeIntention === intention.id
+                    ? 'bg-amber-600 text-white shadow-sm ring-1 ring-amber-700'
+                    : 'bg-white/90 text-text/60 border border-gray-200/80 hover:bg-amber-50 hover:text-amber-900'
+                }`}
+              >
+                <span>{intention.emoji}</span>
+                <span>{intention.label}</span>
               </button>
             ))}
           </div>
@@ -262,6 +305,32 @@ export default function CatalogueClient({ initialProducts, initialWhatsapp = '91
                 >
                   <X className="w-5 h-5" />
                 </button>
+              </div>
+
+              {/* Free Sacred Delivery Progress Bar */}
+              <div className="px-6 py-3.5 bg-amber-50/80 border-b border-amber-200/50">
+                <div className="flex items-center justify-between text-xs font-semibold mb-1.5">
+                  {cartTotal >= FREE_SHIPPING_THRESHOLD ? (
+                    <span className="text-emerald-700 flex items-center gap-1">
+                      <span>✨</span> You unlocked <strong>FREE Sacred Delivery</strong>!
+                    </span>
+                  ) : (
+                    <span className="text-amber-900">
+                      Add <strong>₹{(FREE_SHIPPING_THRESHOLD - cartTotal).toLocaleString('en-IN')}</strong> for <strong>FREE Delivery</strong>
+                    </span>
+                  )}
+                  <span className="text-amber-800 text-[11px] font-bold">
+                    ₹{cartTotal}/₹{FREE_SHIPPING_THRESHOLD}
+                  </span>
+                </div>
+                <div className="w-full bg-amber-200/60 rounded-full h-1.5 overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all duration-500 ${
+                      cartTotal >= FREE_SHIPPING_THRESHOLD ? 'bg-emerald-600' : 'bg-primary'
+                    }`}
+                    style={{ width: `${Math.min(100, (cartTotal / FREE_SHIPPING_THRESHOLD) * 100)}%` }}
+                  />
+                </div>
               </div>
 
               <div className="flex-1 overflow-y-auto p-6 space-y-4">

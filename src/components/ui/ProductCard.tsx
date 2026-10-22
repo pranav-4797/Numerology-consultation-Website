@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { ShoppingCart, MessageCircle, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import type { Product } from '@/types';
 
 const CATEGORY_LABELS: Record<string, { label: string; color: string }> = {
@@ -38,6 +39,7 @@ export default function ProductCard({ product, index, whatsappNumber, onAddToCar
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
     onAddToCart(product);
+    toast.success(`Added "${product.name}" to cart`);
   };
 
   const originalPrice = product.originalPrice || Math.round(product.price * 1.35);

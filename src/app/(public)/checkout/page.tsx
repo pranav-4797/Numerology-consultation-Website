@@ -109,7 +109,7 @@ export default function CheckoutPage() {
   }, []);
 
   const subtotal = cart.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
-  const shippingCharges = 100;
+  const shippingCharges = subtotal >= 999 ? 0 : 100;
   const total = subtotal + shippingCharges;
 
   const onSubmit = async (formData: OrderFormData) => {
@@ -416,9 +416,21 @@ Please share payment details.`;
                 <span>Subtotal</span>
                 <span>₹{subtotal.toLocaleString('en-IN')}</span>
               </div>
-              <div className="flex justify-between text-sm text-text/50">
+              <div className="flex justify-between text-sm text-text/60">
                 <span>Shipping Charges</span>
-                <span className="text-green-600 font-medium">₹{shippingCharges.toLocaleString('en-IN')}</span>
+                {shippingCharges === 0 ? (
+                  <span className="text-emerald-600 font-bold flex items-center gap-1.5">
+                    <span className="line-through text-gray-400 text-xs font-normal">₹100</span>
+                    <span>FREE (Sacred Delivery)</span>
+                  </span>
+                ) : (
+                  <span className="text-text font-medium">
+                    ₹{shippingCharges.toLocaleString('en-IN')}{' '}
+                    <span className="text-[11px] text-amber-700 font-normal">
+                      (Free on ₹999+)
+                    </span>
+                  </span>
+                )}
               </div>
               <div className="border-t border-gray-100 pt-3 flex justify-between items-center">
                 <span className="text-sm font-bold text-text">Total Price</span>
