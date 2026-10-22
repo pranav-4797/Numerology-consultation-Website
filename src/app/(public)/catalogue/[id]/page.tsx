@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
 import { getProductById, getProducts, getSiteSettings } from '@/services/firestore';
 import ProductDetailClient from './ProductDetailClient';
 import type { Product } from '@/types';
@@ -13,8 +12,11 @@ export const dynamic = 'force-static';
 export async function generateStaticParams() {
   try {
     const products = await getProducts();
-    if (!products || products.length === 0) return [{ id: 'placeholder' }];
-    return products.map((p) => ({ id: p.id }));
+    const list = (products || []).map((p) => ({ id: p.id }));
+    if (!list.some((item) => item.id === 'placeholder')) {
+      list.push({ id: 'placeholder' });
+    }
+    return list;
   } catch (error) {
     console.error('Error generating static params for catalogue products:', error);
     return [{ id: 'placeholder' }];
@@ -24,15 +26,16 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
   try {
-    const product = await getProductById(id);
+    const product = id && id !== 'placeholder' ? await getProductById(id) : null;
     if (!product) {
       return {
-        title: 'Product Not Found | Divya Urja',
+        title: 'Spiritual Product Details | Divya Urja Catalogue',
+        description: 'Explore energized Rudraksha, Crystals, Yantras and Gemstone remedies at Divya Urja.',
       };
     }
 
     const title = `${product.name} | Buy Online | Divya Urja`;
-    const description = product.description.slice(0, 160);
+    const description = (product.description || '').slice(0, 160);
 
     return {
       title,
@@ -65,7 +68,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
   try {
     const [prodData, allProducts, settings] = await Promise.all([
-      getProductById(id),
+      id && id !== 'placeholder' ? getProductById(id) : Promise.resolve(null),
       getProducts(),
       getSiteSettings(),
     ]);
@@ -91,28 +94,11 @@ export default async function ProductDetailPage({ params }: PageProps) {
     console.error('Error fetching product detail:', error);
   }
 
-  if (!product) {
-    if (id === 'placeholder') {
-      return (
-        <div className="min-h-[50vh] flex flex-col items-center justify-center p-8 text-center">
-          <h2 className="text-xl font-bold font-playfair mb-2">Product Details</h2>
-          <p className="text-gray-500 text-sm mb-4">Please select an item from our sacred catalogue.</p>
-          <a
-            href="/catalogue"
-            className="px-5 py-2.5 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-primary-dark transition-colors shadow-sm"
-          >
-            Browse Catalogue
-          </a>
-        </div>
-      );
-    }
-    notFound();
-  }
-
   return (
     <ProductDetailClient
-      product={product}
-      relatedProducts={relatedProducts}
+      initialProduct={product}
+      productId={id}
+      initialRelatedProducts={relatedProducts}
       whatsappNumber={whatsapp}
     />
   );

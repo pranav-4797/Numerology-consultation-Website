@@ -59,12 +59,30 @@ export default function BlogDetailClient({ initialBlog, slug: propSlug }: BlogDe
 
   if (!blog) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center text-center px-4">
-        <h1 className="font-playfair text-4xl font-bold text-text mb-4">Article Not Found</h1>
-        <p className="text-text/60 mb-8">The article you are looking for does not exist or has been removed.</p>
-        <Link href="/blog" className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary/90 transition-colors">
-          <ArrowLeft className="w-4 h-4" /> Back to Blog
-        </Link>
+      <div className="min-h-[75vh] flex flex-col items-center justify-center text-center px-4 py-16 bg-[#FDFBF7]">
+        <div className="max-w-md w-full bg-white rounded-2xl border border-gray-200/80 p-8 shadow-xs">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-500/10 text-amber-600 mb-4 ring-8 ring-amber-500/5">
+            <Calendar className="w-7 h-7 text-primary" />
+          </div>
+          <h1 className="font-playfair text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Article No Longer Available</h1>
+          <p className="text-sm text-gray-600 mb-6 leading-relaxed">
+            The spiritual wisdom article you are seeking has been archived, renamed, or moved. Explore our latest published articles or remedies.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link
+              href="/blog"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-primary/90 transition-colors shadow-sm"
+            >
+              <ArrowLeft className="w-4 h-4" /> All Articles
+            </Link>
+            <Link
+              href="/catalogue"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-800 text-sm font-semibold rounded-xl transition-colors"
+            >
+              Spiritual Catalogue
+            </Link>
+          </div>
+        </div>
       </div>
     );
   }

@@ -27,11 +27,14 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import type { Product } from '@/types';
 import ProductCard from '@/components/ui/ProductCard';
+import Loader from '@/components/ui/Loader';
+import { getProductById, getProducts, getSiteSettings } from '@/services/firestore';
 
 interface ProductDetailClientProps {
-  product: Product;
-  relatedProducts: Product[];
-  whatsappNumber: string;
+  initialProduct?: Product | null;
+  productId?: string;
+  initialRelatedProducts?: Product[];
+  whatsappNumber?: string;
 }
 
 interface CartItem {
@@ -49,17 +52,24 @@ const CATEGORY_NAMES: Record<string, string> = {
 };
 
 export default function ProductDetailClient({
-  product,
-  relatedProducts,
-  whatsappNumber,
+  initialProduct,
+  productId: propProductId,
+  initialRelatedProducts = [],
+  whatsappNumber = '919822492488',
 }: ProductDetailClientProps) {
   const router = useRouter();
 
+  const [product, setProduct] = useState<Product | null>(initialProduct ?? null);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>(initialRelatedProducts);
+  const [activeWhatsapp, setActiveWhatsapp] = useState<string>(whatsappNumber);
+  const [loading, setLoading] = useState<boolean>(!initialProduct && propProductId !== 'placeholder');
+  const [isNotFound, setIsNotFound] = useState<boolean>(false);
+
   // Multi-image list
   const imageList =
-    product.images && product.images.length > 0
+    product?.images && product.images.length > 0
       ? product.images
-      : product.image
+      : product?.image
       ? [product.image]
       : [];
 
@@ -72,12 +82,91 @@ export default function ProductDetailClient({
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [activeTab, setActiveTab] = useState<'details' | 'benefits' | 'specs'>('details');
 
-  // Compute pricing
-  const originalPrice = product.originalPrice || Math.round(product.price * 1.35);
-  const discountPercent = Math.round(((originalPrice - product.price) / originalPrice) * 100);
+  // Compute pricing safely
+  const originalPrice = product ? product.originalPrice || Math.round(product.price * 1.35) : 0;
+  const discountPercent =
+    product && originalPrice > product.price
+      ? Math.round(((originalPrice - product.price) / originalPrice) * 100)
+      : 0;
+
+  // Real-time verification & client-side Firestore recovery for shared / deleted links
+  useEffect(() => {
+    let currentId = propProductId;
+    if ((!currentId || currentId === 'placeholder') && typeof window !== 'undefined') {
+      const segments = window.location.pathname.split('/').filter(Boolean);
+      if (segments.length >= 2 && segments[0] === 'catalogue') {
+        currentId = decodeURIComponent(segments[1]);
+      }
+    }
+
+    if (!currentId || currentId === 'placeholder') {
+      setIsNotFound(true);
+      setLoading(false);
+      getProducts()
+        .then((all) => {
+          if (all && all.length > 0) setRelatedProducts(all.slice(0, 4));
+        })
+        .catch(console.error);
+      return;
+    }
+
+    let isMounted = true;
+
+    async function loadOrVerify() {
+      try {
+        if (!product) setLoading(true);
+
+        const [freshProduct, allProducts, settings] = await Promise.all([
+          getProductById(currentId!),
+          getProducts(),
+          getSiteSettings().catch(() => null),
+        ]);
+
+        if (!isMounted) return;
+
+        if (settings?.whatsapp) setActiveWhatsapp(settings.whatsapp);
+
+        if (!freshProduct) {
+          // Product was deleted from Firestore by admin, or invalid link
+          setProduct(null);
+          setIsNotFound(true);
+          if (allProducts && allProducts.length > 0) {
+            setRelatedProducts(allProducts.slice(0, 4));
+          }
+        } else {
+          // Product exists and is active
+          setProduct(freshProduct);
+          setIsNotFound(false);
+          if (allProducts && allProducts.length > 0) {
+            const rel = allProducts
+              .filter((p) => p.id !== freshProduct.id && p.category === freshProduct.category)
+              .slice(0, 4);
+            const remaining = allProducts
+              .filter((p) => p.id !== freshProduct.id && !rel.some((r) => r.id === p.id))
+              .slice(0, 4 - rel.length);
+            setRelatedProducts([...rel, ...remaining]);
+          }
+        }
+      } catch (err) {
+        console.error('Error verifying product in Firestore:', err);
+        if (isMounted && !product) {
+          setIsNotFound(true);
+        }
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    }
+
+    loadOrVerify();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [propProductId]);
 
   // Cart operations
   const addToCart = (qty = quantity, redirect = false) => {
+    if (!product) return;
     try {
       const saved = localStorage.getItem('divyaurja_cart');
       const cart: CartItem[] = saved ? JSON.parse(saved) : [];
@@ -117,6 +206,7 @@ export default function ProductDetailClient({
   };
 
   const handleShareClick = async () => {
+    if (!product) return;
     const url = typeof window !== 'undefined' ? window.location.href : '';
     if (typeof navigator !== 'undefined' && navigator.share) {
       try {
@@ -143,6 +233,7 @@ export default function ProductDetailClient({
   };
 
   const handleWhatsAppOrder = () => {
+    if (!product) return;
     const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
     const message = encodeURIComponent(
       `🙏 *Namaste Guruji!* I am interested in ordering:\n\n` +
@@ -152,7 +243,7 @@ export default function ProductDetailClient({
         `🔗 *Product Link:* ${currentUrl}\n\n` +
         `Please guide me with the energized dispatch & payment details.`
     );
-    window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
+    window.open(`https://wa.me/${activeWhatsapp}?text=${message}`, '_blank');
   };
 
   // Keyboard navigation for image slider
@@ -168,6 +259,205 @@ export default function ProductDetailClient({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [imageList.length]);
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-[70vh] bg-[#FDFBF7] flex items-center justify-center p-6">
+        <Loader text="Loading sacred remedy details..." />
+      </div>
+    );
+  }
+
+  // SENIOR UX/UI DESIGN: Empathetic, High-Converting State when Product is Deleted or Not Found
+  if (isNotFound || !product) {
+    return (
+      <div className="min-h-screen bg-[#FDFBF7] text-[#1E293B]">
+        {/* Top Breadcrumb */}
+        <div className="bg-white border-b border-gray-200/80 shadow-2xs">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between text-xs sm:text-sm">
+            <div className="flex items-center gap-2 text-gray-500 overflow-x-auto whitespace-nowrap py-1">
+              <Link href="/" className="hover:text-primary transition-colors">
+                Home
+              </Link>
+              <span>/</span>
+              <Link href="/catalogue" className="hover:text-primary transition-colors">
+                Catalogue
+              </Link>
+              <span>/</span>
+              <span className="text-gray-900 font-semibold">Product Notice</span>
+            </div>
+            <Link
+              href="/catalogue"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium text-xs transition-colors"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back to Catalogue</span>
+            </Link>
+          </div>
+        </div>
+
+        {/* Notice Card Stage */}
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14 pb-10 text-center">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4 }}
+            className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-tr from-amber-500/20 to-primary/10 text-amber-600 mb-6 ring-8 ring-amber-500/5 shadow-inner"
+          >
+            <Sparkles className="w-10 h-10 animate-pulse text-amber-600" />
+          </motion.div>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="font-playfair text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3"
+          >
+            This Sacred Item is No Longer Available
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-sm sm:text-base text-gray-600 max-w-xl mx-auto mb-8 leading-relaxed"
+          >
+            The energized product you are seeking has been discontinued, sold out, or updated by our admin team.
+            Our sanctified collection has many powerful remedies aligned with your astrological energies.
+          </motion.p>
+
+          {/* Action CTAs */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-10"
+          >
+            <Link
+              href="/catalogue"
+              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 shadow-md hover:shadow-lg transition-all active:scale-[0.98]"
+            >
+              <ShoppingCart className="w-4 h-4" />
+              <span>Explore All Products</span>
+            </Link>
+
+            <button
+              onClick={() => {
+                const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
+                const msg = encodeURIComponent(
+                  `🙏 *Namaste Guruji!* I visited a product link on Divya Urja (${currentUrl}) that is currently unavailable. Could you please recommend an alternative energized remedy for me?`
+                );
+                window.open(`https://wa.me/${activeWhatsapp}?text=${msg}`, '_blank');
+              }}
+              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold text-white bg-[#25D366] hover:bg-[#20BD5A] shadow-md hover:shadow-lg transition-all active:scale-[0.98]"
+            >
+              <MessageCircle className="w-4 h-4" />
+              <span>Ask Guruji on WhatsApp</span>
+            </button>
+          </motion.div>
+
+          {/* Quick Category Exploration Pills */}
+          <div className="bg-white rounded-2xl p-6 border border-gray-200/80 shadow-xs mb-14 text-left">
+            <h3 className="text-xs uppercase tracking-wider font-bold text-gray-500 mb-3 text-center sm:text-left">
+              Explore by Spiritual Category:
+            </h3>
+            <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
+              {[
+                { label: 'Sacred Crystals', icon: '💎', cat: 'crystals' },
+                { label: 'Holy Rudraksha', icon: '📿', cat: 'rudraksha' },
+                { label: 'Healing Bracelets', icon: '✨', cat: 'bracelets' },
+                { label: 'Vedic Yantras', icon: '🔯', cat: 'yantras' },
+                { label: 'Spiritual Pendants', icon: '🧿', cat: 'pendants' },
+              ].map((item) => (
+                <Link
+                  key={item.cat}
+                  href={`/catalogue?category=${item.cat}`}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-gray-50 hover:bg-amber-50 border border-gray-200 hover:border-amber-300 text-gray-700 hover:text-amber-800 transition-all shadow-2xs hover:scale-102"
+                >
+                  <span>{item.icon}</span>
+                  <span>{item.label}</span>
+                </Link>
+              ))}
+              <Link
+                href="/offers"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-500/10 hover:bg-amber-500/20 border border-amber-300 text-amber-800 transition-all shadow-2xs hover:scale-102"
+              >
+                <span>🎁</span>
+                <span>Special Festive Offers</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Active Popular Remedies Grid */}
+        {relatedProducts.length > 0 && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+            <div className="flex items-center justify-between mb-6 border-b border-gray-200 pb-3">
+              <div>
+                <h2 className="text-xl sm:text-2xl font-bold font-playfair text-gray-900">
+                  Popular & Energized Remedies
+                </h2>
+                <p className="text-xs sm:text-sm text-gray-500">
+                  Sacred energized items currently available in our divine store
+                </p>
+              </div>
+              <Link
+                href="/catalogue"
+                className="text-xs sm:text-sm font-bold text-primary hover:underline flex items-center gap-1"
+              >
+                See Full Store <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {relatedProducts.slice(0, 4).map((item, idx) => (
+                <ProductCard
+                  key={item.id}
+                  product={item}
+                  index={idx}
+                  whatsappNumber={activeWhatsapp}
+                  onAddToCart={(p) => {
+                    const saved = localStorage.getItem('divyaurja_cart');
+                    const c: CartItem[] = saved ? JSON.parse(saved) : [];
+                    const exist = c.find((it) => it.product.id === p.id);
+                    const updated = exist
+                      ? c.map((it) => (it.product.id === p.id ? { ...it, quantity: it.quantity + 1 } : it))
+                      : [...c, { product: p, quantity: 1 }];
+                    localStorage.setItem('divyaurja_cart', JSON.stringify(updated));
+                    toast.success(`Added "${p.name}" to cart!`);
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Personalized Consultation Support */}
+        <div className="max-w-4xl mx-auto px-4 pb-20">
+          <div className="bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 border border-amber-200/80 rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xs">
+            <div className="text-center sm:text-left">
+              <span className="text-xs font-bold uppercase tracking-wider text-amber-700 bg-amber-200/50 px-2.5 py-1 rounded-full">
+                Personalized Consultation
+              </span>
+              <h3 className="font-playfair text-xl font-bold text-gray-900 mt-2">
+                Unsure which remedy aligns with your Kundali?
+              </h3>
+              <p className="text-xs sm:text-sm text-gray-600 mt-1 max-w-md">
+                Consult with Guruji to discover the exact gemstone, rudraksha, or yantra tailored for your birth chart and planetary periods.
+              </p>
+            </div>
+            <Link
+              href="/book"
+              className="shrink-0 px-6 py-3 rounded-xl bg-gray-900 hover:bg-black text-white text-xs sm:text-sm font-semibold transition-all shadow-md hover:scale-102"
+            >
+              Book Consultation
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#FDFBF7] text-[#1E293B]">

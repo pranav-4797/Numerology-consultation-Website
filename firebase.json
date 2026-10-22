@@ -11,6 +11,10 @@
       {
         "source": "/blog/**",
         "destination": "/blog/placeholder.html"
+      },
+      {
+        "source": "/catalogue/**",
+        "destination": "/catalogue/placeholder.html"
       }
     ],
     "headers": [

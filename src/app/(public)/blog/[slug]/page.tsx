@@ -6,9 +6,12 @@ export const dynamic = 'force-static';
 export async function generateStaticParams() {
   try {
     const blogs = await getBlogs();
-    const published = blogs.filter((b) => b.status !== 'draft');
-    if (published.length === 0) return [{ slug: 'placeholder' }];
-    return published.map((b) => ({ slug: encodeURIComponent(b.slug) }));
+    const published = (blogs || []).filter((b) => b.status !== 'draft');
+    const list = published.map((b) => ({ slug: encodeURIComponent(b.slug) }));
+    if (!list.some((item) => item.slug === 'placeholder')) {
+      list.push({ slug: 'placeholder' });
+    }
+    return list;
   } catch (error) {
     console.error('Error generating static params for blog:', error);
     return [{ slug: 'placeholder' }];

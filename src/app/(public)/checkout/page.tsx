@@ -24,6 +24,7 @@ export default function CheckoutPage() {
   const [loadingCart, setLoadingCart] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [whatsappNumber, setWhatsappNumber] = useState('919822492488');
+  const [itemUnavailableNotice, setItemUnavailableNotice] = useState(false);
 
   const { register, handleSubmit, formState: { errors } } = useForm<OrderFormData>({
     resolver: zodResolver(orderSchema),
@@ -52,6 +53,8 @@ export default function CheckoutPage() {
             if (targetProd) {
               currentCart = [{ product: targetProd, quantity: 1 }];
               localStorage.setItem('divyaurja_cart', JSON.stringify(currentCart));
+            } else {
+              setItemUnavailableNotice(true);
             }
           } else if (offerId) {
             const { getOffers, getProducts } = await import('@/services/firestore');
@@ -81,6 +84,8 @@ export default function CheckoutPage() {
               }
               currentCart = [{ product: matchedProduct, quantity: 1 }];
               localStorage.setItem('divyaurja_cart', JSON.stringify(currentCart));
+            } else {
+              setItemUnavailableNotice(true);
             }
           }
         }
@@ -211,19 +216,33 @@ Please share payment details.`;
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center py-20 px-4">
         <div className="max-w-md w-full text-center bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
-          <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-            <ShoppingCart className="w-8 h-8 text-primary" />
+          <div className="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <ShoppingCart className="w-8 h-8 text-amber-600" />
           </div>
-          <h2 className="font-playfair text-2xl font-bold text-text mb-2">Your Cart is Empty</h2>
-          <p className="text-sm text-text/50 mb-6">
-            You cannot proceed to checkout without items. Head back to our catalogue and pick some sacred products.
+          <h2 className="font-playfair text-2xl font-bold text-gray-900 mb-2">
+            {itemUnavailableNotice ? 'Item No Longer Available' : 'Your Cart is Empty'}
+          </h2>
+          <p className="text-sm text-gray-600 mb-6 leading-relaxed">
+            {itemUnavailableNotice
+              ? 'The sacred item or offer you selected has been sold out or removed from our collection. Please explore our active collection to discover alternative remedies.'
+              : 'You cannot proceed to checkout without items. Head back to our catalogue and pick some sacred products.'}
           </p>
-          <Link
-            href="/catalogue"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary/90 transition-colors shadow-lg shadow-primary/10"
-          >
-            <ArrowLeft className="w-4 h-4" /> Back to Catalogue
-          </Link>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link
+              href="/catalogue"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary/90 transition-colors shadow-lg shadow-primary/10 text-sm"
+            >
+              <ArrowLeft className="w-4 h-4" /> Browse Sacred Catalogue
+            </Link>
+            {itemUnavailableNotice && (
+              <Link
+                href="/offers"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 text-sm font-semibold rounded-xl transition-colors"
+              >
+                View Offers
+              </Link>
+            )}
+          </div>
         </div>
       </div>
     );
