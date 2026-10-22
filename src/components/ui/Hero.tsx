@@ -135,6 +135,29 @@ export default function Hero({ title, subtitle, ctaText, ctaLink, showParticles 
               </Link>
             </motion.div>
           )}
+
+          {/* Social Proof Trust Bar */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1 }}
+            className="mt-12 pt-8 border-t border-white/10 flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-xs sm:text-sm text-gray-300 font-medium"
+          >
+            <div className="flex items-center gap-2">
+              <span className="text-amber-400 font-bold">★★★★★</span>
+              <span><strong>4.9/5</strong> (700+ Seekers Guided)</span>
+            </div>
+            <div className="hidden sm:block w-1.5 h-1.5 rounded-full bg-white/30" />
+            <div className="flex items-center gap-2">
+              <span className="text-emerald-400">🛡️</span>
+              <span>100% Confidential Vedic Sessions</span>
+            </div>
+            <div className="hidden sm:block w-1.5 h-1.5 rounded-full bg-white/30" />
+            <div className="flex items-center gap-2">
+              <span className="text-primary-light">✨</span>
+              <span>Authentic Certified Energy Science</span>
+            </div>
+          </motion.div>
         </motion.div>
       </div>
 
