@@ -87,6 +87,17 @@ const en: Dictionary = {
   'book.booking': 'Booking...',
   'book.success': 'Request received! We will contact you on WhatsApp with details shortly.',
   'book.error': 'Something went wrong. Please try again.',
+  'book.step1': '1. Choose Consultation',
+  'book.step2': '2. Cosmic Birth Date',
+  'book.step3': '3. Details & Confirm',
+  'book.next': 'Continue',
+  'book.prev': 'Back',
+  'book.cosmicReady': 'Cosmic Blueprint Computed',
+  'book.cosmicSub': 'Driver & Conductor numbers live calculated for your consultation',
+  'book.selectAtLeastOne': 'Please select at least one consultation to proceed.',
+  'book.driverLabel': 'Driver (Moolank)',
+  'book.conductorLabel': 'Conductor (Bhagyank)',
+  'book.confidentialNotice': '100% Confidential Vedic Consultation • Handled directly by Guruji',
 };
 
 const hi: Dictionary = {
@@ -162,6 +173,17 @@ const hi: Dictionary = {
   'book.booking': 'बुक हो रहा है...',
   'book.success': 'अनुरोध मिल गया! हम जल्द ही विवरण के साथ व्हाट्सएप पर आपसे संपर्क करेंगे।',
   'book.error': 'कुछ गलत हो गया। कृपया फिर से प्रयास करें।',
+  'book.step1': '1. परामर्श चुनें',
+  'book.step2': '2. पवित्र जन्म तिथि',
+  'book.step3': '3. विवरण और पुष्टि',
+  'book.next': 'आगे बढ़ें',
+  'book.prev': 'पीछे',
+  'book.cosmicReady': 'कॉस्मिक गणना पूर्ण',
+  'book.cosmicSub': 'गुरुजी के विश्लेषण के लिए मूलांक और भाग्यांक तैयार',
+  'book.selectAtLeastOne': 'आगे बढ़ने के लिए कृपया कम से कम एक परामर्श सेवा चुनें।',
+  'book.driverLabel': 'मूलांक (ड्राइवर)',
+  'book.conductorLabel': 'भाग्यांक (कंडक्टर)',
+  'book.confidentialNotice': '100% गोपनीय वैदिक परामर्श • सीधे गुरुजी द्वारा विश्लेषित',
 };
 
 const mr: Dictionary = {
@@ -237,6 +259,17 @@ const mr: Dictionary = {
   'book.booking': 'बुक होत आहे...',
   'book.success': 'विनंती मिळाली! आम्ही लवकरच तपशीलांसह तुमच्याशी WhatsApp वर संपर्क साधू.',
   'book.error': 'काहीतरी चूक झाली. कृपया पुन्हा प्रयत्न करा.',
+  'book.step1': '1. सल्ला निवडा',
+  'book.step2': '2. पवित्र जन्म तारीख',
+  'book.step3': '3. माहिती आणि पुष्टी',
+  'book.next': 'पुढे जा',
+  'book.prev': 'मागे',
+  'book.cosmicReady': 'अंकशास्त्र गणना तयार',
+  'book.cosmicSub': 'गुरुजींच्या विश्लेषणासाठी मूलांक व भाग्यांक मोजले गेले आहेत',
+  'book.selectAtLeastOne': 'पुढे जाण्यासाठी कृपया किमान एक सेवा निवडा.',
+  'book.driverLabel': 'मूलांक (ड्रायव्हर)',
+  'book.conductorLabel': 'भाग्यांक (कंडक्टर)',
+  'book.confidentialNotice': '100% गोपनीय वैदिक सल्लामसलत • थेट गुरुजींद्वारे मार्गदर्शन',
 };
 
 export const translations: Record<Lang, Dictionary> = { en, hi, mr };
