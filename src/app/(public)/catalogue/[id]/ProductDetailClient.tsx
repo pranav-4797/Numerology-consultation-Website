@@ -650,7 +650,7 @@ export default function ProductDetailClient({
                 </div>
                 <div className="flex flex-col items-center text-center p-2 rounded-xl bg-white border border-gray-100 shadow-2xs">
                   <Truck className="w-5 h-5 text-blue-600 mb-1" />
-                  <span className="text-[11px] font-bold text-gray-800">Free Delivery</span>
+                  <span className="text-[11px] font-bold text-gray-800">Sacred Dispatch</span>
                   <span className="text-[10px] text-gray-600">Pan-India</span>
                 </div>
               </div>
@@ -869,8 +869,8 @@ export default function ProductDetailClient({
                 <div className="text-2xl font-bold text-gray-900">
                   ₹{product.price.toLocaleString('en-IN')}
                 </div>
-                <div className="text-xs text-green-700 font-medium mt-0.5">
-                  FREE Delivery across India
+                <div className="text-xs text-text/60 font-medium mt-0.5">
+                  Standard delivery applied at checkout
                 </div>
               </div>
 
@@ -1145,8 +1145,8 @@ export default function ProductDetailClient({
         )}
       </AnimatePresence>
 
-      {/* Mobile Sticky Action Bar (Amazon Style) */}
-      <div className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-gray-200 px-3 py-2 flex items-center gap-2 shadow-lg safe-area-pb">
+      {/* Mobile Sticky Action Bar - elevated to bottom-14 to sit cleanly above MobileBottomNav */}
+      <div className="sm:hidden fixed bottom-14 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-gray-200 px-3 py-2 flex items-center gap-2 shadow-lg">
         <button
           onClick={handleWhatsAppOrder}
           className="p-3 rounded-xl bg-[#25D366] text-white hover:bg-[#20BD5A] transition-colors shrink-0 shadow-xs flex items-center justify-center min-h-[48px] min-w-[48px]"

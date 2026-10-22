@@ -19,7 +19,7 @@ interface WorkshopRegisterModalProps {
 }
 
 const inputClass =
-  'w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-text placeholder:text-text/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all';
+  'w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-base sm:text-sm text-text placeholder:text-text/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all min-h-[48px]';
 
 export default function WorkshopRegisterModal({ workshop, isOpen, onClose }: WorkshopRegisterModalProps) {
   const { t } = useLanguage();

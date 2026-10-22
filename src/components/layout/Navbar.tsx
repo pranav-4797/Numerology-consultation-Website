@@ -400,10 +400,11 @@ export default function Navbar() {
 
             <Link
               href="/book"
-              className="inline-flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 bg-gradient-to-r from-primary to-primary-dark text-white text-xs sm:text-sm font-bold rounded-xl shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover:scale-102 active:scale-98 transition-all"
+              className="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-2 sm:px-5 sm:py-2.5 bg-gradient-to-r from-primary to-primary-dark text-white text-xs sm:text-sm font-bold rounded-xl shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 active:scale-98 transition-all shrink-0 min-h-[38px] sm:min-h-[44px]"
             >
               <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-              <span>{t('nav.bookConsultation')}</span>
+              <span className="hidden sm:inline">{t('nav.bookConsultation')}</span>
+              <span className="sm:hidden">{t('book.confirm').split(' ')[0]}</span>
             </Link>
 
             {/* Mobile Hamburger Menu Toggle */}

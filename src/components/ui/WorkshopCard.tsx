@@ -89,10 +89,10 @@ export default function WorkshopCard({ workshop, index = 0 }: WorkshopCardProps)
             <button
               onClick={() => setModalOpen(true)}
               disabled={seatsFull}
-              className={`px-3 sm:px-4 py-2 text-sm font-semibold rounded-xl transition-colors whitespace-nowrap ${
+              className={`px-4 py-2.5 text-sm font-bold rounded-xl transition-colors whitespace-nowrap min-h-[44px] flex items-center justify-center cursor-pointer ${
                 seatsFull
                   ? 'bg-gray-100 text-text/30 cursor-not-allowed'
-                  : 'bg-primary text-white hover:bg-primary/90'
+                  : 'bg-primary text-white hover:bg-primary/90 shadow-xs'
               }`}
             >
               {seatsFull ? t('workshop.seatsFull') : t('workshop.registerNow')}

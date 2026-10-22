@@ -116,22 +116,22 @@ export default function Hero({ title, subtitle, ctaText, ctaLink, showParticles 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 }}
-              className="flex flex-col sm:flex-row items-center justify-center gap-4"
+              className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 w-full max-w-sm sm:max-w-none mx-auto"
             >
               <Link
                 href={ctaLink}
-                className="group relative inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-primary to-primary/90 text-white font-semibold rounded-2xl shadow-2xl shadow-primary/30 hover:shadow-primary/50 hover:scale-105 transition-all"
+                className="w-full sm:w-auto group relative inline-flex items-center justify-center gap-2 px-8 py-3.5 sm:py-4 bg-gradient-to-r from-primary to-primary/90 text-white font-semibold rounded-2xl shadow-2xl shadow-primary/30 hover:shadow-primary/50 active:scale-98 transition-all min-h-[48px]"
               >
-                {ctaText}
+                <span>{ctaText}</span>
                 <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
               </Link>
               <Link
                 href="/services"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-white/5 backdrop-blur-md border border-white/10 text-white font-semibold rounded-2xl hover:bg-white/10 transition-all"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 sm:py-4 bg-white/5 backdrop-blur-md border border-white/10 text-white font-semibold rounded-2xl hover:bg-white/10 active:scale-98 transition-all min-h-[48px]"
               >
-                {t('hero.exploreServices')}
+                <span>{t('hero.exploreServices')}</span>
               </Link>
             </motion.div>
           )}
@@ -141,7 +141,7 @@ export default function Hero({ title, subtitle, ctaText, ctaLink, showParticles 
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1 }}
-            className="mt-12 pt-8 border-t border-white/10 flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-xs sm:text-sm text-gray-300 font-medium"
+            className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-10 text-xs sm:text-sm text-gray-300 font-medium"
           >
             <div className="flex items-center gap-2">
               <span className="text-amber-400 font-bold">★★★★★</span>

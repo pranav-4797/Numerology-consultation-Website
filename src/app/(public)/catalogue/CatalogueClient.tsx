@@ -39,8 +39,6 @@ const INTENTIONS = [
   { id: 'career', label: 'Career & Focus', emoji: '🎯', keywords: ['career', 'focus', 'tiger eye', 'success', 'job', 'study', 'confidence', 'business'] },
 ];
 
-const FREE_SHIPPING_THRESHOLD = 999;
-
 export default function CatalogueClient({ initialProducts, initialWhatsapp = '919822492488' }: CatalogueClientProps) {
   const router = useRouter();
   const [products, setProducts] = useState<Product[]>(initialProducts);
@@ -229,16 +227,16 @@ export default function CatalogueClient({ initialProducts, initialWhatsapp = '91
             ))}
           </div>
 
-          {/* Floating Cart Trigger */}
+          {/* Floating Cart Trigger - raised to bottom-20 on mobile to clear bottom nav */}
           {cartCount > 0 && (
             <motion.button
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               onClick={() => setShowCart(true)}
-              className="fixed bottom-6 right-6 z-40 px-5 py-3.5 bg-primary text-white font-semibold rounded-2xl shadow-2xl hover:bg-primary/90 transition-all flex items-center gap-3 border border-white/20 cursor-pointer"
+              className="fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-40 px-4 py-3 sm:px-5 sm:py-3.5 bg-primary text-white font-semibold rounded-2xl shadow-2xl hover:bg-primary/90 transition-all flex items-center gap-2.5 sm:gap-3 border border-white/20 cursor-pointer text-xs sm:text-sm active:scale-95"
             >
               <div className="relative">
-                <ShoppingCart className="w-5 h-5" />
+                <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span className="absolute -top-2 -right-2 w-5 h-5 bg-secondary text-text font-bold text-xs rounded-full flex items-center justify-center shadow-xs">
                   {cartCount}
                 </span>
@@ -307,30 +305,13 @@ export default function CatalogueClient({ initialProducts, initialWhatsapp = '91
                 </button>
               </div>
 
-              {/* Free Sacred Delivery Progress Bar */}
-              <div className="px-6 py-3.5 bg-amber-50/80 border-b border-amber-200/50">
-                <div className="flex items-center justify-between text-xs font-semibold mb-1.5">
-                  {cartTotal >= FREE_SHIPPING_THRESHOLD ? (
-                    <span className="text-emerald-700 flex items-center gap-1">
-                      <span>✨</span> You unlocked <strong>FREE Sacred Delivery</strong>!
-                    </span>
-                  ) : (
-                    <span className="text-amber-900">
-                      Add <strong>₹{(FREE_SHIPPING_THRESHOLD - cartTotal).toLocaleString('en-IN')}</strong> for <strong>FREE Delivery</strong>
-                    </span>
-                  )}
-                  <span className="text-amber-800 text-[11px] font-bold">
-                    ₹{cartTotal}/₹{FREE_SHIPPING_THRESHOLD}
-                  </span>
-                </div>
-                <div className="w-full bg-amber-200/60 rounded-full h-1.5 overflow-hidden">
-                  <div
-                    className={`h-full rounded-full transition-all duration-500 ${
-                      cartTotal >= FREE_SHIPPING_THRESHOLD ? 'bg-emerald-600' : 'bg-primary'
-                    }`}
-                    style={{ width: `${Math.min(100, (cartTotal / FREE_SHIPPING_THRESHOLD) * 100)}%` }}
-                  />
-                </div>
+              {/* Standard Delivery Notice - No Free Delivery */}
+              <div className="px-6 py-3 bg-amber-50/70 border-b border-amber-200/50 flex items-center justify-between text-xs text-amber-950 font-medium">
+                <span className="flex items-center gap-1.5">
+                  <span>📦</span>
+                  <span>Standard Delivery (₹100) applied at checkout</span>
+                </span>
+                <span className="font-semibold text-primary">Sacred Care</span>
               </div>
 
               <div className="flex-1 overflow-y-auto p-6 space-y-4">

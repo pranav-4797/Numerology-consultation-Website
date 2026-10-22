@@ -127,21 +127,21 @@ export default function ProductCard({ product, index, whatsappNumber, onAddToCar
             </span>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-2">
+          {/* Action Buttons - 44px min touch targets for 99% mobile users */}
+          <div className="flex gap-2.5">
             <button
               onClick={handleBuyNow}
               disabled={!product.inStock}
-              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-xs sm:text-sm font-semibold rounded-xl hover:from-amber-600 hover:to-amber-700 hover:shadow-md hover:shadow-amber-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+              className="flex-1 min-h-[44px] flex items-center justify-center gap-1.5 px-3 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-xs sm:text-sm font-bold rounded-xl hover:from-amber-600 hover:to-amber-700 hover:shadow-md hover:shadow-amber-500/20 active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 cursor-pointer"
             >
-              <MessageCircle className="w-3.5 h-3.5" />
-              Buy Now
+              <MessageCircle className="w-4 h-4" />
+              <span>Buy Now</span>
             </button>
             <button
               onClick={handleAddToCart}
               disabled={!product.inStock}
               title="Add to cart"
-              className="flex items-center justify-center gap-1.5 px-3 py-2 bg-primary/10 text-primary text-xs sm:text-sm font-semibold rounded-xl hover:bg-primary hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+              className="min-h-[44px] px-3.5 py-2.5 flex items-center justify-center gap-1.5 bg-primary/10 text-primary text-xs sm:text-sm font-bold rounded-xl hover:bg-primary hover:text-white active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 cursor-pointer"
             >
               <ShoppingCart className="w-4 h-4" />
             </button>

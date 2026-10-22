@@ -39,7 +39,7 @@ export default function PublicOffersPage() {
   if (loading) return <Loader text="Loading special offers..." />;
 
   return (
-    <main className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background">
       {/* Festive Hero Banner */}
       <section className="relative py-20 sm:py-28 bg-gradient-to-br from-amber-950 via-gray-900 to-amber-900 overflow-hidden border-b border-amber-500/20">
         {/* Background festive glows */}
@@ -89,7 +89,7 @@ export default function PublicOffersPage() {
                 placeholder="Search offers or products..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all shadow-sm"
+                className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-base sm:text-sm min-h-[48px] focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all shadow-sm"
               />
             </div>
 
@@ -98,7 +98,7 @@ export default function PublicOffersPage() {
               <Filter className="w-4 h-4 text-amber-600 shrink-0 hidden sm:block" />
               <button
                 onClick={() => setSelectedCategory('all')}
-                className={`px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-all whitespace-nowrap ${
+                className={`px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-xl min-h-[44px] flex items-center transition-all whitespace-nowrap cursor-pointer ${
                   selectedCategory === 'all'
                     ? 'bg-amber-600 text-white shadow-md'
                     : 'bg-white text-text/70 border border-gray-200 hover:border-amber-400 hover:text-amber-700'
@@ -172,6 +172,6 @@ export default function PublicOffersPage() {
           </div>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

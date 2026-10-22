@@ -135,7 +135,7 @@ export default function OfferCard({ offer, index = 0 }: OfferCardProps) {
 
           <Link
             href={ctaLink}
-            className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-gradient-to-r from-primary to-primary/90 text-white text-sm font-bold rounded-xl shadow-md hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
+            className="w-full min-h-[48px] flex items-center justify-center gap-2 py-3.5 px-4 bg-gradient-to-r from-primary to-primary/90 text-white text-sm font-bold rounded-xl shadow-md hover:shadow-xl active:scale-98 transition-all duration-300"
           >
             <Icon className="w-4 h-4" />
             <span>{ctaText}</span>

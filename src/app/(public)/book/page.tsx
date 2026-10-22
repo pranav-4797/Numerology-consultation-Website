@@ -29,7 +29,7 @@ import { calculateBirthNumber } from '@/services/numerology/birthNumber';
 import { calculateConductorNumber } from '@/services/numerology/destinyNumber';
 
 const inputClass =
-  'w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-text placeholder:text-text/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all';
+  'w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-base sm:text-sm text-text placeholder:text-text/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all min-h-[48px]';
 
 const PLANETARY_RULERS: Record<number, { en: string; hi: string; mr: string; gem: string }> = {
   1: { en: 'Sun (Surya) • Radiance & Leadership', hi: 'सूर्य देव • आत्मबल एवं नेतृत्व', mr: 'सूर्य देव • आत्मबल आणि नेतृत्व', gem: 'Ruby (माणिक्य)' },

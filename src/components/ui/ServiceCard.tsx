@@ -80,7 +80,7 @@ export default function ServiceCard({ service, index = 0 }: ServiceCardProps) {
             </div>
             <Link
               href={`/book?service=${service.id}`}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-primary/90 group-hover:gap-3 transition-all text-center"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-primary/90 group-hover:gap-3 transition-all text-center min-h-[44px]"
             >
               {t('nav.bookConsultation')} <ArrowRight className="w-4 h-4" />
             </Link>

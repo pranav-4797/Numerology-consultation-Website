@@ -41,6 +41,17 @@ body {
   box-shadow: 0 0 25px -5px rgba(15, 118, 110, 0.25), 0 0 10px -3px rgba(15, 118, 110, 0.15);
 }
 
+/* Mobile 99% UX Optimization: Prevent iOS auto-zoom on inputs */
+@media screen and (max-width: 768px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
+button, a {
+  touch-action: manipulation;
+}
+
 .gold-gradient-text {
   background: linear-gradient(135deg, #B8860B 0%, #D4AF37 50%, #AA771C 100%);
   -webkit-background-clip: text;

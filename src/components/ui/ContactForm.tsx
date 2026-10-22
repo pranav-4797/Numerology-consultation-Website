@@ -47,7 +47,7 @@ export default function ContactForm() {
           type="text"
           {...register('name')}
           placeholder={t('contact.fullNamePlaceholder')}
-          className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-text placeholder:text-text/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+          className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-base sm:text-sm text-text placeholder:text-text/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all min-h-[48px]"
         />
         {errors.name && (
           <p className="text-xs text-red-500 mt-1">{errors.name.message}</p>
@@ -64,7 +64,7 @@ export default function ContactForm() {
             type="tel"
             {...register('phone')}
             placeholder="+91 98765 43210"
-            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-text placeholder:text-text/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-base sm:text-sm text-text placeholder:text-text/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all min-h-[48px]"
           />
           {errors.phone && (
             <p className="text-xs text-red-500 mt-1">{errors.phone.message}</p>
@@ -79,7 +79,7 @@ export default function ContactForm() {
             type="email"
             {...register('email')}
             placeholder="your@email.com"
-            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-text placeholder:text-text/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-base sm:text-sm text-text placeholder:text-text/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all min-h-[48px]"
           />
           {errors.email && (
             <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>
@@ -96,7 +96,7 @@ export default function ContactForm() {
           rows={5}
           {...register('message')}
           placeholder={t('contact.messagePlaceholder')}
-          className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-text placeholder:text-text/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none"
+          className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-base sm:text-sm text-text placeholder:text-text/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none"
         />
         {errors.message && (
           <p className="text-xs text-red-500 mt-1">{errors.message.message}</p>
@@ -106,7 +106,7 @@ export default function ContactForm() {
       <button
         type="submit"
         disabled={submitting}
-        className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-primary to-primary/90 text-white font-semibold rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:hover:scale-100"
+        className="w-full min-h-[48px] flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-primary to-primary/90 text-white font-semibold rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/40 active:scale-98 transition-all disabled:opacity-50"
       >
         {submitting ? (
           <>
